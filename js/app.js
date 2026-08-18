@@ -117,7 +117,7 @@ const VIEW_TITLES = {
   debt: "客户欠款", customers: "客户", "customer-detail": "客户详情", "customer-edit": "编辑客户",
   "quick-order": "快速开单", import: "批量导入",
   outsource: "外发加工", "outsource-edit": "下外发单", "outsource-detail": "外发单详情",
-  factories: "加工厂管理", "factory-edit": "编辑加工厂"
+  factories: "加工厂管理", "factory-edit": "编辑加工厂", trends: "爆款推荐"
 };
 
 const TAB_VIEWS = ["today", "items", "customers", "orders", "settings"];
@@ -153,6 +153,7 @@ function showView(name) {
       "outsource-detail": "外发单详情与操作",
       factories: "加工厂档案 · 工费标准",
       "factory-edit": "编辑加工厂",
+      trends: "畅销款分析 · 行业风向",
       settings: "警告线 · 同步 · 备份 · 账号"
     };
     sub.textContent = map[name] || "羊毛衫 · 库存订单管理";
@@ -286,6 +287,56 @@ function renderToday() {
   $("#today-profit").textContent = fmt(todayProfit);
   $("#today-orders").textContent = todayOrders;
   $("#today-debt").textContent = fmt(todayDebt);
+  renderTodayReminders();
+}
+
+/** 今日概览：交期/逾期/低库存提醒 */
+function renderTodayReminders() {
+  const box = $("#today-reminders");
+  if (!box) return;
+  const now = Date.now();
+  const todayStrFull = todayStr();
+  const reminders = [];
+  // 1. 定制单今天要交货
+  const dueOrders = ordersCache.filter((o) =>
+    o.type === "custom" && o.status === "pending" && o.due && o.due === todayStrFull
+  );
+  if (dueOrders.length) reminders.push({ icon: "📦", text: `今天有 ${dueOrders.length} 个定制单要交货`, go: "orders" });
+  // 2. 逾期定制单（过了交期还没完成）
+  const overdueOrders = ordersCache.filter((o) =>
+    o.type === "custom" && o.status === "pending" && o.due && now > new Date(o.due + "T23:59:59").getTime()
+  );
+  if (overdueOrders.length) reminders.push({ icon: "⏰", text: `${overdueOrders.length} 个定制单已逾期`, go: "orders" });
+  // 3. 逾期外发单
+  const overdueOs = outsourcesCache.filter((o) =>
+    o.status !== "done" && o.status !== "cancelled" && o.due && now > new Date(o.due + "T23:59:59").getTime()
+  );
+  if (overdueOs.length) reminders.push({ icon: "🏭", text: `${overdueOs.length} 个外发单已逾期`, go: "outsource" });
+  // 4. 低库存款式
+  const lowItems = itemsCache.filter((it) => Store.isItemLowStock(it));
+  if (lowItems.length) reminders.push({ icon: "⚠️", text: `${lowItems.length} 个款式库存不足`, go: "items" });
+  // 5. 欠款提醒
+  const totalDebt = ordersCache.reduce((s, o) => s + (o.status === "cancelled" ? 0 : orderDebt(o)), 0);
+  if (totalDebt > 0) reminders.push({ icon: "💰", text: `客户欠款合计 ${money(totalDebt)}`, go: "debt" });
+
+  if (!reminders.length) {
+    box.innerHTML = `<div class="today-ok">✅ 今日无待办，一切正常</div>`;
+    return;
+  }
+  box.innerHTML = reminders.map((r, i) => `
+    <div class="today-remind" data-go="${r.go}" style="animation-delay:${i * 0.05}s">
+      <span class="tr-icon">${r.icon}</span>
+      <span class="tr-text">${r.text}</span>
+      <span class="tr-arrow">›</span>
+    </div>`).join("");
+  $$("#today-reminders .today-remind").forEach((el) => {
+    el.onclick = () => {
+      const go = el.dataset.go;
+      if (go === "outsource") { renderOutsources(); showView("outsource"); }
+      else if (go === "debt") { renderDebt(); showView("debt"); }
+      else { const tab = $(`.tab[data-view=${go}]`); if (tab) tab.click(); }
+    };
+  });
 }
 
 /* ================= 款式列表页 ================= */
@@ -468,13 +519,15 @@ async function openDetail(id) {
       <button class="btn primary" id="detail-edit">编辑款式</button>
       <button class="btn" id="detail-sell">记一笔销售</button>
       <button class="btn" id="detail-purchase">进货入库</button>
-      <button class="btn" id="detail-share">分享款式卡片</button>
+      <button class="btn" id="detail-share">💬 分享给微信好友</button>
+      <button class="btn" id="detail-ninegrid">📱 生成朋友圈九宫格</button>
       <button class="btn danger" id="detail-delete">删除款式</button>
     </div>`;
   $("#detail-edit").onclick = () => openItemEdit(id);
   $("#detail-sell").onclick = () => openSaleForItem(id);
   $("#detail-purchase").onclick = () => openPurchaseForItem(id);
   $("#detail-share").onclick = () => shareItemCard(it);
+  $("#detail-ninegrid").onclick = () => generateNineGrid(it);
   $("#detail-delete").onclick = async () => {
     if (await confirmModal("删除款式", `确定删除「${it.name}」吗？销售记录会保留，但款式信息将丢失。`)) {
       await Store.deleteItem(id);
@@ -567,9 +620,113 @@ async function shareItemCard(it) {
     a.download = it.name + ".png";
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 3000);
-    toast("卡片已生成并保存");
+    toast("卡片已保存，去微信长按图片转发给好友");
   } catch (e) {
     toast("分享失败：" + (e.message || "未知错误"));
+  }
+}
+
+/** 生成朋友圈九宫格：9 张不同设计的卡片图 */
+async function generateNineGrid(it) {
+  try {
+    const totalStock = (it.colors || []).reduce((s, c) => s + (c.stock || 0), 0);
+    const W = 800, H = 800; // 方形，适合朋友圈
+    const styles = [
+      { bg: ["#8f1122", "#c2253a"], title: it.name, accent: "火爆热销" },
+      { bg: ["#1e3a5f", "#2d5a8a"], title: it.name, accent: "现货速发" },
+      { bg: ["#3d2a1d", "#6b4a2e"], title: it.name, accent: "品质精选" },
+      { bg: ["#0f3d2e", "#1d6b50"], title: it.name, accent: "工厂直供" },
+      { bg: ["#5b1e3a", "#8a2d58"], title: it.name, accent: "新款上市" },
+      { bg: ["#2e2e2e", "#4d4d4d"], title: it.name, accent: "经典百搭" },
+      { bg: ["#7a5a10", "#a87f1d"], title: it.name, accent: "秋冬推荐" },
+      { bg: ["#10263f", "#1e4a75"], title: it.name, accent: "保暖首选" },
+      { bg: ["#6e1120", "#a4162a"], title: it.name, accent: "限时优惠" }
+    ];
+    // 预加载主图
+    const img = new Image();
+    await new Promise((resolve) => {
+      if (it.images && it.images[0]) {
+        img.onload = resolve;
+        img.onerror = resolve;
+        img.src = it.images[0];
+      } else resolve();
+    });
+
+    const blobs = [];
+    for (let i = 0; i < styles.length; i++) {
+      const s = styles[i];
+      const canvas = document.createElement("canvas");
+      canvas.width = W; canvas.height = H;
+      const ctx = canvas.getContext("2d");
+      const g = ctx.createLinearGradient(0, 0, W, H);
+      g.addColorStop(0, s.bg[0]);
+      g.addColorStop(1, s.bg[1]);
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, W, H);
+      // 装饰圆环
+      ctx.strokeStyle = "rgba(255,255,255,.08)";
+      ctx.lineWidth = 2;
+      for (let r = 120; r < 500; r += 60) {
+        ctx.beginPath();
+        ctx.arc(W / 2, H / 2, r, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      // 顶部标签
+      ctx.fillStyle = "#fde8b0";
+      ctx.font = "bold 22px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(s.accent, W / 2, 55);
+      // 标题
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 40px sans-serif";
+      ctx.fillText(it.name, W / 2, 100);
+      // 图片
+      if (img.width) {
+        const iw = W - 100, ih = 420;
+        const ratio = Math.min(iw / img.width, ih / img.height);
+        const dw = img.width * ratio, dh = img.height * ratio;
+        ctx.drawImage(img, (W - dw) / 2, 140, dw, dh);
+      } else {
+        ctx.fillStyle = "rgba(255,255,255,.15)";
+        ctx.fillRect(50, 140, W - 100, 420);
+        ctx.fillStyle = "#fff";
+        ctx.font = "100px sans-serif";
+        ctx.fillText("🧥", W / 2, 380);
+      }
+      // 价格
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 60px sans-serif";
+      ctx.fillText("¥" + fmt(it.price), W / 2, 630);
+      // 颜色
+      ctx.font = "26px sans-serif";
+      ctx.fillStyle = "rgba(255,255,255,.85)";
+      const colors = (it.colors || []).map((c) => `${c.name} ${c.stock}`).join("  ·  ");
+      ctx.fillText(colors || "多色可选", W / 2, 680);
+      // 底部
+      ctx.fillStyle = "rgba(255,255,255,.6)";
+      ctx.font = "20px sans-serif";
+      ctx.fillText("羊毛衫管家 · 库存 " + totalStock + " 件", W / 2, 750);
+      const blob = await new Promise((r) => canvas.toBlob(r, "image/png"));
+      blobs.push(blob);
+    }
+    // 尝试分享多图（微信支持多图分享）
+    const files = blobs.map((b, i) => new File([b], `九宫格-${it.name}-${i + 1}.png`, { type: "image/png" }));
+    if (navigator.canShare && navigator.canShare({ files })) {
+      await navigator.share({ files, title: it.name + " 九宫格" });
+      return;
+    }
+    // 降级：逐张保存到相册（浏览器自动下载 9 张）
+    for (let i = 0; i < blobs.length; i++) {
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blobs[i]);
+      a.download = `九宫格-${it.name}-${i + 1}.png`;
+      // 逐个触发下载，间隔避免被拦截
+      setTimeout(() => a.click(), i * 300);
+      setTimeout(() => URL.revokeObjectURL(a.href), 5000 + i * 300);
+    }
+    toast("已生成 9 张卡片（自动保存），发朋友圈时按顺序选 9 张即可");
+  } catch (e) {
+    toast("生成失败：" + (e.message || "未知错误"));
   }
 }
 
@@ -701,6 +858,7 @@ async function openCustomerDetail(id) {
       ${ordersHtml}
     </div>
     <div class="card detail-actions">
+      <button class="btn primary" id="cd-statement">🧾 生成月结对账单</button>
       <button class="btn primary" id="cd-quick-order">⚡ 给 TA 快速开单</button>
       <button class="btn" id="cd-edit">编辑客户</button>
       <button class="btn danger" id="cd-delete">删除客户</button>
@@ -708,6 +866,7 @@ async function openCustomerDetail(id) {
   $$("#customer-detail-body [data-oid]").forEach((el2) => {
     el2.onclick = () => openOrderDetail(el2.dataset.oid);
   });
+  $("#cd-statement").onclick = () => generateCustomerStatement(c);
   $("#cd-quick-order").onclick = () => openQuickOrder(c.id);
   $("#cd-edit").onclick = () => openCustomerEdit(id);
   $("#cd-delete").onclick = async () => {
@@ -720,6 +879,111 @@ async function openCustomerDetail(id) {
     }
   };
   showView("customer-detail");
+}
+
+/** 生成客户月结对账单图片（可分享微信） */
+async function generateCustomerStatement(c) {
+  try {
+    const cOrders = ordersCache.filter((o) => o.customer === c.name && o.status !== "cancelled")
+      .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+    if (!cOrders.length) return toast("该客户暂无订单");
+    // 按月份分组
+    const byMonth = {};
+    for (const o of cOrders) {
+      const d = new Date(o.createdAt);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+      if (!byMonth[key]) byMonth[key] = [];
+      byMonth[key].push(o);
+    }
+    // 默认生成最近有订单的月份
+    const months = Object.keys(byMonth).sort().reverse();
+    let monthKey = months[0];
+    // 如果有多个月份，弹窗选择
+    if (months.length > 1) {
+      const pick = prompt(`选择对账月份（${months.join(" / ")}）：`, months[0]);
+      if (pick && byMonth[pick]) monthKey = pick;
+    }
+    const monthOrders = byMonth[monthKey];
+    const total = monthOrders.reduce((s, o) => s + orderTotal(o), 0);
+    const paid = monthOrders.reduce((s, o) => s + (o.paidAmount || 0), 0);
+    const debt = monthOrders.reduce((s, o) => s + orderDebt(o), 0);
+
+    // 绘制对账单图片
+    const W = 750, H = 300 + monthOrders.length * 46 + 120;
+    const canvas = document.createElement("canvas");
+    canvas.width = W; canvas.height = H;
+    const ctx = canvas.getContext("2d");
+    // 背景
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, "#ffffff"); g.addColorStop(1, "#faf7f3");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+    // 顶部品牌条
+    ctx.fillStyle = "#b91c2e";
+    ctx.fillRect(0, 0, W, 90);
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 30px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("羊毛衫管家 · 月结对账单", W / 2, 42);
+    ctx.font = "18px sans-serif";
+    ctx.fillStyle = "#fde8b0";
+    ctx.fillText(`${monthKey} · ${c.name}`, W / 2, 70);
+    // 汇总
+    ctx.textAlign = "left";
+    ctx.fillStyle = "#1c1917";
+    ctx.font = "bold 20px sans-serif";
+    ctx.fillText(`本月合计：¥${fmt(total)}`, 40, 130);
+    ctx.fillStyle = "#78716c";
+    ctx.font = "16px sans-serif";
+    ctx.fillText(`已收款：¥${fmt(paid)}    欠款：¥${fmt(debt)}`, 40, 158);
+    // 表头
+    ctx.fillStyle = "#f5f2ee";
+    ctx.fillRect(40, 185, W - 80, 34);
+    ctx.fillStyle = "#78716c";
+    ctx.font = "bold 15px sans-serif";
+    ctx.fillText("日期", 50, 208);
+    ctx.fillText("商品", 170, 208);
+    ctx.fillText("金额", W - 160, 208);
+    ctx.fillText("状态", W - 90, 208);
+    // 明细
+    ctx.font = "15px sans-serif";
+    let y = 235;
+    for (const o of monthOrders) {
+      const d = new Date(o.createdAt);
+      const dateStr = `${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+      const lines = (o.lines || []).map((l) => `${l.qty}×${l.itemName}${l.color ? "(" + l.color + ")" : ""}`).join("、");
+      const amt = orderTotal(o);
+      ctx.fillStyle = "#1c1917";
+      ctx.fillText(dateStr, 50, y);
+      ctx.fillText(lines.slice(0, 18), 170, y);
+      ctx.fillText("¥" + fmt(amt), W - 175, y);
+      ctx.fillStyle = o.payStatus === "paid" ? "#15803d" : "#b45309";
+      ctx.fillText(o.payStatus === "paid" ? "已收" : "欠", W - 90, y);
+      ctx.fillStyle = "#1c1917";
+      y += 46;
+      if (y > H - 60) break;
+    }
+    // 底部
+    ctx.fillStyle = "#a8a29e";
+    ctx.font = "14px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText(`共计 ${monthOrders.length} 单 · 请核对后与我确认，谢谢！`, W / 2, H - 30);
+    // 转图片分享
+    const blob = await new Promise((r) => canvas.toBlob(r, "image/png"));
+    const file = new File([blob], `对账单-${c.name}-${monthKey}.png`, { type: "image/png" });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: `对账单-${c.name}` });
+    } else {
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `对账单-${c.name}-${monthKey}.png`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+      toast("对账单已生成并保存");
+    }
+  } catch (e) {
+    toast("生成失败：" + (e.message || "未知错误"));
+  }
 }
 
 function openCustomerEdit(id) {
@@ -985,9 +1249,145 @@ function renderFactories() {
       </div>`;
   }).join("");
   $$("#factory-list .list-card").forEach((card) => {
-    card.onclick = () => openFactoryEdit(card.dataset.id);
+    card.onclick = () => openFactoryDetail(card.dataset.id);
   });
   staggerIn($("#factory-list"));
+}
+
+/** 加工厂详情（含月结对账） */
+async function openFactoryDetail(id) {
+  const f = factoriesCache.find((x) => x.id === id);
+  if (!f) return;
+  const fOuts = outsourcesCache.filter((o) => o.factoryId === id).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  const totalCost = fOuts.filter((o) => !o.cancelled).reduce((s, o) => s + osCost(o), 0);
+  const unsettled = fOuts.filter((o) => !o.cancelled && !o.settled).reduce((s, o) => s + osCost(o), 0);
+  const listHtml = fOuts.length ? fOuts.slice(0, 15).map((o) => {
+    const it = itemsCache.find((x) => x.id === o.itemId);
+    const st = osStatus(o);
+    return `<div class="list-card" data-oid="${o.id}">
+      <div style="flex:1;min-width:0">
+        <div class="order-head"><span class="order-customer">${escapeHtml(it ? it.name : o.itemName)}${o.color ? "（" + escapeHtml(o.color) + "）" : ""}</span>
+        <span class="order-status ${st.cls}">${st.label}</span></div>
+        <div class="order-lines-preview">发出 ${o.qty} · 已回 ${osReturned(o)} · 工费 ${money(osCost(o))}${o.settled ? " · 已结算" : ""}</div>
+        <div class="order-addr">🕐 ${timeStr(o.createdAt)}</div>
+      </div>
+    </div>`;
+  }).join("") : '<div class="hint">暂无外发单</div>';
+  $("#customer-detail-body").innerHTML = `
+    <div class="card">
+      <h3>${escapeHtml(f.name)}</h3>
+      <div class="detail-color-row"><span>电话</span><span class="v">${escapeHtml(f.phone || "—")}</span></div>
+      <div class="detail-color-row"><span>擅长</span><span class="v">${escapeHtml(f.skill || "—")}</span></div>
+      <div class="detail-color-row"><span>工费标准</span><span class="v">${f.price ? money(f.price) + "/件" : "未设置"}</span></div>
+      <div class="detail-color-row"><span>累计工费</span><span class="v">${money(totalCost)}</span></div>
+      <div class="detail-color-row"><span>未结算</span><span class="v" style="${unsettled ? "color:var(--danger)" : ""}">${unsettled ? money(unsettled) : "无"}</span></div>
+    </div>
+    <div class="card">
+      <h3>外发记录</h3>
+      ${listHtml}
+    </div>
+    <div class="card detail-actions">
+      <button class="btn primary" id="fd-statement">🧾 生成月结对账单</button>
+      <button class="btn" id="fd-edit">编辑加工厂</button>
+    </div>`;
+  $$("#customer-detail-body [data-oid]").forEach((el2) => {
+    el2.onclick = () => openOutsourceDetail(el2.dataset.oid);
+  });
+  $("#fd-statement").onclick = () => generateFactoryStatement(f);
+  $("#fd-edit").onclick = () => openFactoryEdit(id);
+  showView("customer-detail");
+}
+
+/** 生成加工厂月结对账单图片 */
+async function generateFactoryStatement(f) {
+  try {
+    const fOuts = outsourcesCache.filter((o) => o.factoryId === f.id && o.status !== "cancelled")
+      .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+    if (!fOuts.length) return toast("该加工厂暂无外发单");
+    const byMonth = {};
+    for (const o of fOuts) {
+      const d = new Date(o.createdAt);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+      if (!byMonth[key]) byMonth[key] = [];
+      byMonth[key].push(o);
+    }
+    const months = Object.keys(byMonth).sort().reverse();
+    let monthKey = months[0];
+    if (months.length > 1) {
+      const pick = prompt(`选择对账月份（${months.join(" / ")}）：`, months[0]);
+      if (pick && byMonth[pick]) monthKey = pick;
+    }
+    const monthOuts = byMonth[monthKey];
+    const totalCost = monthOuts.reduce((s, o) => s + osCost(o), 0);
+    const settled = monthOuts.filter((o) => o.settled).reduce((s, o) => s + osCost(o), 0);
+    const unsettled = totalCost - settled;
+
+    const W = 750, H = 300 + monthOuts.length * 46 + 120;
+    const canvas = document.createElement("canvas");
+    canvas.width = W; canvas.height = H;
+    const ctx = canvas.getContext("2d");
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, "#ffffff"); g.addColorStop(1, "#faf7f3");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = "#b91c2e";
+    ctx.fillRect(0, 0, W, 90);
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 30px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("羊毛衫管家 · 外发工费对账单", W / 2, 42);
+    ctx.font = "18px sans-serif";
+    ctx.fillStyle = "#fde8b0";
+    ctx.fillText(`${monthKey} · ${f.name}`, W / 2, 70);
+    ctx.textAlign = "left";
+    ctx.fillStyle = "#1c1917";
+    ctx.font = "bold 20px sans-serif";
+    ctx.fillText(`本月工费合计：¥${fmt(totalCost)}`, 40, 130);
+    ctx.fillStyle = "#78716c";
+    ctx.font = "16px sans-serif";
+    ctx.fillText(`已结算：¥${fmt(settled)}    未结算：¥${fmt(unsettled)}`, 40, 158);
+    ctx.fillStyle = "#f5f2ee";
+    ctx.fillRect(40, 185, W - 80, 34);
+    ctx.fillStyle = "#78716c";
+    ctx.font = "bold 15px sans-serif";
+    ctx.fillText("日期", 50, 208);
+    ctx.fillText("款式/颜色", 170, 208);
+    ctx.fillText("件数", W - 260, 208);
+    ctx.fillText("工费", W - 160, 208);
+    ctx.font = "15px sans-serif";
+    let y = 235;
+    for (const o of monthOuts) {
+      const d = new Date(o.createdAt);
+      const dateStr = `${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+      const it = itemsCache.find((x) => x.id === o.itemId);
+      const name = it ? it.name : o.itemName;
+      ctx.fillStyle = "#1c1917";
+      ctx.fillText(dateStr, 50, y);
+      ctx.fillText(`${name}${o.color ? "(" + o.color + ")" : ""}`.slice(0, 12), 170, y);
+      ctx.fillText(`${osReturned(o)}件`, W - 265, y);
+      ctx.fillText("¥" + fmt(osCost(o)), W - 175, y);
+      y += 46;
+      if (y > H - 60) break;
+    }
+    ctx.fillStyle = "#a8a29e";
+    ctx.font = "14px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText(`共计 ${monthOuts.length} 单 · 请核对工费，确认后安排结算，谢谢！`, W / 2, H - 30);
+    const blob = await new Promise((r) => canvas.toBlob(r, "image/png"));
+    const file = new File([blob], `外发对账-${f.name}-${monthKey}.png`, { type: "image/png" });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: `外发对账-${f.name}` });
+    } else {
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `外发对账-${f.name}-${monthKey}.png`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+      toast("对账单已生成并保存");
+    }
+  } catch (e) {
+    toast("生成失败：" + (e.message || "未知错误"));
+  }
 }
 
 function openFactoryEdit(id) {
@@ -1917,6 +2317,65 @@ function renderStats() {
     </div>`).join("");
 }
 
+/* ================= 爆款推荐 ================= */
+
+/** 行业风向参考（羊毛衫市场常见热门，可后续联网更新） */
+const INDUSTRY_TRENDS = [
+  { name: "半高领/堆堆领打底衫", color: "燕麦色、驼色", note: "秋冬内搭刚需，走量快" },
+  { name: "粗针织圆领毛衣", color: "米白、焦糖色", note: "外穿+叠穿两用，通用款" },
+  { name: "羊毛开衫", color: "黑色、灰色", note: "通勤百搭，线下批发稳定" },
+  { name: "高领加厚毛衣", color: "酒红、藏青", note: "保暖款，北方市场畅销" },
+  { name: "V领羊绒衫", color: "浅粉、奶油白", note: "精致款，直播/网店热销" },
+  { name: "提花/条纹毛衣", color: "红白、蓝白", note: "复古风回潮，年轻客群" }
+];
+
+function renderTrends() {
+  // 1. 我的畅销款：按销量排序
+  const rows = itemsCache.map((it) => {
+    const totalSold = (it.colors || []).reduce((s, c) => s + (c.sold || 0), 0);
+    const totalStock = (it.colors || []).reduce((s, c) => s + (c.stock || 0), 0);
+    const profit = ((it.price || 0) - (it.cost || 0)) * totalSold;
+    return { it, totalSold, totalStock, profit };
+  }).filter((r) => r.totalSold > 0).sort((a, b) => b.totalSold - a.totalSold);
+
+  const mineEl = $("#trends-mine");
+  if (!rows.length) {
+    mineEl.innerHTML = '<div class="empty"><span class="empty-icon">🔥</span>还没有销售数据<br>产生销售后自动分析你的畅销款</div>';
+  } else {
+    mineEl.innerHTML = rows.slice(0, 10).map((r, i) => {
+      const medal = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : "·";
+      return `
+      <div class="list-card" data-id="${r.it.id}">
+        <div class="thumb">${medal}</div>
+        <div class="list-main">
+          <div class="list-title">${escapeHtml(r.it.name)}</div>
+          <div class="list-sub">已售 ${r.totalSold} 件 · 库存 ${r.totalStock} · 利润 ${money(r.profit)}</div>
+          <div class="list-tags">${(r.it.colors || []).slice(0, 4).map((c) => `<span class="tag green">${escapeHtml(c.name)} ${c.stock}</span>`).join("")}</div>
+        </div>
+        <div class="list-side"><div class="num">#${i + 1}</div><div class="lbl">${r.it.price ? money(r.it.price) : ""}</div></div>
+      </div>`;
+    }).join("");
+    $$("#trends-mine .list-card").forEach((card) => {
+      card.onclick = () => openDetail(card.dataset.id);
+    });
+  }
+  staggerIn(mineEl);
+
+  // 2. 行业风向
+  const indEl = $("#trends-industry");
+  indEl.innerHTML = INDUSTRY_TRENDS.map((t) => `
+    <div class="list-card">
+      <div class="thumb">📈</div>
+      <div class="list-main">
+        <div class="list-title">${escapeHtml(t.name)}</div>
+        <div class="list-sub">热门颜色：${escapeHtml(t.color)}</div>
+        <div class="list-sub">${escapeHtml(t.note)}</div>
+      </div>
+      <div class="list-side"><div class="num">${t.color.split("、").length}</div><div class="lbl">参考色</div></div>
+    </div>`).join("");
+  staggerIn(indEl);
+}
+
 /* ================= 设置 ================= */
 
 async function initSettings() {
@@ -2135,6 +2594,7 @@ function bindEvents() {
       else if (go === "stats") { renderStats(); showView("stats"); }
       else if (go === "quick-order") openQuickOrder();
       else if (go === "outsource") { renderOutsources(); showView("outsource"); }
+      else if (go === "trends") { renderTrends(); showView("trends"); }
       else { const tab = $(`.tab[data-view=${go}]`); if (tab) tab.click(); }
     };
   });
