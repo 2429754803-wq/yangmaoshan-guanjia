@@ -96,7 +96,7 @@ let editingFactoryId = null;
 
 let itemFilter = "all";
 let itemSearch = "";
-let orderFilter = "today";  // today=今日 all=全部 pending=未完成 done=已完成 unship=待发货 debt=有欠款 custom=定制单
+let orderFilter = "today";  // today=今日 history=历史 all=全部 pending=未完成 done=已完成 unship=待发货 debt=有欠款 custom=定制单
 let orderSort = "time";     // time=按时间 amount=按金额
 let orderType = "stock";   // stock=现货单 custom=定制单
 let editingItemId = null;
@@ -1824,6 +1824,7 @@ function renderOrders() {
   const todayKey = todayStr();
   let list = ordersCache.filter((o) => {
     if (orderFilter === "today") return o.status !== "cancelled" && isToday(o.createdAt);
+    if (orderFilter === "history") return o.status !== "cancelled" && !isToday(o.createdAt);
     if (orderFilter === "pending") return o.status === "pending";
     if (orderFilter === "done") return o.status === "done";
     if (orderFilter === "unship") return o.status === "pending" && !o.shippedAt;
@@ -2998,6 +2999,7 @@ function bindEvents() {
   // 订单筛选
   const orderChip = (key) => () => { orderFilter = key; setOrderChips(key); renderOrders(); };
   $("#order-filter-today").onclick = orderChip("today");
+  $("#order-filter-history").onclick = orderChip("history");
   $("#order-filter-all").onclick = orderChip("all");
   $("#order-filter-pending").onclick = orderChip("pending");
   $("#order-filter-done").onclick = orderChip("done");
@@ -3257,6 +3259,7 @@ function setChips(which) {
 
 function setOrderChips(which) {
   $("#order-filter-today").classList.toggle("active", which === "today");
+  $("#order-filter-history").classList.toggle("active", which === "history");
   $("#order-filter-all").classList.toggle("active", which === "all");
   $("#order-filter-pending").classList.toggle("active", which === "pending");
   $("#order-filter-done").classList.toggle("active", which === "done");
