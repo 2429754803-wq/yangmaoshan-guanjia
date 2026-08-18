@@ -100,6 +100,11 @@ function announceModal(versions) {
 
 /** 各版本更新公告（每次发布新版本时在此追加一条） */
 const CHANGELOG = {
+  "3.2": [
+    "界面质感升级：数字跳动动画、空状态美化、按钮按压反馈",
+    "更像 App：禁止下拉刷新回弹、点击无高亮闪烁",
+    "快捷操作重排：常用 6 个放前面（快速开单/订单/生产/送货入库/客户/盘点），其余收进「更多功能」"
+  ],
   "3.1": [
     "全局搜索修复：数据异常不再报错，输入栏右侧新增「搜索」键，支持回车搜索",
     "语音快速开单：支持「款式 + 颜色 + 数量」一起说（如：圆领毛衣 红色 3件），自动填颜色"
@@ -497,11 +502,24 @@ function renderToday() {
   for (const s of salesCache) {
     if (s.onCredit) totalDebt += s.qty * s.price;
   }
-  $("#today-sales").textContent = fmt(todaySales);
-  $("#today-profit").textContent = fmt(todayProfit);
-  $("#today-orders").textContent = todayOrders;
-  $("#today-debt").textContent = fmt(totalDebt);
+  setStat("today-sales", fmt(todaySales));
+  setStat("today-profit", fmt(todayProfit));
+  setStat("today-orders", todayOrders);
+  setStat("today-debt", fmt(totalDebt));
   renderTodayReminders();
+}
+
+/** 更新今日统计数字（数值变化时带跳动动画） */
+function setStat(id, v) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const old = el.textContent;
+  el.textContent = v;
+  if (old !== String(v)) {
+    el.classList.remove("bump");
+    void el.offsetWidth; // 重置动画
+    el.classList.add("bump");
+  }
 }
 
 /** 今日概览：交期/逾期/低库存提醒 */
@@ -3573,6 +3591,13 @@ function bindEvents() {
       else { const tab = $(`.tab[data-view=${go}]`); if (tab) tab.click(); }
     };
   });
+  // 快捷操作：更多功能折叠
+  $("#quick-more-toggle").onclick = () => {
+    const more = $("#quick-more");
+    const isHidden = more.classList.contains("hidden");
+    more.classList.toggle("hidden");
+    $("#quick-more-toggle").textContent = isHidden ? "收起 ▴" : "更多功能 ▾";
+  };
 
   // 主题
   $("#theme-toggle").onclick = () => applyTheme(!isDark);
