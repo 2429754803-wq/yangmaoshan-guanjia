@@ -408,6 +408,15 @@ body {
 .img-share-hint { font-size: var(--fs-sm); color: var(--text2); margin: 10px 0 4px; line-height: 1.6; }
 .img-share-box .btn-row { margin-top: 10px; }
 .qr-box #pay-qr-canvas { display: flex; justify-content: center; background: #fff; border-radius: 12px; padding: 12px; }
+
+/* 语音按住说话录音态 */
+.voice-btn { transition: all .15s var(--ease); }
+.voice-btn.recording {
+  background: var(--danger); color: #fff; border-color: transparent;
+  box-shadow: 0 0 0 5px rgba(220,38,38,.18);
+  animation: voicePulse 1s ease-in-out infinite;
+}
+@keyframes voicePulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.06); } }
 .list-side { text-align: right; flex: none; display: flex; flex-direction: column; justify-content: center; gap: 3px; padding-left: 6px; }
 .list-side .num { font-size: var(--fs-num); font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.3px; }
 .list-side .lbl { font-size: var(--fs-tiny); color: var(--text3); }
@@ -851,6 +860,62 @@ select.input { appearance: auto; }
 .modal h3 { margin-bottom: 10px; font-size: var(--fs-lg); font-weight: 700; }
 .modal-text { font-size: var(--fs-sm); color: var(--text2); line-height: 1.7; margin-bottom: 4px; white-space: pre-line; }
 
+/* ============ 更新公告弹窗 ============ */
+.announce-mask {
+  position: fixed; inset: 0; z-index: 120;
+  background: rgba(28,25,23,.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  animation: fadeIn .2s ease;
+}
+.announce-box {
+  background: var(--card);
+  border-radius: 24px;
+  width: min(92vw, 380px);
+  max-height: 84vh;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  animation: modalIn .32s var(--ease-spring);
+}
+.announce-head {
+  background: linear-gradient(135deg, #a4162a, #cf3148);
+  color: #fff; text-align: center;
+  padding: 22px 16px 20px;
+  flex: none;
+}
+.announce-icon { font-size: 42px; line-height: 1; filter: drop-shadow(0 3px 6px rgba(0,0,0,.25)); }
+.announce-title { font-size: 21px; font-weight: 800; letter-spacing: 2px; margin-top: 8px; }
+.announce-sub { font-size: 12.5px; opacity: .88; margin-top: 4px; }
+.announce-list {
+  flex: 1; overflow: auto;
+  padding: 16px 20px 6px;
+  -webkit-overflow-scrolling: touch;
+}
+.announce-ver { display: flex; align-items: center; gap: 10px; margin: 8px 0 6px; }
+.announce-ver:first-child { margin-top: 0; }
+.announce-ver-tag {
+  background: rgba(185,28,46,.1);
+  color: #b91c2e;
+  font-size: 12px; font-weight: 800;
+  padding: 3px 12px; border-radius: 20px;
+  flex: none;
+}
+.announce-ver-line { flex: 1; height: 1px; background: var(--border); }
+.announce-item {
+  display: flex; gap: 9px; align-items: flex-start;
+  font-size: var(--fs-sm); color: var(--text);
+  line-height: 1.65; padding: 5px 0;
+}
+.announce-dot {
+  flex: none; width: 6px; height: 6px; border-radius: 50%;
+  background: linear-gradient(135deg, #b91c2e, #e15a6c);
+  margin-top: 9px;
+}
+.announce-ok { flex: none; margin: 12px 20px 18px; border-radius: 14px; }
+
 /* ============ Toast ============ */
 .toast {
   position: fixed;
@@ -946,14 +1011,10 @@ select.input { appearance: auto; }
           <div id="today-time-text" class="today-time-text"></div>
         </div>
         <div class="stats-summary">
-          <div class="stat-card"><div class="stat-num" id="today-sales">0</div><div class="stat-lbl">今日销售额</div></div>
+          <div class="stat-card"><div class="stat-num" id="today-sales">0</div><div class="stat-lbl">今日营业额</div></div>
           <div class="stat-card"><div class="stat-num" id="today-profit">0</div><div class="stat-lbl">今日利润</div></div>
           <div class="stat-card"><div class="stat-num" id="today-orders">0</div><div class="stat-lbl">今日新订单</div></div>
           <div class="stat-card"><div class="stat-num" id="today-debt">0</div><div class="stat-lbl">未收款合计</div></div>
-        </div>
-        <div class="card" id="today-reminders-card">
-          <h3>📢 今日提醒</h3>
-          <div id="today-reminders"></div>
         </div>
         <div class="card">
           <h3>快捷操作</h3>
@@ -961,7 +1022,7 @@ select.input { appearance: auto; }
             <button class="quick-btn" data-go="quick-order">⚡ 快速开单</button>
             <button class="quick-btn" data-go="customers">👥 客户</button>
             <button class="quick-btn" data-go="orders">📦 订单</button>
-            <button class="quick-btn" data-go="outsource">🏭 外发</button>
+            <button class="quick-btn" data-go="outsource">🏭 生产</button>
             <button class="quick-btn" data-go="factory-add">➕ 新加工商</button>
             <button class="quick-btn" data-go="stocktake">📋 盘点</button>
             <button class="quick-btn" data-go="purchase">📥 送货入库</button>
@@ -969,6 +1030,10 @@ select.input { appearance: auto; }
             <button class="quick-btn" data-go="trends">🔥 爆款</button>
             <button class="quick-btn" data-go="addrbook">📮 地址簿</button>
           </div>
+        </div>
+        <div class="card" id="today-reminders-card">
+          <h3>📢 今日提醒</h3>
+          <div id="today-reminders"></div>
         </div>
       </section>
 
@@ -981,7 +1046,7 @@ select.input { appearance: auto; }
         <div id="report-content"></div>
       </section>
 
-      <!-- ============ 外发加工（工厂） ============ -->
+      <!-- ============ 生产加工（工厂） ============ -->
       <section id="view-outsource" class="view">
         <div class="filter-row">
           <button id="os-filter-all" class="chip active">全部</button>
@@ -991,12 +1056,12 @@ select.input { appearance: auto; }
         </div>
         <div id="outsource-list" class="list"></div>
         <div class="btn-row">
-          <button id="os-new" class="btn primary">＋ 下外发单</button>
+          <button id="os-new" class="btn primary">＋ 下生产单</button>
           <button id="os-factories" class="btn">🏭 加工商管理</button>
         </div>
       </section>
 
-      <!-- ============ 新建外发单 ============ -->
+      <!-- ============ 新建生产单 ============ -->
       <section id="view-outsource-edit" class="view">
         <div class="card">
           <label class="lbl">加工商 *</label>
@@ -1016,13 +1081,13 @@ select.input { appearance: auto; }
           <label class="lbl">备注</label>
           <input id="os-note" class="input" placeholder="备注">
           <div class="btn-row">
-            <button id="os-save" class="btn primary">下外发单</button>
+            <button id="os-save" class="btn primary">下生产单</button>
             <button id="os-cancel" class="btn">取消</button>
           </div>
         </div>
       </section>
 
-      <!-- ============ 外发单详情 ============ -->
+      <!-- ============ 生产单详情 ============ -->
       <section id="view-outsource-detail" class="view">
         <div id="outsource-detail-body"></div>
       </section>
@@ -1045,7 +1110,7 @@ select.input { appearance: auto; }
           <label class="lbl">擅长工序</label>
           <input id="fa-skill" class="input" placeholder="如：缝纫、套口、后整理">
           <label class="lbl">默认工费（元/件，可选）</label>
-          <input id="fa-price" class="input" type="number" inputmode="decimal" placeholder="下外发单时自动带出">
+          <input id="fa-price" class="input" type="number" inputmode="decimal" placeholder="下生产单时自动带出">
           <label class="lbl">备注</label>
           <input id="fa-note" class="input" placeholder="备注">
           <div class="btn-row">
@@ -1125,6 +1190,10 @@ select.input { appearance: auto; }
         <div class="search-bar">
           <input id="customer-search" class="input" placeholder="搜索客户名称 / 电话…">
         </div>
+        <div class="filter-row">
+          <button id="customer-sort-qty" class="chip active">🧶 按买货件数</button>
+          <button id="customer-sort-debt" class="chip">💰 按欠款</button>
+        </div>
         <div id="customer-list" class="list"></div>
       </section>
 
@@ -1165,11 +1234,11 @@ select.input { appearance: auto; }
           <hr>
           <label class="lbl">🎤 语音/文字快速加商品</label>
           <div class="addr-row">
-            <input id="qo-voice-text" class="input" placeholder="例：黑色 3件 38元">
-            <button id="qo-voice-btn" class="btn small">🎤 说</button>
+            <input id="qo-voice-text" class="input" placeholder="例：圆领毛衣 3件">
+            <button id="qo-voice-btn" class="btn small voice-btn">🎤 按住说</button>
             <button id="qo-text-btn" class="btn small">识别</button>
           </div>
-          <div class="hint" style="margin-bottom:6px">说或输入「颜色 + 数量件 + 单价元」，自动匹配款式加入下方清单；也支持长按输入法麦克风键说话。</div>
+          <div class="hint" style="margin-bottom:6px">按住「🎤 按住说」说话，松开自动识别；说「款式名 + 数量」，如"圆领毛衣 3件"。也支持打字后点识别，或用输入法麦克风键说话。</div>
           <hr>
           <label class="lbl">商品</label>
           <div id="qo-lines" class="order-lines"></div>
@@ -1304,7 +1373,7 @@ select.input { appearance: auto; }
             <select id="pu-supplier" class="input"><option value="">— 选择加工商 —</option></select>
             <button id="pu-new-supplier" class="btn small">＋ 新加工商</button>
           </div>
-          <div class="hint">加工商即你的外发加工合作伙伴，在「加工商管理」中可增删改。</div>
+          <div class="hint">加工商即你的生产加工合作伙伴，在「加工商管理」中可增删改。</div>
           <div class="btn-row">
             <button id="pu-confirm" class="btn primary">确认入库</button>
           </div>
@@ -1501,6 +1570,19 @@ select.input { appearance: auto; }
       <button id="modal-cancel" class="btn">取消</button>
       <button id="modal-ok" class="btn primary">确定</button>
     </div>
+  </div>
+</div>
+
+<!-- 更新公告弹窗（分点展示更新内容） -->
+<div id="announce-mask" class="announce-mask hidden">
+  <div class="announce-box">
+    <div class="announce-head">
+      <div class="announce-icon">🎉</div>
+      <div class="announce-title">更新公告</div>
+      <div class="announce-sub">羊毛衫管家已自动更新到最新版</div>
+    </div>
+    <div id="announce-list" class="announce-list"></div>
+    <button id="announce-ok" class="btn primary announce-ok">知道了</button>
   </div>
 </div>
 
@@ -2095,7 +2177,7 @@ const Sync = {
 
 /* ---------------- 授权与版本（2.4 工厂版） ---------------- */
 
-const APP_VERSION = "2.7";
+const APP_VERSION = "2.9";
 
 const License = {
   /** 当前账号绑定的授权码（本地记录） */
@@ -2257,32 +2339,60 @@ function confirmModal(title, text) {
   });
 }
 
-/** 公告弹窗（单按钮"知道了"，用于更新公告） */
-function announceModal(title, text) {
-  const mask = $("#modal-mask");
-  const ok = $("#modal-ok");
-  const cancel = $("#modal-cancel");
-  $("#modal-title").textContent = title;
-  $("#modal-text").textContent = text;
-  cancel.classList.add("hidden");
-  ok.textContent = "知道了";
+/** 公告弹窗（分点展示，单按钮"知道了"） */
+function announceModal(versions) {
+  const mask = $("#announce-mask");
+  if (!mask) return;
+  const list = $("#announce-list");
+  list.innerHTML = versions.map((v) => `
+    <div class="announce-ver">
+      <span class="announce-ver-tag">v${escapeHtml(v.version)}</span>
+      <span class="announce-ver-line"></span>
+    </div>
+    ${(v.items || []).map((it) => `
+      <div class="announce-item"><span class="announce-dot"></span><span>${escapeHtml(it)}</span></div>`).join("")}
+  `).join("");
   mask.classList.remove("hidden");
-  const done = () => {
-    mask.classList.add("hidden");
-    cancel.classList.remove("hidden");
-    ok.textContent = "确定";
-    ok.onclick = null;
-    cancel.onclick = null;
-  };
-  ok.onclick = done;
-  cancel.onclick = done;
+  const close = () => mask.classList.add("hidden");
+  $("#announce-ok").onclick = close;
+  mask.addEventListener("click", (e) => { if (e.target === mask) close(); });
 }
 
 /** 各版本更新公告（每次发布新版本时在此追加一条） */
 const CHANGELOG = {
-  "2.7": "🎉 v2.7 更新内容：\n· 更新更省心：打开 App 自动更新到最新版，无需询问、无需操作\n· 每次更新后自动弹出公告，告诉你这次改了什么\n· 发货数量直接输入件数，全部发完自动\"配送完成\"，撤销自动恢复未完成\n· 今日销售额/利润实时刷新（每10秒，多设备每分钟同步）",
-  "2.6": "🎉 v2.6 更新内容：\n· 发货数量可直接输入件数，全部发完自动\"配送完成\"\n· 今日销售额/利润实时刷新（多设备同步）\n· 语音/文字快速开单（说\"黑色3件38元\"直接加单）\n· 订单收款二维码\n· 发货单图片生成\n· 对账单图片分享（长按保存发微信）\n· 本次起更新自动完成，无需手动操作",
-  "2.5": "🎉 v2.5 更新内容：\n· 订单今日/历史视图 + 时间/金额排序\n· 发货状态 + 部分发货\n· 周报/月报 + 整改建议\n· 送货入库（加工商送货）\n· 线上爆款速查（淘宝/小红书）\n· 应用内检查更新"
+  "2.9": [
+    "更新公告全新美化：分点展示、版本标签、卡片式设计",
+    "周报/月报不再第一天就推：数据满一周/满一个月后才会自动出现",
+    "公告优化：多版本合并展示，最新版排最前"
+  ],
+  "2.8": [
+    "首页快捷操作移到中间，进首页就能看到",
+    "今日营业额/利润 = 销售 + 今日订单，实时刷新",
+    "语音快速开单改为微信式「按住说话」，说款式名+数量即可",
+    "外发加工改名「生产加工」，加工商列表直接显示未结清工费",
+    "客户列表显示每个客户共买多少件货，支持按件数/欠款排序"
+  ],
+  "2.7": [
+    "打开 App 自动更新到最新版，无需任何操作",
+    "更新完成后自动弹出公告，告诉你改了什么",
+    "发货数量直接输入件数，全部发完自动「配送完成」",
+    "今日营业额/利润每 10 秒实时刷新，多设备每分钟同步"
+  ],
+  "2.6": [
+    "发货数量可直接输入件数，全部发完自动「配送完成」",
+    "语音/文字快速开单（说「黑色3件38元」直接加单）",
+    "订单收款二维码（客户扫码确认应收金额）",
+    "发货单图片生成",
+    "对账单图片分享（长按保存发微信）"
+  ],
+  "2.5": [
+    "订单今日/历史视图 + 时间/金额排序",
+    "发货状态 + 部分发货",
+    "周报/月报 + 整改建议",
+    "送货入库（加工商送货）",
+    "线上爆款速查（淘宝/小红书）",
+    "应用内检查更新"
+  ]
 };
 
 /** 更新公告：版本变化后首次打开时弹出一次（记录在 localStorage） */
@@ -2292,13 +2402,14 @@ function showUpdateAnnouncement() {
     const seen = localStorage.getItem("knit-seen-version") || "";
     if (seen === APP_VERSION) return;
     const cur = vNum(APP_VERSION);
-    const entries = Object.keys(CHANGELOG)
+    const keys = Object.keys(CHANGELOG)
       .filter((v) => vNum(v) > vNum(seen) && vNum(v) <= cur)
       .sort((a, b) => vNum(a) - vNum(b));
     localStorage.setItem("knit-seen-version", APP_VERSION);
-    if (!entries.length) return;
-    const text = entries.map((v) => CHANGELOG[v]).join("\n\n");
-    announceModal("📢 更新公告", text + "\n\n（更新已自动完成）");
+    if (!keys.length) return;
+    // 最新版本排最前
+    const versions = keys.slice().reverse().map((v) => ({ version: v, items: CHANGELOG[v] }));
+    announceModal(versions);
   } catch (e) {}
 }
 
@@ -2376,7 +2487,7 @@ const VIEW_TITLES = {
   stocktake: "盘点", "stocktake-history": "盘点记录", purchase: "送货入库", "batch-price": "批量改价",
   debt: "客户欠款", customers: "客户", "customer-detail": "客户详情", "customer-edit": "编辑客户",
   "quick-order": "快速开单", import: "批量导入",
-  outsource: "外发加工", "outsource-edit": "下外发单", "outsource-detail": "外发单详情",
+  outsource: "生产加工", "outsource-edit": "下生产单", "outsource-detail": "生产单详情",
   factories: "加工商管理", "factory-edit": "编辑加工商", trends: "爆款推荐",
   addrbook: "地址簿", "addr-edit": "编辑地址",
   report: "经营报表 · 周报/月报"
@@ -2411,9 +2522,9 @@ function showView(name) {
       "customer-edit": "编辑客户信息",
       "quick-order": "选客户 → 加商品 → 保存",
       import: "粘贴订单 → 一键导入",
-      outsource: "外发单 · 领料 · 回货 · 结算",
-      "outsource-edit": "下外发单给加工商",
-      "outsource-detail": "外发单详情与操作",
+      outsource: "生产单 · 领料 · 回货 · 结算",
+      "outsource-edit": "下生产单给加工商",
+      "outsource-detail": "生产单详情与操作",
       factories: "加工商档案 · 工费标准",
       "factory-edit": "编辑加工商",
       trends: "畅销款分析 · 行业风向",
@@ -2527,10 +2638,30 @@ function orderTotal(o) {
   return (o.lines || []).reduce((s, l) => s + (l.qty * l.price), 0);
 }
 
+/** 订单利润 = 各明细(售价-成本)×数量（成本按款式档案） */
+function orderProfit(o) {
+  return (o.lines || []).reduce((s, l) => {
+    const it = itemsCache.find((x) => x.id === l.itemId);
+    const cost = it ? (it.cost || 0) : 0;
+    return s + ((l.price || 0) - cost) * (l.qty || 0);
+  }, 0);
+}
+
 function orderDebt(o) {
   const total = orderTotal(o);
   const paid = o.paidAmount || 0;
   return Math.max(0, total - paid);
+}
+
+/** 最早一笔数据的时间（销售/订单/入库/生产/盘点），用于判断周报月报是否到期 */
+function earliestDataTs() {
+  let ts = Date.now();
+  for (const s of salesCache) if (s.time && s.time < ts) ts = s.time;
+  for (const o of ordersCache) if (o.createdAt && o.createdAt < ts) ts = o.createdAt;
+  for (const p of purchaseCache) if (p.time && p.time < ts) ts = p.time;
+  for (const os of outsourcesCache) if (os.createdAt && os.createdAt < ts) ts = os.createdAt;
+  for (const st of stocktakeCache) if (st.time && st.time < ts) ts = st.time;
+  return ts;
 }
 
 /** 时间显示：今天/明天 + 实时时钟 */
@@ -2588,17 +2719,19 @@ function renderToday() {
   updateClock();
   const now = Date.now();
   let todaySales = 0, todayProfit = 0, todayOrders = 0;
-  // 今日销售额/利润（来自销售记录）
+  // 今日营业额/利润（销售记录）
   for (const s of salesCache) {
     if (isToday(s.time)) {
       todaySales += s.qty * s.price;
       todayProfit += (s.profit || 0);
     }
   }
-  // 今日新订单数（今日创建的订单）
+  // 今日新订单数 + 今日订单营业额/利润（快速开单/订单都算营业额）
   for (const o of ordersCache) {
     if (isToday(o.createdAt) && o.status !== "cancelled") {
       todayOrders++;
+      todaySales += orderTotal(o);
+      todayProfit += orderProfit(o);
     }
   }
   // 未收款合计 = 所有未结清订单（不只今日）
@@ -2625,9 +2758,11 @@ function renderTodayReminders() {
   const now = Date.now();
   const todayStrFull = todayStr();
   const reminders = [];
-  // 0. 周报/月报入口
-  reminders.push({ icon: "📊", text: "查看本周经营周报（含整改建议）", go: "report-week" });
-  reminders.push({ icon: "📅", text: "查看本月经营月报（含整改建议）", go: "report-month" });
+  // 0. 周报/月报：数据满一周/满一个月后才出现（避免第一天就推）
+  const earliest = earliestDataTs();
+  const DAY = 86400000;
+  if (now - earliest >= 7 * DAY) reminders.push({ icon: "📊", text: "查看本周经营周报（含整改建议）", go: "report-week" });
+  if (now - earliest >= 30 * DAY) reminders.push({ icon: "📅", text: "查看本月经营月报（含整改建议）", go: "report-month" });
   // 1. 定制单今天要交货
   const dueOrders = ordersCache.filter((o) =>
     o.type === "custom" && o.status === "pending" && o.due && o.due === todayStrFull
@@ -2638,11 +2773,11 @@ function renderTodayReminders() {
     o.type === "custom" && o.status === "pending" && o.due && now > new Date(o.due + "T23:59:59").getTime()
   );
   if (overdueOrders.length) reminders.push({ icon: "⏰", text: `${overdueOrders.length} 个定制单已逾期`, go: "orders" });
-  // 3. 逾期外发单
+  // 3. 逾期生产单
   const overdueOs = outsourcesCache.filter((o) =>
     o.status !== "done" && o.status !== "cancelled" && o.due && now > new Date(o.due + "T23:59:59").getTime()
   );
-  if (overdueOs.length) reminders.push({ icon: "🏭", text: `${overdueOs.length} 个外发单已逾期`, go: "outsource" });
+  if (overdueOs.length) reminders.push({ icon: "🏭", text: `${overdueOs.length} 个生产单已逾期`, go: "outsource" });
   // 4. 低库存款式
   const lowItems = itemsCache.filter((it) => Store.isItemLowStock(it));
   if (lowItems.length) reminders.push({ icon: "⚠️", text: `${lowItems.length} 个款式库存不足`, go: "items" });
@@ -2688,8 +2823,20 @@ function renderReport() {
   const days = reportPeriod === "week" ? 7 : 30;
   const from = Date.now() - days * 86400000;
   const label = reportPeriod === "week" ? "本周" : "本月";
+  const reportName = reportPeriod === "week" ? "周报" : "月报";
   const el = $("#report-content");
   if (!el) return;
+  // 数据满一周/满一个月后才出报告（避免第一天就出空报告）
+  const needMs = days * 86400000;
+  if (Date.now() - earliestDataTs() < needMs) {
+    el.innerHTML = `
+      <div class="card" style="text-align:center;padding:36px 20px">
+        <div style="font-size:52px">📅</div>
+        <h3 style="margin:10px 0 6px">${reportName}还没到时间</h3>
+        <div class="hint">使用满 ${days} 天后自动生成报告，现在数据还不够完整。<br>继续记录销售和订单，到期会在今日提醒中自动出现。</div>
+      </div>`;
+    return;
+  }
   // 销售统计
   let salesQty = 0, salesAmt = 0, salesProfit = 0;
   const itemSold = {};
@@ -2727,8 +2874,8 @@ function renderReport() {
   // 整改建议
   const tips = [];
   if (overdueOrders.length) tips.push(`⏰ 有 ${overdueOrders.length} 个定制单已逾期，尽快联系客户确认交期并安排生产。`);
-  if (overdueOs.length) tips.push(`🏭 有 ${overdueOs.length} 个外发单已逾期，及时催促加工商回货。`);
-  if (lowItems.length) tips.push(`⚠️ ${lowItems.length} 个款式库存低于警告线，建议尽快安排补货或下外发单。`);
+  if (overdueOs.length) tips.push(`🏭 有 ${overdueOs.length} 个生产单已逾期，及时催促加工商回货。`);
+  if (lowItems.length) tips.push(`⚠️ ${lowItems.length} 个款式库存低于警告线，建议尽快安排补货或下生产单。`);
   if (slowItems.length) tips.push(`🐌 ${slowItems.length} 个款式${label}无销量但仍有库存，建议促销或主动联系客户消化。`);
   if (orderDebtAmt > 0) tips.push(`💰 ${label}新订单欠款合计 ${money(orderDebtAmt)}，建议按欠款清单安排催收。`);
   if (salesAmt === 0) tips.push(`📉 ${label}暂无销售记录，建议主动联系老客户或加大推广。`);
@@ -3215,35 +3362,41 @@ async function confirmSale() {
 
 let customerSearch = "";
 let editingCustomerId = null;
+let customerSort = "qty"; // qty=按买货件数 debt=按欠款
 
 function renderCustomers() {
   const q = customerSearch.toLowerCase();
   const list = customersCache.filter((c) =>
     !q || c.name.toLowerCase().includes(q) || (c.phone || "").includes(q)
   );
+  // 统计每个客户买过多少货
+  const rows = list.map((c) => {
+    const cOrders = ordersCache.filter((o) => o.customer === c.name && o.status !== "cancelled");
+    const total = cOrders.reduce((s, o) => s + orderTotal(o), 0);
+    const pieces = cOrders.reduce((s, o) => s + orderTotalQty(o), 0);
+    const count = cOrders.length;
+    const debt = cOrders.reduce((s, o) => s + orderDebt(o), 0);
+    return { c, total, pieces, count, debt };
+  });
+  // 排序：默认按买货件数，可切换按欠款
+  rows.sort((a, b) => (customerSort === "debt" ? b.debt - a.debt : b.pieces - a.pieces));
   const el = $("#customer-list");
-  if (!list.length) {
+  if (!rows.length) {
     el.innerHTML = '<div class="empty"><span class="empty-icon">👥</span>' + (customersCache.length ? "没有匹配的客户" : "还没有客户<br>点右上角 ＋ 新客户，或从订单/快速开单中自动创建") + "</div>";
     return;
   }
-  el.innerHTML = list.map((c) => {
-    // 统计该客户订单
-    const cOrders = ordersCache.filter((o) => o.customer === c.name && o.status !== "cancelled");
-    const total = cOrders.reduce((s, o) => s + orderTotal(o), 0);
-    const count = cOrders.length;
-    const debt = cOrders.reduce((s, o) => s + orderDebt(o), 0);
-    return `
+  el.innerHTML = rows.map(({ c, total, pieces, count, debt }) => `
       <div class="list-card" data-id="${c.id}">
         <div class="list-main">
           <div class="list-title">${escapeHtml(c.name)}</div>
-          <div class="list-sub">${escapeHtml(c.phone || "无电话")} · ${count} 单 · 累计 ${money(total)}${debt ? " · 欠 " + money(debt) : ""}</div>
+          <div class="list-sub">${escapeHtml(c.phone || "无电话")} · ${count} 单</div>
+          <div class="list-sub">🧶 共买 <b>${pieces}</b> 件 · ${money(total)}${debt ? " · 欠 " + money(debt) : ""}</div>
         </div>
         <div class="list-side">
-          <div class="num" style="${debt ? "color:var(--danger)" : ""}">${debt ? money(debt) : "✓"}</div>
-          <div class="lbl">${debt ? "欠款" : "已结清"}</div>
+          <div class="num">${pieces}</div>
+          <div class="lbl">买货件数</div>
         </div>
-      </div>`;
-  }).join("");
+      </div>`).join("");
   $$("#customer-list .list-card").forEach((card) => {
     card.onclick = () => openCustomerDetail(card.dataset.id);
   });
@@ -3427,7 +3580,7 @@ async function saveCustomerEdit() {
   showView("customers");
 }
 
-/* ================= 外发加工（工厂） ================= */
+/* ================= 生产加工（工厂） ================= */
 
 function osStatus(o) {
   const now = Date.now();
@@ -3464,7 +3617,7 @@ function renderOutsources() {
   const list = osFiltered();
   const el = $("#outsource-list");
   if (!list.length) {
-    el.innerHTML = '<div class="empty"><span class="empty-icon">🏭</span>' + (outsourcesCache.length ? "没有匹配的外发单" : "还没有外发单<br>点下方 ＋ 下外发单，发给加工商生产") + "</div>";
+    el.innerHTML = '<div class="empty"><span class="empty-icon">🏭</span>' + (outsourcesCache.length ? "没有匹配的生产单" : "还没有生产单<br>点下方 ＋ 下生产单，发给加工商生产") + "</div>";
     return;
   }
   el.innerHTML = list.map((o) => {
@@ -3539,7 +3692,7 @@ async function saveOutsource() {
     returns: [],
     settled: false
   });
-  toast("外发单已下达");
+  toast("生产单已下达");
   await reloadAll();
   renderOutsources();
   showView("outsource");
@@ -3574,10 +3727,10 @@ async function openOutsourceDetail(id) {
     </div>
     <div class="card detail-actions">
       ${remaining > 0 && o.status !== "cancelled" ? `<button class="btn primary" id="os-return">📥 回货入库（剩 ${remaining} 件）</button>` : ""}
-      ${o.status === "active" ? `<button class="btn" id="os-cancel-order">取消外发单</button>` : ""}
+      ${o.status === "active" ? `<button class="btn" id="os-cancel-order">取消生产单</button>` : ""}
       ${!o.settled && returned > 0 ? `<button class="btn" id="os-settle">💰 标记已结算 ${money(osCost(o))}</button>` : ""}
       ${o.settled ? `<div class="hint" style="text-align:center">✅ 已结算 ${money(osCost(o))}</div>` : ""}
-      <button class="btn danger" id="os-delete">删除外发单</button>
+      <button class="btn danger" id="os-delete">删除生产单</button>
     </div>`;
   const back = () => { showView("outsource"); renderOutsources(); };
   const retBtn = $("#os-return");
@@ -3611,7 +3764,7 @@ async function openOutsourceDetail(id) {
   };
   const cancelBtn = $("#os-cancel-order");
   if (cancelBtn) cancelBtn.onclick = async () => {
-    if (!await confirmModal("取消外发单", "确定取消这张外发单吗？")) return;
+    if (!await confirmModal("取消生产单", "确定取消这张生产单吗？")) return;
     o.status = "cancelled";
     await Store.saveOutsource(o);
     toast("已取消");
@@ -3630,7 +3783,7 @@ async function openOutsourceDetail(id) {
   };
   const delBtn = $("#os-delete");
   if (delBtn) delBtn.onclick = async () => {
-    if (await confirmModal("删除外发单", "确定删除这条外发单吗？")) {
+    if (await confirmModal("删除生产单", "确定删除这条生产单吗？")) {
       await Store.deleteOutsource(id);
       toast("已删除");
       await reloadAll();
@@ -3648,18 +3801,29 @@ function renderFactories() {
     el.innerHTML = '<div class="empty"><span class="empty-icon">🏭</span>还没有加工商<br>点下方 ＋ 新增加工商</div>';
     return;
   }
-  el.innerHTML = factoriesCache.map((f) => {
+  // 各加工商未结清工费（按未结清金额排序）
+  const rows = factoriesCache.map((f) => {
     const active = outsourcesCache.filter((o) => o.factoryId === f.id && o.status !== "done" && o.status !== "cancelled").length;
-    return `
+    const unsettled = outsourcesCache.filter((o) => o.factoryId === f.id && o.status !== "cancelled" && !o.settled).reduce((s, o) => s + osCost(o), 0);
+    return { f, active, unsettled };
+  }).sort((a, b) => b.unsettled - a.unsettled);
+  const totalUnpaid = rows.reduce((s, x) => s + x.unsettled, 0);
+  el.innerHTML = `
+    <div class="card" style="padding:12px 16px">
+      <div class="detail-color-row"><span>各加工商未结清工费合计</span><span class="v" style="${totalUnpaid ? "color:var(--danger);font-weight:700" : ""}">${totalUnpaid ? money(totalUnpaid) : "无 ✅"}</span></div>
+    </div>` +
+  rows.map(({ f, active, unsettled }) => `
       <div class="list-card" data-id="${f.id}">
         <div class="list-main">
           <div class="list-title">${escapeHtml(f.name)}</div>
           <div class="list-sub">${escapeHtml(f.phone || "无电话")}${f.skill ? " · " + escapeHtml(f.skill) : ""}</div>
-          <div class="list-sub">工费 ${f.price ? money(f.price) + "/件" : "未设置"} · 进行中 ${active} 单</div>
+          <div class="list-sub">工费 ${f.price ? money(f.price) + "/件" : "未设置"} · 生产中 ${active} 单</div>
         </div>
-        <div class="list-side"><div class="num">${active}</div><div class="lbl">生产中</div></div>
-      </div>`;
-  }).join("");
+        <div class="list-side">
+          <div class="num" style="${unsettled ? "color:var(--danger);font-size:15px" : ""}">${unsettled ? money(unsettled) : "✓"}</div>
+          <div class="lbl">${unsettled ? "未结清" : "已结清"}</div>
+        </div>
+      </div>`).join("");
   $$("#factory-list .list-card").forEach((card) => {
     card.onclick = () => openFactoryDetail(card.dataset.id);
   });
@@ -3671,8 +3835,8 @@ async function openFactoryDetail(id) {
   const f = factoriesCache.find((x) => x.id === id);
   if (!f) return;
   const fOuts = outsourcesCache.filter((o) => o.factoryId === id).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-  const totalCost = fOuts.filter((o) => !o.cancelled).reduce((s, o) => s + osCost(o), 0);
-  const unsettled = fOuts.filter((o) => !o.cancelled && !o.settled).reduce((s, o) => s + osCost(o), 0);
+  const totalCost = fOuts.filter((o) => o.status !== "cancelled").reduce((s, o) => s + osCost(o), 0);
+  const unsettled = fOuts.filter((o) => o.status !== "cancelled" && !o.settled).reduce((s, o) => s + osCost(o), 0);
   const listHtml = fOuts.length ? fOuts.slice(0, 15).map((o) => {
     const it = itemsCache.find((x) => x.id === o.itemId);
     const st = osStatus(o);
@@ -3684,7 +3848,7 @@ async function openFactoryDetail(id) {
         <div class="order-addr">🕐 ${timeStr(o.createdAt)}</div>
       </div>
     </div>`;
-  }).join("") : '<div class="hint">暂无外发单</div>';
+  }).join("") : '<div class="hint">暂无生产单</div>';
   $("#customer-detail-body").innerHTML = `
     <div class="card">
       <h3>${escapeHtml(f.name)}</h3>
@@ -3695,7 +3859,7 @@ async function openFactoryDetail(id) {
       <div class="detail-color-row"><span>未结算</span><span class="v" style="${unsettled ? "color:var(--danger)" : ""}">${unsettled ? money(unsettled) : "无"}</span></div>
     </div>
     <div class="card">
-      <h3>外发记录</h3>
+      <h3>生产记录</h3>
       ${listHtml}
     </div>
     <div class="card detail-actions">
@@ -3715,7 +3879,7 @@ async function generateFactoryStatement(f) {
   try {
     const fOuts = outsourcesCache.filter((o) => o.factoryId === f.id && o.status !== "cancelled")
       .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
-    if (!fOuts.length) return toast("该加工商暂无外发单");
+    if (!fOuts.length) return toast("该加工商暂无生产单");
     const byMonth = {};
     for (const o of fOuts) {
       const d = new Date(o.createdAt);
@@ -3747,7 +3911,7 @@ async function generateFactoryStatement(f) {
     ctx.fillStyle = "#ffffff";
     ctx.font = "bold 30px sans-serif";
     ctx.textAlign = "center";
-    ctx.fillText("羊毛衫管家 · 外发工费对账单", W / 2, 42);
+    ctx.fillText("羊毛衫管家 · 生产工费对账单", W / 2, 42);
     ctx.font = "18px sans-serif";
     ctx.fillStyle = "#fde8b0";
     ctx.fillText(`${monthKey} · ${f.name}`, W / 2, 70);
@@ -3786,7 +3950,7 @@ async function generateFactoryStatement(f) {
     ctx.textAlign = "center";
     ctx.fillText(`共计 ${monthOuts.length} 单 · 请核对工费，确认后安排结算，谢谢！`, W / 2, H - 30);
     // 预览分享（长按保存/系统分享，iOS 与微信内通用）
-    await finishShareImage(canvas, `外发对账-${f.name}-${monthKey}.png`, `外发对账 ${monthKey}`, "👆 长按图片保存，发微信给加工商核对工费");
+    await finishShareImage(canvas, `生产对账-${f.name}-${monthKey}.png`, `生产对账 ${monthKey}`, "👆 长按图片保存，发微信给加工商核对工费");
   } catch (e) {
     toast("生成失败：" + (e.message || "未知错误"));
   }
@@ -3914,32 +4078,35 @@ function addQuickLine() {
   renderQuickLines();
 }
 
-/** 解析「颜色 + 数量件 + 单价元」文本，自动匹配款式并加入清单 */
+/** 解析「款式名 + 数量件」（可带单价），自动匹配款式并加入清单 */
 function parseQuickText(raw) {
   const text = (raw || "").trim();
   if (!text) return toast("请输入或说出内容");
   let qty = 1;
-  const qm = text.match(/(\d+(?:\.\d+)?)\s*件/);
+  const qm = text.match(/(\d+(?:\.\d+)?)\s*(?:件|个)/);
   if (qm) qty = Math.max(1, Math.round(Number(qm[1])));
   let price = 0;
   const pm = text.match(/(\d+(?:\.\d+)?)\s*(?:元|块)/);
   if (pm) price = Number(pm[1]);
-  // 剩余文字作颜色/款式关键词
+  // 剩余文字作款式/颜色关键词
   const rest = text
-    .replace(/(\d+(?:\.\d+)?)\s*件/g, "")
+    .replace(/(\d+(?:\.\d+)?)\s*(?:件|个)/g, "")
     .replace(/(\d+(?:\.\d+)?)\s*(?:元|块)/g, "")
     .replace(/[，。！？,\.!?\s]+/g, "").trim();
-  if (!rest) return toast("没听清款式/颜色，请带上颜色名再说一次");
-  // 匹配：颜色优先，其次款式名
+  if (!rest) return toast("没听清款式，请说「款式名 + 数量」（如：圆领毛衣 3件）");
+  // 款式名优先匹配，其次颜色匹配
   let hit = null;
-  for (const it of itemsCache) {
-    for (const c of it.colors || []) {
-      if (rest.includes(c.name)) { hit = { it, color: c.name }; break; }
+  const byName = itemsCache.find((it) => it.name && (it.name.includes(rest) || rest.includes(it.name)));
+  if (byName) hit = { it: byName, color: "" };
+  if (!hit) {
+    for (const it of itemsCache) {
+      for (const c of it.colors || []) {
+        if (rest.includes(c.name)) { hit = { it, color: c.name }; break; }
+      }
+      if (hit) break;
     }
-    if (hit) break;
-    if (it.name && (it.name.includes(rest) || rest.includes(it.name))) { hit = { it, color: "" }; break; }
   }
-  if (!hit) return toast(`没匹配到「${rest}」，请手动添加或改用已有颜色名`);
+  if (!hit) return toast(`没匹配到「${rest}」，请说款式全名或改用已有款式名`);
   const finalPrice = price || hit.it.price || 0;
   quickLines.push({ itemId: hit.it.id, itemName: hit.it.name, color: hit.color, qty, price: finalPrice });
   renderQuickLines();
@@ -3947,26 +4114,60 @@ function parseQuickText(raw) {
   $("#qo-voice-text").value = "";
 }
 
-/** 语音识别（Chrome/Edge 可用；不支持的手机用输入法麦克风键说话） */
-function startVoiceQuickOrder() {
+/** 语音识别：微信式按住说话（按下开始，松开识别；实时显示识别文字） */
+function bindVoiceHold() {
+  const btn = $("#qo-voice-btn");
+  if (!btn) return;
+  let rec = null, listening = false;
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) return toast("此浏览器不支持语音识别，可点输入框长按麦克风键说话");
-  try {
-    const rec = new SR();
-    rec.lang = "zh-CN";
-    rec.interimResults = false;
-    rec.maxAlternatives = 1;
-    rec.onresult = (e) => {
-      const t = e.results[0][0].transcript;
-      $("#qo-voice-text").value = t;
-      parseQuickText(t);
-    };
-    rec.onerror = (e) => toast("语音识别失败：" + (e.error || ""));
-    toast("🎤 请说话…（颜色 + 数量件 + 单价元）");
-    rec.start();
-  } catch (e) {
-    toast("语音启动失败");
-  }
+  const start = (e) => {
+    e.preventDefault();
+    if (listening) return;
+    if (!SR) return toast("此浏览器不支持语音识别，可点输入框用输入法麦克风键说话");
+    try {
+      rec = new SR();
+      rec.lang = "zh-CN";
+      rec.interimResults = true;
+      rec.maxAlternatives = 1;
+      rec.continuous = false;
+      rec.onresult = (ev) => {
+        let t = "";
+        for (let i = 0; i < ev.results.length; i++) t += ev.results[i][0].transcript;
+        $("#qo-voice-text").value = t;
+        if (ev.results[0].isFinal) parseQuickText(t);
+      };
+      rec.onerror = (err) => {
+        listening = false;
+        btn.classList.remove("recording");
+        btn.textContent = "🎤 按住说";
+        if (err.error !== "aborted" && err.error !== "no-speech" && err.error !== "not-allowed") {
+          toast("语音识别失败：" + err.error);
+        } else if (err.error === "not-allowed") {
+          toast("请允许使用麦克风权限");
+        }
+      };
+      rec.onend = () => {
+        listening = false;
+        btn.classList.remove("recording");
+        btn.textContent = "🎤 按住说";
+      };
+      listening = true;
+      btn.classList.add("recording");
+      btn.textContent = "🎤 松开识别…";
+      rec.start();
+    } catch (e) {
+      listening = false;
+      toast("语音启动失败");
+    }
+  };
+  const stop = (e) => {
+    e.preventDefault();
+    if (rec && listening) { try { rec.stop(); } catch {} }
+  };
+  btn.addEventListener("pointerdown", start);
+  btn.addEventListener("pointerup", stop);
+  btn.addEventListener("pointercancel", stop);
+  btn.addEventListener("pointerleave", stop);
 }
 
 async function saveQuickOrder(continueNext) {
@@ -5479,6 +5680,8 @@ function bindEvents() {
 
   // 客户
   $("#customer-search").oninput = debounce((e) => { customerSearch = e.target.value; renderCustomers(); }, 200);
+  $("#customer-sort-qty").onclick = () => { customerSort = "qty"; $("#customer-sort-qty").classList.add("active"); $("#customer-sort-debt").classList.remove("active"); renderCustomers(); };
+  $("#customer-sort-debt").onclick = () => { customerSort = "debt"; $("#customer-sort-debt").classList.add("active"); $("#customer-sort-qty").classList.remove("active"); renderCustomers(); };
   $("#ce-save").onclick = saveCustomerEdit;
   $("#ce-cancel").onclick = () => { showView("customers"); renderCustomers(); };
 
@@ -5489,7 +5692,7 @@ function bindEvents() {
   $("#qo-save").onclick = () => saveQuickOrder(false);
   $("#qo-save-continue").onclick = () => saveQuickOrder(true);
   // 语音/文字快速加商品
-  $("#qo-voice-btn").onclick = startVoiceQuickOrder;
+  bindVoiceHold();
   $("#qo-text-btn").onclick = () => parseQuickText($("#qo-voice-text").value);
   $("#qo-voice-text").addEventListener("keydown", (e) => {
     if (e.key === "Enter") { e.preventDefault(); parseQuickText($("#qo-voice-text").value); }
@@ -5499,7 +5702,7 @@ function bindEvents() {
   $("#import-preview").onclick = previewImport;
   $("#import-do").onclick = doImport;
 
-  // 外发加工
+  // 生产加工
   $("#os-new").onclick = openOutsourceEdit;
   $("#os-factories").onclick = () => { renderFactories(); showView("factories"); };
   $("#os-save").onclick = saveOutsource;
