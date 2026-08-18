@@ -360,6 +360,8 @@ body {
 .ship-line { display: flex; align-items: center; gap: 8px; background: var(--bg2); border-radius: 10px; padding: 6px 10px; }
 .ship-name { flex: 1; min-width: 0; font-size: var(--fs-sm); color: var(--text); word-break: break-all; }
 .ship-qty { font-size: var(--fs-sm); color: var(--text2); white-space: nowrap; }
+.ship-input { width: 88px; flex: none; }
+.ship-input .ship-qty-input { text-align: center; font-weight: 700; }
 .ship-ops { display: flex; gap: 6px; }
 .mini-btn {
   width: 30px; height: 30px; border-radius: 9px; border: 1px solid var(--border);
@@ -372,6 +374,27 @@ body {
   padding: 8px 0; border-bottom: 1px dashed var(--border);
 }
 .tip-line:last-child { border-bottom: none; }
+
+/* 图片分享/预览弹层 */
+.img-share-mask {
+  position: fixed; inset: 0; z-index: 999;
+  background: rgba(0,0,0,.72);
+  display: flex; align-items: center; justify-content: center;
+  padding: 18px; animation: fadeIn .2s var(--ease);
+}
+.img-share-box {
+  background: var(--card); border-radius: 18px; padding: 16px;
+  width: min(92vw, 420px); max-height: 92vh; overflow: auto;
+  text-align: center;
+}
+.img-share-box h3 { font-size: var(--fs-md); margin-bottom: 10px; }
+.img-share-box img {
+  width: 100%; border-radius: 12px; display: block;
+  box-shadow: 0 4px 16px rgba(0,0,0,.25);
+}
+.img-share-hint { font-size: var(--fs-sm); color: var(--text2); margin: 10px 0 4px; line-height: 1.6; }
+.img-share-box .btn-row { margin-top: 10px; }
+.qr-box #pay-qr-canvas { display: flex; justify-content: center; background: #fff; border-radius: 12px; padding: 12px; }
 .list-side { text-align: right; flex: none; display: flex; flex-direction: column; justify-content: center; gap: 3px; padding-left: 6px; }
 .list-side .num { font-size: var(--fs-num); font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.3px; }
 .list-side .lbl { font-size: var(--fs-tiny); color: var(--text3); }
