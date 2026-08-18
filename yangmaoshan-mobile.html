@@ -2287,7 +2287,7 @@ const Sync = {
 
 /* ---------------- 授权与版本（2.4 工厂版） ---------------- */
 
-const APP_VERSION = "3.5";
+const APP_VERSION = "3.6";
 
 const License = {
   /** 当前账号绑定的授权码（本地记录） */
@@ -2470,6 +2470,11 @@ function announceModal(versions) {
 
 /** 各版本更新公告（每次发布新版本时在此追加一条） */
 const CHANGELOG = {
+  "3.6": [
+    "款式分享卡不再显示成本，只展示售价、库存、已售",
+    "分享界面全新设计：白底圆角图、价格大字、颜色小标签、品牌感更强",
+    "分享流程优化：生成后弹出预览，长按保存或系统分享，iOS/微信内都好用"
+  ],
   "3.5": [
     "彻底修复全局搜索：去掉重复拼接导致的报错，搜索现在真正可用",
     "首页统计卡片可点击：点「今日新订单」只看今天的订单，点「未收款合计」直达欠款列表"
@@ -3290,26 +3295,46 @@ async function openDetail(id) {
 
 /* ================= 分享款式卡片 ================= */
 
+/** 圆角矩形路径 */
+function roundRectPath(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+/** 款式分享卡（发给微信好友）：不显示成本，品牌感更强 */
 async function shareItemCard(it) {
   try {
     const totalStock = (it.colors || []).reduce((s, c) => s + (c.stock || 0), 0);
-    const W = 800, H = 1000;
+    const totalSold = (it.colors || []).reduce((s, c) => s + (c.sold || 0), 0);
+    const W = 800, H = 1040;
     const canvas = document.createElement("canvas");
     canvas.width = W; canvas.height = H;
     const ctx = canvas.getContext("2d");
-    // 背景渐变
+    // 背景渐变 + 装饰光斑
     const g = ctx.createLinearGradient(0, 0, 0, H);
     g.addColorStop(0, "#8f1122");
-    g.addColorStop(0.6, "#b91c2e");
-    g.addColorStop(1, "#7f1020");
+    g.addColorStop(0.55, "#b91c2e");
+    g.addColorStop(1, "#6f0e1d");
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, W, H);
-    // 顶部标题
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 44px sans-serif";
+    ctx.fillStyle = "rgba(255,255,255,.06)";
+    ctx.beginPath(); ctx.arc(W - 80, 80, 200, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(60, H - 110, 170, 0, Math.PI * 2); ctx.fill();
+    // 顶部品牌行
     ctx.textAlign = "center";
-    ctx.fillText("🧥 " + it.name, W / 2, 80);
-    // 图片
+    ctx.fillStyle = "#fde8b0";
+    ctx.font = "bold 24px sans-serif";
+    ctx.fillText("洪合羊毛衫 · 厂家直供", W / 2, 60);
+    // 款式名
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 46px sans-serif";
+    ctx.fillText(it.name, W / 2, 116);
+    // 图片（白底圆角）
     const img = new Image();
     await new Promise((resolve) => {
       if (it.images && it.images[0]) {
@@ -3318,49 +3343,54 @@ async function shareItemCard(it) {
         img.src = it.images[0];
       } else resolve();
     });
+    ctx.fillStyle = "#ffffff";
+    roundRectPath(ctx, 40, 148, W - 80, 500, 26);
+    ctx.fill();
     if (img.width) {
-      const iw = W - 80, ih = 460;
+      const iw = W - 80, ih = 500;
       const ratio = Math.min(iw / img.width, ih / img.height);
       const dw = img.width * ratio, dh = img.height * ratio;
-      ctx.drawImage(img, (W - dw) / 2, 130, dw, dh);
+      ctx.save();
+      roundRectPath(ctx, 40, 148, W - 80, 500, 26);
+      ctx.clip();
+      ctx.drawImage(img, (W - dw) / 2, 148 + (500 - dh) / 2, dw, dh);
+      ctx.restore();
     } else {
-      ctx.fillStyle = "rgba(255,255,255,.2)";
-      ctx.fillRect(40, 130, W - 80, 460);
-      ctx.fillStyle = "#fff";
-      ctx.font = "90px sans-serif";
-      ctx.fillText("🧥", W / 2, 400);
+      ctx.fillStyle = "#faf7f3";
+      ctx.font = "130px sans-serif";
+      ctx.fillText("🧥", W / 2, 450);
     }
-    // 价格行
+    // 价格
     ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 52px sans-serif";
-    ctx.fillText("¥" + fmt(it.price), W / 2, 660);
-    ctx.font = "28px sans-serif";
-    ctx.fillStyle = "rgba(255,255,255,.85)";
-    ctx.fillText("库存 " + totalStock + " 件 · 成本 ¥" + fmt(it.cost), W / 2, 710);
-    // 颜色标签
-    const colors = (it.colors || []).map((c) => `${c.name} ${c.stock}`).join("  ·  ");
-    ctx.fillStyle = "rgba(255,255,255,.75)";
+    ctx.font = "bold 80px sans-serif";
+    ctx.fillText("¥" + fmt(it.price), W / 2, 726);
+    // 库存/已售（不显示成本）
     ctx.font = "26px sans-serif";
-    ctx.fillText(colors || "暂无颜色", W / 2, 770);
-    // 底部
-    ctx.fillStyle = "rgba(255,255,255,.6)";
-    ctx.font = "24px sans-serif";
-    ctx.fillText("羊毛衫管家", W / 2, 940);
-    // 转 blob
-    const blob = await new Promise((r) => canvas.toBlob(r, "image/png"));
-    const file = new File([blob], it.name + ".png", { type: "image/png" });
-    // 尝试 Web Share API（带文件）
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], title: it.name });
-      return;
+    ctx.fillStyle = "rgba(255,255,255,.85)";
+    ctx.fillText("库存 " + totalStock + " 件" + (totalSold ? " · 已售 " + totalSold + " 件" : "") + " · 现货速发", W / 2, 782);
+    // 颜色标签（圆角小片）
+    const colors = (it.colors || []).slice(0, 6);
+    if (colors.length) {
+      ctx.font = "24px sans-serif";
+      const widths = colors.map((c) => ctx.measureText(c.name + " " + c.stock).width);
+      const totalW = widths.reduce((a, b) => a + b, 0) + colors.length * 48 - 16;
+      let cx = (W - totalW) / 2;
+      const cy = 828;
+      for (let i = 0; i < colors.length; i++) {
+        ctx.fillStyle = "rgba(255,255,255,.16)";
+        roundRectPath(ctx, cx, cy, widths[i] + 32, 46, 23);
+        ctx.fill();
+        ctx.fillStyle = "#ffffff";
+        ctx.fillText(colors[i].name + " " + colors[i].stock, cx + 16, cy + 30);
+        cx += widths[i] + 48;
+      }
     }
-    // 降级：下载
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = it.name + ".png";
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(a.href), 3000);
-    toast("卡片已保存，去微信长按图片转发给好友");
+    // 底部
+    ctx.fillStyle = "rgba(255,255,255,.55)";
+    ctx.font = "22px sans-serif";
+    ctx.fillText("— 羊毛衫管家 · 微信下单 · 现货速发 —", W / 2, H - 44);
+    // 预览分享（长按保存 / 系统分享，iOS 微信内通用）
+    await finishShareImage(canvas, it.name + ".png", it.name, "👆 长按图片保存，转发给微信好友");
   } catch (e) {
     toast("分享失败：" + (e.message || "未知错误"));
   }
