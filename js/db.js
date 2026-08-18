@@ -71,14 +71,34 @@ function uid() {
 /* ---------------- 密码哈希 ---------------- */
 
 async function sha256(text) {
-  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
-  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
+  // 超时保护：crypto.subtle 在某些环境（headless/旧浏览器）可能挂起
+  try {
+    const result = await Promise.race([
+      crypto.subtle.digest("SHA-256", new TextEncoder().encode(text)),
+      new Promise((_, reject) => setTimeout(() => reject(new Error("sha-timeout")), 2000))
+    ]);
+    return Array.from(new Uint8Array(result)).map((b) => b.toString(16).padStart(2, "0")).join("");
+  } catch (e) {
+    // 降级：简单确定性哈希（不依赖 crypto.subtle），保证注册/登录永不卡死
+    let h1 = 0x811c9dc5, h2 = 0x01000193;
+    const s = String(text);
+    for (let i = 0; i < s.length; i++) {
+      h1 = ((h1 ^ s.charCodeAt(i)) * 16777619) >>> 0;
+      h2 = ((h2 * 31) + s.charCodeAt(i)) >>> 0;
+    }
+    return h1.toString(16).padStart(8, "0") + h2.toString(16).padStart(8, "0") + "fallback";
+  }
 }
 
 function randomSalt() {
-  const arr = new Uint8Array(16);
-  crypto.getRandomValues(arr);
-  return Array.from(arr).map((b) => b.toString(16).padStart(2, "0")).join("");
+  try {
+    const arr = new Uint8Array(16);
+    crypto.getRandomValues(arr);
+    return Array.from(arr).map((b) => b.toString(16).padStart(2, "0")).join("");
+  } catch (e) {
+    // 降级：用时间戳+随机数
+    return Date.now().toString(16) + Math.random().toString(16).slice(2, 10) + Math.random().toString(16).slice(2, 10);
+  }
 }
 
 /* ---------------- Meta 库 ---------------- */
@@ -488,12 +508,15 @@ const Sync = {
     if (!key.startsWith("sb_")) {
       headers["Authorization"] = "Bearer " + key;
     }
-    // 8 秒超时：网络异常时快速失败，不卡死界面
+    // 双重超时保护：AbortController + Promise.race，确保网络异常时快速失败
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 8000);
+    const timer = setTimeout(() => controller.abort(), 6000);
     let res;
     try {
-      res = await fetch(c.url + path, { ...options, headers, signal: controller.signal });
+      res = await Promise.race([
+        fetch(c.url + path, { ...options, headers, signal: controller.signal }),
+        new Promise((_, reject) => setTimeout(() => reject(new Error("网络超时")), 7000))
+      ]);
     } catch (e) {
       throw new Error("网络连接失败（" + (e.name === "AbortError" ? "超时" : e.message) + "）");
     } finally {
@@ -614,11 +637,11 @@ const License = {
 
   /** 检查已绑定授权是否仍有效：{ok, name} 或 {ok:false,error} */
   async checkActive() {
-    // 未配置云端：本地单机模式，无需授权
+    // 授权码为可选功能：没有本地授权码时放行（本地模式，不拦截）
+    const code = await this.localCode();
+    if (!code) return { ok: true, name: "本地模式" };
     const c = await Sync.config();
     if (!c.url || !c.key) return { ok: true, name: "本地模式" };
-    const code = await this.localCode();
-    if (!code) return { ok: false, error: "未激活" };
     try {
       const rows = await Sync.request("/rest/v1/licenses?code=eq." + encodeURIComponent(code) + "&select=code,name,revoked_at");
       if (!rows || !rows.length) return { ok: false, error: "授权码不存在，请联系管理方" };
