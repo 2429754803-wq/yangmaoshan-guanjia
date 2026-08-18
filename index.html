@@ -291,6 +291,14 @@
           <label class="lbl">收货地址</label>
           <textarea id="qo-address" class="input ta" placeholder="自动带出，可改"></textarea>
           <hr>
+          <label class="lbl">🎤 语音/文字快速加商品</label>
+          <div class="addr-row">
+            <input id="qo-voice-text" class="input" placeholder="例：黑色 3件 38元">
+            <button id="qo-voice-btn" class="btn small">🎤 说</button>
+            <button id="qo-text-btn" class="btn small">识别</button>
+          </div>
+          <div class="hint" style="margin-bottom:6px">说或输入「颜色 + 数量件 + 单价元」，自动匹配款式加入下方清单；也支持长按输入法麦克风键说话。</div>
+          <hr>
           <label class="lbl">商品</label>
           <div id="qo-lines" class="order-lines"></div>
           <button id="qo-add-line" class="btn small">＋ 添加商品</button>
