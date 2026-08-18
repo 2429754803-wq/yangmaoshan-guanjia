@@ -195,7 +195,8 @@ const FONT_SIZES = { s: "13px", m: "15px", l: "17px", xl: "19px" };
 
 function applyFontSize(size) {
   const px = FONT_SIZES[size] || FONT_SIZES.m;
-  document.documentElement.style.setProperty("--base-font-size", px);
+  // 修改 --fs 变量：CSS 里所有字号都基于它派生，改一处全局生效
+  document.documentElement.style.setProperty("--fs", px);
   document.body.style.fontSize = px;
   try { localStorage.setItem("knit-fontsize", size); } catch {}
   $$(".fontsize-chip").forEach((c) => c.classList.toggle("active", c.dataset.size === size));
