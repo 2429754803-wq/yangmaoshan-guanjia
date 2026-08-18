@@ -6,11 +6,11 @@
  *  - 每账号一个数据库 (knit-stock-<accountId>)：
  *      items      - 款式 { id, name, price, cost, images:[dataURL], colors:[{name, stock, sold}], lowStock, createdAt }
  *      sales      - 销售记录 { id, itemId, itemName, color, qty, price, customer, time }
- *      orders     - 订单 { id, customer, phone, address, lines:[...], status:'pending'|'done'|'cancelled',
- *                          payStatus:'unpaid'|'partial'|'paid', paidAmount, createdAt, doneAt }
+ *      orders     - 订单 { id, customer, phone, address, lines:[{itemId, itemName, color, qty, price, shipped}], status:'pending'|'done'|'cancelled',
+ *                          payStatus:'unpaid'|'partial'|'paid', paidAmount, createdAt, doneAt, shippedAt }
  *      addrs      - 地址簿 { id, name, phone, address }
  *      stocktakes - 盘点记录 { id, time, lines:[{itemId, itemName, color, book, actual, diff}] }
- *      purchases  - 进货记录 { id, itemId, itemName, color, qty, unitPrice, supplier, time }
+ *      purchases  - 送货入库记录 { id, itemId, itemName, color, qty, unitPrice(工费), supplier(加工商), time }
  *  - 同步接口：每账号数据 export/import（未来接 Supabase）
  */
 
@@ -588,7 +588,7 @@ const Sync = {
 
 /* ---------------- 授权与版本（2.4 工厂版） ---------------- */
 
-const APP_VERSION = "2.4";
+const APP_VERSION = "2.5";
 
 const License = {
   /** 当前账号绑定的授权码（本地记录） */
