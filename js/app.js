@@ -79,6 +79,51 @@ function confirmModal(title, text) {
   });
 }
 
+/** 公告弹窗（单按钮"知道了"，用于更新公告） */
+function announceModal(title, text) {
+  const mask = $("#modal-mask");
+  const ok = $("#modal-ok");
+  const cancel = $("#modal-cancel");
+  $("#modal-title").textContent = title;
+  $("#modal-text").textContent = text;
+  cancel.classList.add("hidden");
+  ok.textContent = "知道了";
+  mask.classList.remove("hidden");
+  const done = () => {
+    mask.classList.add("hidden");
+    cancel.classList.remove("hidden");
+    ok.textContent = "确定";
+    ok.onclick = null;
+    cancel.onclick = null;
+  };
+  ok.onclick = done;
+  cancel.onclick = done;
+}
+
+/** 各版本更新公告（每次发布新版本时在此追加一条） */
+const CHANGELOG = {
+  "2.7": "🎉 v2.7 更新内容：\n· 更新更省心：打开 App 自动更新到最新版，无需询问、无需操作\n· 每次更新后自动弹出公告，告诉你这次改了什么\n· 发货数量直接输入件数，全部发完自动\"配送完成\"，撤销自动恢复未完成\n· 今日销售额/利润实时刷新（每10秒，多设备每分钟同步）",
+  "2.6": "🎉 v2.6 更新内容：\n· 发货数量可直接输入件数，全部发完自动\"配送完成\"\n· 今日销售额/利润实时刷新（多设备同步）\n· 语音/文字快速开单（说\"黑色3件38元\"直接加单）\n· 订单收款二维码\n· 发货单图片生成\n· 对账单图片分享（长按保存发微信）\n· 本次起更新自动完成，无需手动操作",
+  "2.5": "🎉 v2.5 更新内容：\n· 订单今日/历史视图 + 时间/金额排序\n· 发货状态 + 部分发货\n· 周报/月报 + 整改建议\n· 送货入库（加工商送货）\n· 线上爆款速查（淘宝/小红书）\n· 应用内检查更新"
+};
+
+/** 更新公告：版本变化后首次打开时弹出一次（记录在 localStorage） */
+function showUpdateAnnouncement() {
+  try {
+    const vNum = (s) => Number(String(s).split(".").map((n) => String(n).padStart(3, "0")).join(""));
+    const seen = localStorage.getItem("knit-seen-version") || "";
+    if (seen === APP_VERSION) return;
+    const cur = vNum(APP_VERSION);
+    const entries = Object.keys(CHANGELOG)
+      .filter((v) => vNum(v) > vNum(seen) && vNum(v) <= cur)
+      .sort((a, b) => vNum(a) - vNum(b));
+    localStorage.setItem("knit-seen-version", APP_VERSION);
+    if (!entries.length) return;
+    const text = entries.map((v) => CHANGELOG[v]).join("\n\n");
+    announceModal("📢 更新公告", text + "\n\n（更新已自动完成）");
+  } catch (e) {}
+}
+
 /** 图片分享预览弹层：长按保存 / 系统分享（iOS、微信内都可用） */
 function showImagePreview(url, filename, title, tip, blob) {
   const mask = document.createElement("div");
@@ -126,6 +171,8 @@ let factoriesCache = [];
 let outsourcesCache = [];
 let osFilter = "all";
 let editingFactoryId = null;
+/** 加工商保存成功后的回调（从"送货入库"内联添加时设置，保存后返回入库页并选中新加工商） */
+let afterFactorySave = null;
 
 let itemFilter = "all";
 let itemSearch = "";
@@ -152,7 +199,7 @@ const VIEW_TITLES = {
   debt: "客户欠款", customers: "客户", "customer-detail": "客户详情", "customer-edit": "编辑客户",
   "quick-order": "快速开单", import: "批量导入",
   outsource: "外发加工", "outsource-edit": "下外发单", "outsource-detail": "外发单详情",
-  factories: "加工厂管理", "factory-edit": "编辑加工厂", trends: "爆款推荐",
+  factories: "加工商管理", "factory-edit": "编辑加工商", trends: "爆款推荐",
   addrbook: "地址簿", "addr-edit": "编辑地址",
   report: "经营报表 · 周报/月报"
 };
@@ -187,10 +234,10 @@ function showView(name) {
       "quick-order": "选客户 → 加商品 → 保存",
       import: "粘贴订单 → 一键导入",
       outsource: "外发单 · 领料 · 回货 · 结算",
-      "outsource-edit": "下外发单给加工厂",
+      "outsource-edit": "下外发单给加工商",
       "outsource-detail": "外发单详情与操作",
-      factories: "加工厂档案 · 工费标准",
-      "factory-edit": "编辑加工厂",
+      factories: "加工商档案 · 工费标准",
+      "factory-edit": "编辑加工商",
       trends: "畅销款分析 · 行业风向",
       addrbook: "常用地址管理",
       report: "周报/月报 · 经营分析与整改建议",
@@ -209,7 +256,7 @@ function showView(name) {
     headerBtn.textContent = "＋ 新客户";
     headerBtn.classList.remove("hidden");
   } else if (name === "factories") {
-    headerBtn.textContent = "＋ 新加工厂";
+    headerBtn.textContent = "＋ 新加工商";
     headerBtn.classList.remove("hidden");
   } else {
     headerBtn.classList.add("hidden");
@@ -502,7 +549,7 @@ function renderReport() {
   // 整改建议
   const tips = [];
   if (overdueOrders.length) tips.push(`⏰ 有 ${overdueOrders.length} 个定制单已逾期，尽快联系客户确认交期并安排生产。`);
-  if (overdueOs.length) tips.push(`🏭 有 ${overdueOs.length} 个外发单已逾期，及时催促加工厂回货。`);
+  if (overdueOs.length) tips.push(`🏭 有 ${overdueOs.length} 个外发单已逾期，及时催促加工商回货。`);
   if (lowItems.length) tips.push(`⚠️ ${lowItems.length} 个款式库存低于警告线，建议尽快安排补货或下外发单。`);
   if (slowItems.length) tips.push(`🐌 ${slowItems.length} 个款式${label}无销量但仍有库存，建议促销或主动联系客户消化。`);
   if (orderDebtAmt > 0) tips.push(`💰 ${label}新订单欠款合计 ${money(orderDebtAmt)}，建议按欠款清单安排催收。`);
@@ -1239,7 +1286,7 @@ function renderOutsources() {
   const list = osFiltered();
   const el = $("#outsource-list");
   if (!list.length) {
-    el.innerHTML = '<div class="empty"><span class="empty-icon">🏭</span>' + (outsourcesCache.length ? "没有匹配的外发单" : "还没有外发单<br>点下方 ＋ 下外发单，发给加工厂生产") + "</div>";
+    el.innerHTML = '<div class="empty"><span class="empty-icon">🏭</span>' + (outsourcesCache.length ? "没有匹配的外发单" : "还没有外发单<br>点下方 ＋ 下外发单，发给加工商生产") + "</div>";
     return;
   }
   el.innerHTML = list.map((o) => {
@@ -1256,7 +1303,7 @@ function renderOutsources() {
             <span class="order-customer">${escapeHtml(name)}${o.color ? "（" + escapeHtml(o.color) + "）" : ""}</span>
             <span class="order-status ${st.cls}">${st.label}</span>
           </div>
-          <div class="order-lines-preview">🏭 ${escapeHtml(fa ? fa.name : "未知加工厂")} · 发出 ${o.qty} 件 · 工费 ${money(o.price)}/件</div>
+          <div class="order-lines-preview">🏭 ${escapeHtml(fa ? fa.name : "未知加工商")} · 发出 ${o.qty} 件 · 工费 ${money(o.price)}/件</div>
           <div class="order-addr">📤 已回 ${returned} · 待回 ${remaining}${o.due ? " · 交期 " + o.due.slice(5) : ""}</div>
           <div class="order-addr">${o.settled ? "💰 已结算 " + money(osCost(o)) : "💰 未结算 · 工费 " + money(osCost(o))}</div>
         </div>
@@ -1271,7 +1318,7 @@ function renderOutsources() {
 function openOutsourceEdit() {
   // 选工厂（自动带出默认工费）
   const selF = $("#os-factory");
-  selF.innerHTML = '<option value="">— 选择加工厂 —</option>' + factoriesCache.map((f) =>
+  selF.innerHTML = '<option value="">— 选择加工商 —</option>' + factoriesCache.map((f) =>
     `<option value="${f.id}">${escapeHtml(f.name)}${f.price ? "（" + money(f.price) + "/件）" : ""}</option>`).join("");
   // 选款式（自动带出）
   const selI = $("#os-item");
@@ -1295,7 +1342,7 @@ async function saveOutsource() {
   const material = $("#os-material").value.trim();
   const due = $("#os-due").value;
   const note = $("#os-note").value.trim();
-  if (!factoryId) return toast("请选择加工厂");
+  if (!factoryId) return toast("请选择加工商");
   if (!itemId) return toast("请选择款式");
   if (!(qty >= 1)) return toast("请填写发出数量");
   if (!(price >= 0)) return toast("请填写工费单价");
@@ -1336,7 +1383,7 @@ async function openOutsourceDetail(id) {
         <span class="order-customer">${escapeHtml(it ? it.name : o.itemName)}${o.color ? "（" + escapeHtml(o.color) + "）" : ""}</span>
         <span class="order-status ${st.cls}">${st.label}</span>
       </div>
-      <div class="detail-color-row"><span>加工厂</span><span class="v">${escapeHtml(fa ? fa.name : "—")}</span></div>
+      <div class="detail-color-row"><span>加工商</span><span class="v">${escapeHtml(fa ? fa.name : "—")}</span></div>
       <div class="detail-color-row"><span>发出数量</span><span class="v">${o.qty} 件</span></div>
       <div class="detail-color-row"><span>工费</span><span class="v">${money(o.price)}/件 · 已产生 ${money(osCost(o))}</span></div>
       <div class="detail-color-row"><span>领料</span><span class="v">${escapeHtml(o.material || "—")}</span></div>
@@ -1395,7 +1442,7 @@ async function openOutsourceDetail(id) {
   };
   const settleBtn = $("#os-settle");
   if (settleBtn) settleBtn.onclick = async () => {
-    if (!await confirmModal("标记已结算", `确定这笔工费 ${money(osCost(o))} 已结算给加工厂？`)) return;
+    if (!await confirmModal("标记已结算", `确定这笔工费 ${money(osCost(o))} 已结算给加工商？`)) return;
     o.settled = true;
     o.settledAt = Date.now();
     await Store.saveOutsource(o);
@@ -1415,12 +1462,12 @@ async function openOutsourceDetail(id) {
   showView("outsource-detail");
 }
 
-/* ================= 加工厂管理 ================= */
+/* ================= 加工商管理 ================= */
 
 function renderFactories() {
   const el = $("#factory-list");
   if (!factoriesCache.length) {
-    el.innerHTML = '<div class="empty"><span class="empty-icon">🏭</span>还没有加工厂<br>点下方 ＋ 新增加工厂</div>';
+    el.innerHTML = '<div class="empty"><span class="empty-icon">🏭</span>还没有加工商<br>点下方 ＋ 新增加工商</div>';
     return;
   }
   el.innerHTML = factoriesCache.map((f) => {
@@ -1441,7 +1488,7 @@ function renderFactories() {
   staggerIn($("#factory-list"));
 }
 
-/** 加工厂详情（含月结对账） */
+/** 加工商详情（含月结对账） */
 async function openFactoryDetail(id) {
   const f = factoriesCache.find((x) => x.id === id);
   if (!f) return;
@@ -1475,7 +1522,7 @@ async function openFactoryDetail(id) {
     </div>
     <div class="card detail-actions">
       <button class="btn primary" id="fd-statement">🧾 生成月结对账单</button>
-      <button class="btn" id="fd-edit">编辑加工厂</button>
+      <button class="btn" id="fd-edit">编辑加工商</button>
     </div>`;
   $$("#customer-detail-body [data-oid]").forEach((el2) => {
     el2.onclick = () => openOutsourceDetail(el2.dataset.oid);
@@ -1485,12 +1532,12 @@ async function openFactoryDetail(id) {
   showView("customer-detail");
 }
 
-/** 生成加工厂月结对账单图片 */
+/** 生成加工商月结对账单图片 */
 async function generateFactoryStatement(f) {
   try {
     const fOuts = outsourcesCache.filter((o) => o.factoryId === f.id && o.status !== "cancelled")
       .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
-    if (!fOuts.length) return toast("该加工厂暂无外发单");
+    if (!fOuts.length) return toast("该加工商暂无外发单");
     const byMonth = {};
     for (const o of fOuts) {
       const d = new Date(o.createdAt);
@@ -1561,7 +1608,7 @@ async function generateFactoryStatement(f) {
     ctx.textAlign = "center";
     ctx.fillText(`共计 ${monthOuts.length} 单 · 请核对工费，确认后安排结算，谢谢！`, W / 2, H - 30);
     // 预览分享（长按保存/系统分享，iOS 与微信内通用）
-    await finishShareImage(canvas, `外发对账-${f.name}-${monthKey}.png`, `外发对账 ${monthKey}`, "👆 长按图片保存，发微信给加工厂核对工费");
+    await finishShareImage(canvas, `外发对账-${f.name}-${monthKey}.png`, `外发对账 ${monthKey}`, "👆 长按图片保存，发微信给加工商核对工费");
   } catch (e) {
     toast("生成失败：" + (e.message || "未知错误"));
   }
@@ -1580,7 +1627,7 @@ function openFactoryEdit(id) {
 
 async function saveFactoryEdit() {
   const name = $("#fa-name").value.trim();
-  if (!name) return toast("请填写加工厂名称");
+  if (!name) return toast("请填写加工商名称");
   const existing = editingFactoryId ? factoriesCache.find((x) => x.id === editingFactoryId) : null;
   await Store.saveFactory({
     id: editingFactoryId || undefined,
@@ -1593,6 +1640,9 @@ async function saveFactoryEdit() {
   });
   toast("已保存");
   await reloadAll();
+  const cb = afterFactorySave;
+  afterFactorySave = null;
+  if (cb) { cb(name); return; }
   renderFactories();
   showView("factories");
 }
@@ -2606,7 +2656,7 @@ async function renderPurchaseSelects(selectedItemId) {
     return `<option value="${it.id}">${escapeHtml(it.name)}（库存 ${totalStock}）</option>`;
   }).join("");
   if (selectedItemId) selItem.value = selectedItemId;
-  // 加工商下拉（来自加工厂档案）
+  // 加工商下拉（来自加工商档案）
   const selSup = $("#pu-supplier");
   if (selSup) {
     selSup.innerHTML = `<option value="">— 选择加工商 —</option>` + factoriesCache.map((f) =>
@@ -3055,7 +3105,9 @@ async function enterApp() {
   startClock();
   startTodayAutoRefresh();
   showView("today");
-  // 检查更新（不阻塞）
+  // 更新公告（版本变化后首次打开时弹出一次）
+  showUpdateAnnouncement();
+  // 检查更新（不阻塞）：发现新版自动更新
   checkUpdateSilently();
 }
 
@@ -3094,16 +3146,30 @@ async function submitLicense() {
   }, 800);
 }
 
+/** 启动时静默检查：发现新版本直接自动更新（不询问、不跳浏览器） */
 async function checkUpdateSilently() {
   try {
-    const up = await License.checkUpdate();
-    if (up.hasNew && up.url) {
-      const go = await confirmModal("发现新版本 " + up.version, (up.notes || "有新版本可用") + "\n\n是否立即更新？");
-      if (go && up.url) {
-        window.open(up.url, "_blank");
+    const up = await checkRemoteVersion();
+    if (up.hasNew) {
+      toast("发现新版本 " + up.version + "，正在自动更新…");
+      setTimeout(() => doAppUpdate(), 600);
+    }
+  } catch (e) {}
+}
+
+/** 读取站点 version.json（部署时自动生成）：{hasNew, version, notes}，失败则视为无更新 */
+async function checkRemoteVersion() {
+  try {
+    const base = location.origin + location.pathname.replace(/[^/]*$/, "");
+    const r = await fetch(base + "version.json?v=" + Date.now(), { cache: "no-store" });
+    if (r.ok) {
+      const v = await r.json();
+      if (v && v.version) {
+        return { hasNew: v.version !== APP_VERSION, version: v.version, notes: v.notes || "" };
       }
     }
   } catch (e) {}
+  return { hasNew: false };
 }
 
 async function logout() {
@@ -3153,6 +3219,7 @@ function bindEvents() {
       else if (go === "outsource") { renderOutsources(); showView("outsource"); }
       else if (go === "trends") { renderTrends(); showView("trends"); }
       else if (go === "addrbook") openAddrBook();
+      else if (go === "factory-add") { afterFactorySave = null; openFactoryEdit(); }
       else { const tab = $(`.tab[data-view=${go}]`); if (tab) tab.click(); }
     };
   });
@@ -3160,7 +3227,7 @@ function bindEvents() {
   // 主题
   $("#theme-toggle").onclick = () => applyTheme(!isDark);
 
-  // 新增款式 / 新订单 / 新客户 / 新加工厂
+  // 新增款式 / 新订单 / 新客户 / 新加工商
   $("#header-btn").onclick = () => {
     const v = currentView || ($(".tab.active") ? $(".tab.active").dataset.view : "items");
     if (v === "orders") openOrderEdit();
@@ -3267,7 +3334,7 @@ function bindEvents() {
     const f = factoriesCache.find((x) => x.id === $("#os-factory").value);
     if (f && f.price && !$("#os-price").value) $("#os-price").value = f.price;
   };
-  // 加工厂
+  // 加工商
   $("#fa-new").onclick = () => openFactoryEdit();
   $("#fa-save").onclick = saveFactoryEdit;
   $("#fa-cancel").onclick = () => { renderFactories(); showView("factories"); };
@@ -3326,9 +3393,23 @@ function bindEvents() {
   $("#st-finish").onclick = finishStocktake;
   $("#st-history").onclick = () => { renderStocktakeHistory(); showView("stocktake-history"); };
 
-  // 进货
+  // 送货入库
   $("#pu-item").onchange = updatePurchaseColor;
   $("#pu-confirm").onclick = confirmPurchase;
+  // 从送货入库内联添加加工商：保存后返回入库页并选中新加工商
+  $("#pu-new-supplier").onclick = () => {
+    afterFactorySave = (name) => {
+      renderPurchaseSelects();
+      const sel = $("#pu-supplier");
+      if (sel && name) {
+        const opts = Array.from(sel.options);
+        const hit = opts.find((o) => o.value === name);
+        if (hit) sel.value = name;
+      }
+      showView("purchase");
+    };
+    openFactoryEdit();
+  };
 
   // 批量改价
   $("#bp-mode").onchange = () => {
@@ -3413,15 +3494,11 @@ function bindEvents() {
     const res = $("#update-result");
     res.textContent = "正在检查…";
     res.style.color = "var(--text2)";
-    const up = await checkAppUpdate();
+    const up = await checkRemoteVersion();
     if (up.hasNew) {
-      res.innerHTML = `发现新版本 <b>${up.version}</b>${up.notes ? "：" + escapeHtml(up.notes) : ""}`;
+      res.innerHTML = `发现新版本 <b>${up.version}</b>，正在自动更新…`;
       res.style.color = "var(--warn)";
-      const go = await confirmModal(
-        "发现新版本 " + up.version,
-        (up.notes ? "更新内容：" + up.notes + "\n\n" : "") + "点击「确定」立即更新，无需重新安装或重新添加到桌面，更新完成后刷新即为最新版。"
-      );
-      if (go) await doAppUpdate();
+      setTimeout(() => doAppUpdate(), 500);
     } else {
       res.textContent = "已是最新版本（" + APP_VERSION + "）";
       res.style.color = "var(--ok)";
@@ -3429,25 +3506,9 @@ function bindEvents() {
   };
 }
 
-/** 检查是否有新版本：优先读取站点 version.json（部署时自动生成），失败则回退到云端版本表 */
+/** 检查是否有新版本：读取站点 version.json（部署时自动生成） */
 async function checkAppUpdate() {
-  try {
-    const base = location.origin + location.pathname.replace(/[^/]*$/, "");
-    const r = await fetch(base + "version.json?v=" + Date.now(), { cache: "no-store" });
-    if (r.ok) {
-      const v = await r.json();
-      if (v && v.version && v.version !== APP_VERSION) {
-        return { hasNew: true, version: v.version, notes: v.notes || "" };
-      }
-      return { hasNew: false };
-    }
-  } catch {}
-  try {
-    const up = await License.checkUpdate();
-    return up && up.hasNew ? up : { hasNew: false };
-  } catch {
-    return { hasNew: false };
-  }
+  return checkRemoteVersion();
 }
 
 /** 执行更新：清缓存 + 更新 Service Worker + 刷新页面 */
