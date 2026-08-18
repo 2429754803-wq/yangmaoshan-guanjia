@@ -978,6 +978,53 @@ select.input { appearance: auto; }
 /* 滚动条美化 */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+/* ============ 质感与 App 化升级（3.2） ============ */
+html, body { overscroll-behavior: none; }
+#app { min-height: 100vh; min-height: 100dvh; }
+button, .list-card, .chip, .quick-btn, .os-board-cell, .tab { -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
+
+/* 快捷操作：常用按钮高亮 + 更多折叠 */
+.quick-btn.primary {
+  background: linear-gradient(135deg, #a4162a, #c2253a);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(185,28,46,.3), inset 0 1px 0 rgba(255,255,255,.18);
+}
+.quick-more-toggle {
+  display: block; width: 100%;
+  margin-top: 10px;
+  padding: 9px;
+  background: none; border: none;
+  color: var(--text3);
+  font-size: var(--fs-xxs);
+  font-weight: 600;
+  letter-spacing: .5px;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: color .18s var(--ease), background .18s var(--ease);
+}
+.quick-more-toggle:active { background: var(--bg2); color: var(--text2); }
+.quick-more { margin-top: 10px; animation: viewIn .25s var(--ease); }
+
+/* 今日统计数字跳动（数值变化时） */
+@keyframes numBump {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.22); }
+  100% { transform: scale(1); }
+}
+.stat-num.bump { animation: numBump .5s var(--ease-spring); }
+
+/* 空状态美化 */
+.empty { text-align: center; padding: 40px 16px; color: var(--text3); }
+.empty .empty-icon {
+  width: 68px; height: 68px; margin: 0 auto 14px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 28%, rgba(185,28,46,.14), rgba(185,28,46,.06) 65%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 30px;
+  box-shadow: inset 0 2px 8px rgba(185,28,46,.06);
+}
 </style>
 <script>const m={name:"羊毛衫管家",short_name:"羊毛衫管家",description:"洪合羊毛衫商家专用：库存、销售、订单、盘点、进货、欠款一站管理",start_url:"./",display:"standalone",orientation:"portrait",background_color:"#f6f4f1",theme_color:"#b91c2e",lang:"zh-CN",icons:[{src:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAADWUlEQVR4nO3d0UrjUBRA0Tj0TwL1/z9H8H6LwzwIgxR1Ora5vXutd6Gck53EWNun1/P5bYOoX0e/ADiSAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBEDa6egXMJP95WWrGM/PR7+EKTy9ns9vW1jpoL9kxENI3wLVD/73GZTnkA2gvPRL9ug8kgFUl/2VPTiXXADFJf+LPTafVAC15V5rD80pFQB8JADSMgGULus/YY/MKxMAXCIA0gRAmgBIEwBpp9WeQtTf3XgP+0K7Oa32+O3952cc9qPbF9zNr1WfPVeeY9/LvuhupgngFkOZadCPbF94N1MEcMthzDLoR7UvvpvD/yVyhiFwrCN/J5jiCgDJAJz9Ofo4cAUgTQCkCYA0AZAmANIEQJoASBMAaQIgTQCkCYA0AZAmANIEQJoASBMAaQIgTQCkCYA0AZAmANIEQJoASBMAaQIgTQCkCYA0AZAmANIEQJoASBMAaYcGMNPXZXIcX5EE1Vuge9TvSjPv3MbBdwGHB3DrIRw94Ec3Ft/NFAHcahgzDHgFY+HdTBPATw9llgGvYiy6m9M2mffhXPvVmTMNdzVjwd1MF8DMw2K93Ux1CwT3JgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGmZAFb6JIN7GJF5ZQKArR5A5az2v0ZoTqkAYKsHUDq7XWPE5pMLoLjk7xrBuSQDqC77MyM6j2wA5aV/nMEIz+Hp9Xx+24Ku/YjvlY1gCLkAHPhfG6EQUrdADn5zSgcA2QCc/c0rHQBcIgDSBECaAEgTAGkCIE0ApGUCKP15/yeMyLwyAfB9I3Lw5wIoLfZaIzajVAB/1N///pkRnEvu7dCQvgLA3wRAmgBIEwBpAiBNAKQJgDQBkCYA0gRAmgBIEwBpAiBNAKQJgDQBkCYA0gRAmgBIEwBpAiBNAKQJgDQBkCYAtrLf4PCeHVXsdBEAAAAASUVORK5CYII=",sizes:"192x192",type:"image/png",purpose:"any"},{src:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAYAAAD0eNT6AAALM0lEQVR4nO3dXW7cNhSA0bjITgzM7H85A9hrcdGHvhRFflqJvNJ3zgISccBLftY4yNvH4/H1DQBI+WP3AwAA6wkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABH3f/QBwpPfXywfKqT6fT58wt/D28Xh87X4I+K9c+OwmCLgqAcDluPSZSgxwJQKAy3DxcxVCgCsQAIzn4ueqhACT+VcAjOby58rsXybzBoCRHJzcjbcBTOMNAOO4/Lkj+5ppBACjOCS5M/ubSQQAYzgcKbDPmUIAMIJDkRL7nQkEANs5DCmy79lNALCVQ5Ay+5+dBAAABAkAtvHTD5gD9hEAbOHyB/PAXgIAAIIEAMv56R/MBfsJAAAIEgAs5ad/MB/MIAAAIEgAAECQAGAZr//BnDCHAACAIAEAAEECAACCBABL+P4fzAuzCAAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQd93PwAz/wvdz+dz298NHM95wj8JgEF2DuiPnkUMwPU4T/gZATDApEH9N2IArsN5wq8SABtNH9QfPbO3AjCL84Tf5ZcAN7nisN7p+eFOrj6PV3/+q/IGYLE7bXRvA2DGDN6B82Q9bwAWutOwFtYFk9117u66rokEwCJ339R3Xx9Mcvd5u/v6phAAC1Q2c2WdsFNlzirr3EkAnKy2iWvrhZVq81Vb72oC4ETVzVtdN5ypOlfVda8gAAAgSACcpF6t9fXDkerzVF//WQTACWxWnwM4T5yr0wkAAAgSAAfz07/PA5wn53C+HksAAEDQ28fj8bX7Ie5CnQKcz/9GegxvAAAgSAAAQJAAAIAgAXAQ3/8DrOG8PYYAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAOMjn83nUHwWA8/Z0AgAAggQAAAQJgAP5GsDnAs6TczlnjyMAACBIAABAkAA4mNdTPg9wnpzD+XosAQAAQQLgBCrV5wDOE+fqdALgJPUIqK8fjlSfp/r6zyIAOJxhBZwn8wmAE7kIAecJUwmAk9UioLZeWKk2X7X1riYAFqhs4so6YafKnFXWuZMAWOTum/nu64NJ7j5vd1/fFAJgoTtu6r/WdMd1wXR3nDvnyVoCYLE7bfC7rAOuynnC/yEANrn65Xn154c7ufo8Xv35r+r77gco+3vTv79e367CoMJMzhN+lwAYYPrguvThOpwn/CoBMPii3RkELn24NucJPyMABnMJA84TzuKXAAEgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIALPH5fPqkwbwwiAAAgCABAABBAgAAggQAy/g9ADAnzCEAACBIAABAkABgKV8DgPlgBgEAAEECgOW8BQBzwX4CAACCBABbeAsA5oG9BADbiAAwB+wjAAA2EcHsJADYygEIsIcAYDsRQJF9z24CgBEchpTY70wgABjDoUiBfc4UAoBRHI7cmf3NJAKAcRyS3HFP29dMIwAYyYHJXbj4mUoAMJrDkyuzf5ns7ePx+Nr9EPAr3l8vHxSX4OLnCgQAlyMEmMrFz5UIAC5NDLCbS5+rEgCM5GLnboQC0wgAxnDpUyEGmEAAsJ2LnyohwE7+GSBbufwps//ZSQCwjcMPzAH7CAC2cPmDeWAvAcByLn8wF+wnAFjK5Q/mgxkEAAAECQCW8dM/mBPmEAAAECQAACBIALCE1/9gXphFAABAkAAAgCABAABBAgAAggQAAAQJAAAIEgAAECQAACBIAABAkAAAgCABAABBAgAAggQAAAQJAAAIEgAAECQAACBIAABAkABgic/n0ycN5oVBBAAABAkAAAgSACzjawAwJ8whAACGEMmsJABYygEHMIMAYDkRAOaC/QQAW4gAMA/sJQDYRgSAOWAfAcBWIoDy3rf/2UkAsJ2DkBoXPxO8fTweX7sfAv7p/fXyoXArLn2mEQAAEOQrAAAIEgAAECQAACBIAABAkAAAgCABAABBAgAAggQAAAQJAAAIEgAAECQAACBIAABAkAAAgCABAABBAgAAggQAAAQJAAAIEgAAECQAACBIAABAkAAAgCABAABBAgAAggQAAAQJAAAIEgAAECQAACBIAABAkAAAgCABAABBAgAAggQAAAQJAAAIEgAAECQAACBIAABAkAAAgCABAABBAgAAggQAAAQJAAAIEgAAECQAACBIAABAkAAAgCABAABBAgAAggQAAAQJAAAIEgAAECQAACBIAABAkAAAgCABAABBAgAAggQAAAQJAAAIEgAAECQAACBIAABAkAAAgCABAABBAgAAggQAAAQJAAAIEgAAECQAACBIAABAkAAAgCABAADfev4EqvuXup6IGkUAAAAASUVORK5CYII=",sizes:"512x512",type:"image/png",purpose:"any"},{src:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAADWUlEQVR4nO3d0UrjUBRA0Tj0TwL1/z9H8H6LwzwIgxR1Ora5vXutd6Gck53EWNun1/P5bYOoX0e/ADiSAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBEDa6egXMJP95WWrGM/PR7+EKTy9ns9vW1jpoL9kxENI3wLVD/73GZTnkA2gvPRL9ug8kgFUl/2VPTiXXADFJf+LPTafVAC15V5rD80pFQB8JADSMgGULus/YY/MKxMAXCIA0gRAmgBIEwBpp9WeQtTf3XgP+0K7Oa32+O3952cc9qPbF9zNr1WfPVeeY9/LvuhupgngFkOZadCPbF94N1MEcMthzDLoR7UvvpvD/yVyhiFwrCN/J5jiCgDJAJz9Ofo4cAUgTQCkCYA0AZAmANIEQJoASBMAaQIgTQCkCYA0AZAmANIEQJoASBMAaQIgTQCkCYA0AZAmANIEQJoASBMAaQIgTQCkCYA0AZAmANIEQJoASBMAaYcGMNPXZXIcX5EE1Vuge9TvSjPv3MbBdwGHB3DrIRw94Ec3Ft/NFAHcahgzDHgFY+HdTBPATw9llgGvYiy6m9M2mffhXPvVmTMNdzVjwd1MF8DMw2K93Ux1CwT3JgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGmZAFb6JIN7GJF5ZQKArR5A5az2v0ZoTqkAYKsHUDq7XWPE5pMLoLjk7xrBuSQDqC77MyM6j2wA5aV/nMEIz+Hp9Xx+24Ku/YjvlY1gCLkAHPhfG6EQUrdADn5zSgcA2QCc/c0rHQBcIgDSBECaAEgTAGkCIE0ApGUCKP15/yeMyLwyAfB9I3Lw5wIoLfZaIzajVAB/1N///pkRnEvu7dCQvgLA3wRAmgBIEwBpAiBNAKQJgDQBkCYA0gRAmgBIEwBpAiBNAKQJgDQBkCYA0gRAmgBIEwBpAiBNAKQJgDQBkCYAtrLf4PCeHVXsdBEAAAAASUVORK5CYII=",sizes:"192x192",type:"image/png",purpose:"maskable"}]};const b=new Blob([JSON.stringify(m)],{type:"application/json"});const l=document.createElement("link");l.rel="manifest";l.href=URL.createObjectURL(b);document.head.appendChild(l);</script></head>
 <body>
@@ -1062,17 +1109,22 @@ select.input { appearance: auto; }
         <div class="card">
           <h3>快捷操作</h3>
           <div class="quick-grid">
-            <button class="quick-btn" data-go="quick-order">⚡ 快速开单</button>
-            <button class="quick-btn" data-go="customers">👥 客户</button>
+            <button class="quick-btn primary" data-go="quick-order">⚡ 快速开单</button>
             <button class="quick-btn" data-go="orders">📦 订单</button>
             <button class="quick-btn" data-go="outsource">🏭 生产</button>
-            <button class="quick-btn" data-go="factory-add">➕ 新加工商</button>
-            <button class="quick-btn" data-go="stocktake">📋 盘点</button>
             <button class="quick-btn" data-go="purchase">📥 送货入库</button>
-            <button class="quick-btn" data-go="stats">📊 统计</button>
-            <button class="quick-btn" data-go="trends">🔥 爆款</button>
-            <button class="quick-btn" data-go="addrbook">📮 地址簿</button>
+            <button class="quick-btn" data-go="customers">👥 客户</button>
+            <button class="quick-btn" data-go="stocktake">📋 盘点</button>
           </div>
+          <div class="quick-more hidden" id="quick-more">
+            <div class="quick-grid">
+              <button class="quick-btn" data-go="stats">📊 统计</button>
+              <button class="quick-btn" data-go="trends">🔥 爆款</button>
+              <button class="quick-btn" data-go="addrbook">📮 地址簿</button>
+              <button class="quick-btn" data-go="factory-add">➕ 新加工商</button>
+            </div>
+          </div>
+          <button class="quick-more-toggle" id="quick-more-toggle">更多功能 ▾</button>
         </div>
         <div class="card" id="today-reminders-card">
           <h3>📢 今日提醒</h3>
@@ -2224,7 +2276,7 @@ const Sync = {
 
 /* ---------------- 授权与版本（2.4 工厂版） ---------------- */
 
-const APP_VERSION = "3.1";
+const APP_VERSION = "3.2";
 
 const License = {
   /** 当前账号绑定的授权码（本地记录） */
@@ -2407,6 +2459,11 @@ function announceModal(versions) {
 
 /** 各版本更新公告（每次发布新版本时在此追加一条） */
 const CHANGELOG = {
+  "3.2": [
+    "界面质感升级：数字跳动动画、空状态美化、按钮按压反馈",
+    "更像 App：禁止下拉刷新回弹、点击无高亮闪烁",
+    "快捷操作重排：常用 6 个放前面（快速开单/订单/生产/送货入库/客户/盘点），其余收进「更多功能」"
+  ],
   "3.1": [
     "全局搜索修复：数据异常不再报错，输入栏右侧新增「搜索」键，支持回车搜索",
     "语音快速开单：支持「款式 + 颜色 + 数量」一起说（如：圆领毛衣 红色 3件），自动填颜色"
@@ -2804,11 +2861,24 @@ function renderToday() {
   for (const s of salesCache) {
     if (s.onCredit) totalDebt += s.qty * s.price;
   }
-  $("#today-sales").textContent = fmt(todaySales);
-  $("#today-profit").textContent = fmt(todayProfit);
-  $("#today-orders").textContent = todayOrders;
-  $("#today-debt").textContent = fmt(totalDebt);
+  setStat("today-sales", fmt(todaySales));
+  setStat("today-profit", fmt(todayProfit));
+  setStat("today-orders", todayOrders);
+  setStat("today-debt", fmt(totalDebt));
   renderTodayReminders();
+}
+
+/** 更新今日统计数字（数值变化时带跳动动画） */
+function setStat(id, v) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const old = el.textContent;
+  el.textContent = v;
+  if (old !== String(v)) {
+    el.classList.remove("bump");
+    void el.offsetWidth; // 重置动画
+    el.classList.add("bump");
+  }
 }
 
 /** 今日概览：交期/逾期/低库存提醒 */
@@ -5880,6 +5950,13 @@ function bindEvents() {
       else { const tab = $(`.tab[data-view=${go}]`); if (tab) tab.click(); }
     };
   });
+  // 快捷操作：更多功能折叠
+  $("#quick-more-toggle").onclick = () => {
+    const more = $("#quick-more");
+    const isHidden = more.classList.contains("hidden");
+    more.classList.toggle("hidden");
+    $("#quick-more-toggle").textContent = isHidden ? "收起 ▴" : "更多功能 ▾";
+  };
 
   // 主题
   $("#theme-toggle").onclick = () => applyTheme(!isDark);
