@@ -290,6 +290,7 @@ body {
   color: #fff;
   box-shadow: 0 3px 10px rgba(185,28,46,.3);
 }
+.chip.sort-chip { color: var(--text); font-weight: 600; }
 
 /* ============ 列表卡片 ============ */
 .list { display: flex; flex-direction: column; gap: 12px; }
@@ -351,6 +352,26 @@ body {
 .tag.green { background: var(--ok-bg); color: var(--ok); }
 .tag.red { background: var(--danger-bg); color: var(--danger); font-weight: 600; }
 .tag.blue { background: rgba(59,130,246,.12); color: #3b82f6; }
+.tag.warn { background: rgba(245,158,11,.14); color: #d97706; }
+.danger-text { color: var(--danger); font-weight: 700; }
+
+/* 订单发货明细 */
+.ship-lines { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+.ship-line { display: flex; align-items: center; gap: 8px; background: var(--bg2); border-radius: 10px; padding: 6px 10px; }
+.ship-name { flex: 1; min-width: 0; font-size: var(--fs-sm); color: var(--text); word-break: break-all; }
+.ship-qty { font-size: var(--fs-sm); color: var(--text2); white-space: nowrap; }
+.ship-ops { display: flex; gap: 6px; }
+.mini-btn {
+  width: 30px; height: 30px; border-radius: 9px; border: 1px solid var(--border);
+  background: var(--card); color: var(--text); font-size: 17px; font-weight: 700; line-height: 1;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.mini-btn:active { transform: scale(.92); }
+.tip-line {
+  font-size: var(--fs-sm); line-height: 1.7; color: var(--text);
+  padding: 8px 0; border-bottom: 1px dashed var(--border);
+}
+.tip-line:last-child { border-bottom: none; }
 .list-side { text-align: right; flex: none; display: flex; flex-direction: column; justify-content: center; gap: 3px; padding-left: 6px; }
 .list-side .num { font-size: var(--fs-num); font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.3px; }
 .list-side .lbl { font-size: var(--fs-tiny); color: var(--text3); }
@@ -561,6 +582,24 @@ select.input { appearance: auto; }
 .addr-row .input { flex: 1; }
 .addr-row .btn { width: auto; margin-top: 0; }
 
+/* 带单位的输入框 */
+.unit-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+.unit-wrap .input { padding-right: 34px; }
+.unit-wrap .unit {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: var(--fs-xs);
+  color: var(--text3);
+  pointer-events: none;
+}
+.color-row .unit-wrap { flex: 1; }
+
 .order-card { flex-direction: column; }
 .order-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
 .order-customer { font-size: 15.5px; font-weight: 700; }
@@ -632,6 +671,32 @@ select.input { appearance: auto; }
 }
 .quick-btn:active { transform: scale(.93); box-shadow: var(--shadow-press); }
 .quick-btn:hover { box-shadow: var(--shadow-md); }
+
+/* 今日日期卡片 */
+.today-date-card {
+  background: linear-gradient(135deg, var(--primary-deep), var(--primary));
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  margin-bottom: 14px;
+  color: #fff;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+  overflow: hidden;
+}
+.today-date-card::after {
+  content: "";
+  position: absolute;
+  top: -40px; right: -30px;
+  width: 130px; height: 130px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,.15), transparent 65%);
+  pointer-events: none;
+}
+.today-date-text { font-size: var(--fs-lg); font-weight: 700; position: relative; }
+.today-time-text { font-size: var(--fs-sm); opacity: .85; font-variant-numeric: tabular-nums; position: relative; }
 
 /* 今日提醒 */
 .today-ok {
