@@ -388,6 +388,37 @@ body {
 }
 .tip-line:last-child { border-bottom: none; }
 
+/* 生产看板 */
+.os-board { padding: 14px 14px 12px; }
+.os-board-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.os-board-cell {
+  background: var(--bg2); border-radius: 14px; padding: 12px 4px;
+  text-align: center; cursor: pointer;
+  transition: transform .15s var(--ease);
+}
+.os-board-cell:active { transform: scale(.94); }
+.os-board-num { font-size: 26px; font-weight: 800; color: var(--text); line-height: 1.2; }
+.os-board-lbl { font-size: var(--fs-tiny); color: var(--text2); margin-top: 3px; white-space: nowrap; }
+.os-board-settle { margin-top: 10px; font-size: var(--fs-sm); color: var(--text2); text-align: right; }
+
+/* 订单快捷收款 */
+.quick-pay-btn {
+  flex: none; align-self: center;
+  border: none; border-radius: 10px;
+  background: linear-gradient(135deg, #a4162a, #c2253a);
+  color: #fff; font-size: var(--fs-xs); font-weight: 700;
+  padding: 8px 12px; margin-left: 8px;
+  box-shadow: 0 2px 8px rgba(185,28,46,.35);
+}
+.quick-pay-btn:active { transform: scale(.94); }
+
+/* 全局搜索分组 */
+.search-group-title {
+  font-size: var(--fs-xs); font-weight: 700; color: var(--text2);
+  padding: 14px 4px 6px;
+}
+.search-group-title:first-child { padding-top: 4px; }
+
 /* 图片分享/预览弹层 */
 .img-share-mask {
   position: fixed; inset: 0; z-index: 999;
@@ -996,6 +1027,7 @@ select.input { appearance: auto; }
           <h1 id="page-title">款式库存</h1>
           <div class="header-sub" id="header-sub">羊毛衫 · 库存订单管理</div>        </div>
         <div class="header-right">
+          <button id="search-btn" class="header-btn ghost" title="搜索">🔍</button>
           <button id="theme-toggle" class="header-btn ghost" title="切换主题">🌙</button>
           <button id="header-btn" class="header-btn hidden">＋ 新增</button>
           <button id="user-btn" class="header-btn ghost" title="账号">👤</button>
@@ -1004,6 +1036,14 @@ select.input { appearance: auto; }
     </header>
 
     <main id="content">
+      <!-- ============ 全局搜索 ============ -->
+      <section id="view-search" class="view">
+        <div class="search-bar">
+          <input id="global-search-input" class="input" placeholder="搜款式 / 客户 / 订单…" autocomplete="off">
+        </div>
+        <div id="global-search-result" class="list"></div>
+      </section>
+
       <!-- ============ 今日概览 ============ -->
       <section id="view-today" class="view">
         <div class="today-date-card" id="today-date-card">
@@ -1050,10 +1090,13 @@ select.input { appearance: auto; }
       <section id="view-outsource" class="view">
         <div class="filter-row">
           <button id="os-filter-all" class="chip active">全部</button>
+          <button id="os-filter-duetoday" class="chip">📥 今日回货</button>
+          <button id="os-filter-owe" class="chip">📦 欠货</button>
           <button id="os-filter-active" class="chip">生产中</button>
           <button id="os-filter-overdue" class="chip">已逾期</button>
           <button id="os-filter-settled" class="chip">未结算</button>
         </div>
+        <div class="card os-board" id="os-board"></div>
         <div id="outsource-list" class="list"></div>
         <div class="btn-row">
           <button id="os-new" class="btn primary">＋ 下生产单</button>
@@ -1289,6 +1332,7 @@ select.input { appearance: auto; }
         </div>
         <div id="order-list" class="list"></div>
         <div class="btn-row">
+          <button id="order-ship-list-btn" class="btn">📦 发货清单（拣货）</button>
           <button id="order-import-btn" class="btn">📥 批量导入订单</button>
         </div>
       </section>
@@ -2177,7 +2221,7 @@ const Sync = {
 
 /* ---------------- 授权与版本（2.4 工厂版） ---------------- */
 
-const APP_VERSION = "2.9";
+const APP_VERSION = "3.0";
 
 const License = {
   /** 当前账号绑定的授权码（本地记录） */
@@ -2360,6 +2404,13 @@ function announceModal(versions) {
 
 /** 各版本更新公告（每次发布新版本时在此追加一条） */
 const CHANGELOG = {
+  "3.0": [
+    "生产看板：今日回货 / 欠货 / 逾期 / 进行中一目了然，未结算工费合计",
+    "今日提醒：今天要回货、欠货未回的生产单自动提醒",
+    "全局搜索：顶部🔍一个框同时搜款式 / 客户 / 订单",
+    "订单列表一键收款：不用进详情就能收钱",
+    "发货清单（拣货单）：仓库按清单配货打包"
+  ],
   "2.9": [
     "更新公告全新美化：分点展示、版本标签、卡片式设计",
     "周报/月报不再第一天就推：数据满一周/满一个月后才会自动出现",
@@ -2490,7 +2541,8 @@ const VIEW_TITLES = {
   outsource: "生产加工", "outsource-edit": "下生产单", "outsource-detail": "生产单详情",
   factories: "加工商管理", "factory-edit": "编辑加工商", trends: "爆款推荐",
   addrbook: "地址簿", "addr-edit": "编辑地址",
-  report: "经营报表 · 周报/月报"
+  report: "经营报表 · 周报/月报",
+  search: "全局搜索"
 };
 
 const TAB_VIEWS = ["today", "items", "customers", "orders", "settings"];
@@ -2530,6 +2582,7 @@ function showView(name) {
       trends: "畅销款分析 · 行业风向",
       addrbook: "常用地址管理",
       report: "周报/月报 · 经营分析与整改建议",
+      search: "一个搜索框找款式 / 客户 / 订单",
       settings: "警告线 · 同步 · 备份 · 账号"
     };
     sub.textContent = map[name] || "羊毛衫 · 库存订单管理";
@@ -2778,6 +2831,16 @@ function renderTodayReminders() {
     o.status !== "done" && o.status !== "cancelled" && o.due && now > new Date(o.due + "T23:59:59").getTime()
   );
   if (overdueOs.length) reminders.push({ icon: "🏭", text: `${overdueOs.length} 个生产单已逾期`, go: "outsource" });
+  // 3.1 今天要回货的生产单
+  const dueOsToday = outsourcesCache.filter((o) =>
+    o.status !== "done" && o.status !== "cancelled" && o.due && o.due === todayStrFull
+  );
+  if (dueOsToday.length) reminders.push({ icon: "📥", text: `今天有 ${dueOsToday.length} 个生产单要回货`, go: "outsource-duetoday" });
+  // 3.2 欠货未回的生产单
+  const oweOs = outsourcesCache.filter((o) =>
+    o.status !== "done" && o.status !== "cancelled" && osRemaining(o) > 0
+  );
+  if (oweOs.length) reminders.push({ icon: "📦", text: `${oweOs.length} 个生产单欠货未回`, go: "outsource-owe" });
   // 4. 低库存款式
   const lowItems = itemsCache.filter((it) => Store.isItemLowStock(it));
   if (lowItems.length) reminders.push({ icon: "⚠️", text: `${lowItems.length} 个款式库存不足`, go: "items" });
@@ -2799,6 +2862,8 @@ function renderTodayReminders() {
     el.onclick = () => {
       const go = el.dataset.go;
       if (go === "outsource") { renderOutsources(); showView("outsource"); }
+      else if (go === "outsource-duetoday") { osFilter = "duetoday"; setOsChips("duetoday"); renderOutsources(); showView("outsource"); }
+      else if (go === "outsource-owe") { osFilter = "owe"; setOsChips("owe"); renderOutsources(); showView("outsource"); }
       else if (go === "debt") { renderDebt(); showView("debt"); }
       else if (go === "report-week") openReport("week");
       else if (go === "report-month") openReport("month");
@@ -3604,6 +3669,13 @@ function osCost(o) {
 
 function osFiltered() {
   let list = outsourcesCache;
+  if (osFilter === "duetoday") {
+    const t = todayStr();
+    list = list.filter((o) => o.status !== "done" && o.status !== "cancelled" && o.due && o.due === t);
+  }
+  if (osFilter === "owe") {
+    list = list.filter((o) => o.status !== "done" && o.status !== "cancelled" && osRemaining(o) > 0);
+  }
   if (osFilter === "active") list = list.filter((o) => o.status !== "done" && o.status !== "cancelled");
   if (osFilter === "overdue") {
     const now = Date.now();
@@ -3613,7 +3685,37 @@ function osFiltered() {
   return list;
 }
 
+/** 生产看板：今日回货 / 逾期 / 欠货 / 进行中 / 未结算（仓库视角） */
+function renderOsBoard() {
+  const board = $("#os-board");
+  if (!board) return;
+  const now = Date.now();
+  const t = todayStr();
+  const active = outsourcesCache.filter((o) => o.status !== "done" && o.status !== "cancelled");
+  const dueToday = active.filter((o) => o.due && o.due === t);
+  const overdue = active.filter((o) => o.due && now > new Date(o.due + "T23:59:59").getTime());
+  const owe = active.filter((o) => osRemaining(o) > 0);
+  const unsettledCost = outsourcesCache.filter((o) => o.status !== "cancelled" && !o.settled).reduce((s, o) => s + osCost(o), 0);
+  const cell = (key, icon, num, lbl, hot) => `
+    <div class="os-board-cell" data-f="${key}" ${hot ? 'style="background:var(--danger-bg)"' : ""}>
+      <div class="os-board-num" ${hot ? 'style="color:var(--danger)"' : ""}>${num}</div>
+      <div class="os-board-lbl">${icon} ${lbl}</div>
+    </div>`;
+  board.innerHTML = `
+    <div class="os-board-grid">
+      ${cell("duetoday", "📥", dueToday.length, "今日回货", dueToday.length > 0)}
+      ${cell("owe", "📦", owe.length, "欠货未回", owe.length > 0)}
+      ${cell("overdue", "⏰", overdue.length, "已逾期", overdue.length > 0)}
+      ${cell("all", "🏭", active.length, "进行中", false)}
+    </div>
+    <div class="os-board-settle">未结算工费合计 <b style="color:${unsettledCost ? "var(--danger)" : "var(--ok)"}">${unsettledCost ? money(unsettledCost) : "无 ✅"}</b></div>`;
+  $$("#os-board .os-board-cell").forEach((c) => {
+    c.onclick = () => { osFilter = c.dataset.f; setOsChips(c.dataset.f); renderOutsources(); };
+  });
+}
+
 function renderOutsources() {
+  renderOsBoard();
   const list = osFiltered();
   const el = $("#outsource-list");
   if (!list.length) {
@@ -4386,6 +4488,8 @@ function renderOrders() {
     const checkBox = orderBatchMode
       ? `<input type="checkbox" class="order-check" data-id="${o.id}" ${orderBatchSelected.has(o.id) ? "checked" : ""}>`
       : "";
+    const quickPay = (!orderBatchMode && debt > 0 && o.status !== "cancelled")
+      ? `<button class="quick-pay-btn" data-id="${o.id}" data-debt="${debt}">💰 收款</button>` : "";
     return `
       <div class="list-card order-card" data-id="${o.id}">
         ${checkBox}
@@ -4399,6 +4503,7 @@ function renderOrders() {
           <div class="order-addr">📮 ${escapeHtml(o.address || "无地址")}</div>
           <div class="order-addr">🕐 ${timeStr(o.createdAt)} · 合计 ${money(total)}${shippedQty && shippedQty < totalQty ? ` · 已发 ${shippedQty}/${totalQty} 件` : ""}</div>
         </div>
+        ${quickPay}
       </div>`;
   }).join("");
   $$("#order-list .order-card").forEach((card) => {
@@ -4410,6 +4515,13 @@ function renderOrders() {
     } else {
       card.onclick = () => openOrderDetail(card.dataset.id);
     }
+  });
+  // 快捷收款（不进入详情）
+  $$("#order-list .quick-pay-btn").forEach((b) => {
+    b.onclick = (e) => {
+      e.stopPropagation();
+      quickCollect(b.dataset.id);
+    };
   });
   $$("#order-list .order-check").forEach((cb) => {
     cb.onchange = () => {
@@ -4440,6 +4552,72 @@ function updateOrderBatchBar() {
   const bar = $("#order-batch-bar");
   if (!bar) return;
   $("#order-batch-count").textContent = `已选 ${orderBatchSelected.size} 单`;
+}
+
+/** 订单列表快捷收款（不进详情，仓库/手机快速收钱） */
+async function quickCollect(id) {
+  const o = ordersCache.find((x) => x.id === id);
+  if (!o) return;
+  const total = orderTotal(o);
+  const debt = orderDebt(o);
+  const v = prompt(`「${o.customer}」欠 ${money(debt)}，本次收款金额：`, String(debt || ""));
+  const n = Number(v);
+  if (!(n > 0)) return;
+  const newPaid = Math.min(total, (o.paidAmount || 0) + n);
+  const status = newPaid >= total ? "paid" : "partial";
+  await Store.setOrderPay(id, status, newPaid);
+  toast(`已收款 ${money(n)}` + (newPaid >= total ? "，已结清 ✅" : `，还欠 ${money(total - newPaid)}`));
+  await reloadAll();
+  renderOrders();
+  renderToday();
+}
+
+/** 生成发货清单图片（仓库拣货单：所有待发货订单） */
+async function generateShipListImage() {
+  const list = ordersCache.filter((o) => o.status === "pending" && !o.shippedAt)
+    .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+  if (!list.length) return toast("当前没有待发货订单");
+  try {
+    const W = 750;
+    const H = 300 + list.length * 78 + 130;
+    const canvas = document.createElement("canvas");
+    canvas.width = W; canvas.height = H;
+    const ctx = canvas.getContext("2d");
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, "#ffffff"); g.addColorStop(1, "#faf7f3");
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = "#b91c2e"; ctx.fillRect(0, 0, W, 90);
+    ctx.fillStyle = "#ffffff"; ctx.textAlign = "center";
+    ctx.font = "bold 30px sans-serif";
+    ctx.fillText("羊毛衫管家 · 发货清单", W / 2, 42);
+    ctx.font = "18px sans-serif"; ctx.fillStyle = "#fde8b0";
+    ctx.fillText(todayStr() + " · 仓库拣货用", W / 2, 70);
+    ctx.textAlign = "left";
+    ctx.fillStyle = "#1c1917"; ctx.font = "bold 18px sans-serif";
+    const totalQtyAll = list.reduce((s, o) => s + orderTotalQty(o), 0);
+    ctx.fillText(`待发货 ${list.length} 单 · 共 ${totalQtyAll} 件`, 40, 128);
+    let y = 158;
+    ctx.font = "15px sans-serif";
+    for (const o of list) {
+      const lines = (o.lines || []).map((l) => `${l.qty}×${l.itemName}${l.color ? "(" + l.color + ")" : ""}`).join("、");
+      ctx.fillStyle = "#1c1917"; ctx.font = "bold 16px sans-serif";
+      ctx.fillText((o.customer || "") + "　" + (o.phone || ""), 40, y);
+      ctx.font = "14px sans-serif"; ctx.fillStyle = "#57534e";
+      ctx.fillText(lines.slice(0, 26), 40, y + 24);
+      ctx.fillStyle = "#78716c";
+      ctx.fillText("📮 " + (o.address || "").slice(0, 26), 40, y + 46);
+      ctx.fillStyle = "#b45309"; ctx.font = "bold 14px sans-serif";
+      ctx.fillText(orderTotalQty(o) + "件 · ¥" + fmt(orderTotal(o)), W - 140, y);
+      ctx.font = "15px sans-serif"; ctx.fillStyle = "#57534e";
+      y += 78;
+      if (y > H - 60) break;
+    }
+    ctx.fillStyle = "#a8a29e"; ctx.font = "14px sans-serif"; ctx.textAlign = "center";
+    ctx.fillText("按清单配货打包，发货后在 App 里标记发货", W / 2, H - 34);
+    await finishShareImage(canvas, "发货清单-" + todayStr() + ".png", "发货清单（拣货单）", "👆 长按图片保存，仓库按清单配货");
+  } catch (e) {
+    toast("生成失败：" + (e.message || "未知错误"));
+  }
 }
 
 async function batchMarkDone() {
@@ -5302,6 +5480,68 @@ function renderTrends() {
   staggerIn(indEl);
 }
 
+/* ================= 全局搜索 ================= */
+
+function renderGlobalSearch() {
+  const el = $("#global-search-result");
+  if (!el) return;
+  const q = ($("#global-search-input").value || "").trim().toLowerCase();
+  if (!q) {
+    el.innerHTML = '<div class="hint" style="text-align:center;padding:30px 0">输入关键词，同时搜索款式 / 客户 / 订单</div>';
+    return;
+  }
+  // 款式
+  const items = itemsCache.filter((it) => it.name.toLowerCase().includes(q) || (it.colors || []).some((c) => c.name.toLowerCase().includes(q))).slice(0, 5);
+  // 客户
+  const custs = customersCache.filter((c) => c.name.toLowerCase().includes(q) || (c.phone || "").includes(q)).slice(0, 5);
+  // 订单
+  const orders = ordersCache.filter((o) =>
+    (o.customer || "").toLowerCase().includes(q) ||
+    (o.lines || []).some((l) => (l.itemName || "").toLowerCase().includes(q))
+  ).slice(0, 8);
+  const group = (title, rows) => rows.length
+    ? `<div class="search-group-title">${title}（${rows.length}）</div>` + rows.join("")
+    : "";
+  el.innerHTML = group("🧥 款式", items.map((it) => {
+    const totalStock = (it.colors || []).reduce((s, c) => s + (c.stock || 0), 0);
+    return `<div class="list-card" data-item="${it.id}">
+      <div class="thumb">${(it.images && it.images[0]) ? `<img src="${it.images[0]}" alt="" loading="lazy">` : "🧥"}</div>
+      <div class="list-main">
+        <div class="list-title">${escapeHtml(it.name)}</div>
+        <div class="list-sub">库存 ${totalStock} 件 · ${money(it.price)}</div>
+      </div>
+    </div>`;
+  }).join("")) +
+  group("👥 客户", custs.map((c) => {
+    const cOrders = ordersCache.filter((o) => o.customer === c.name && o.status !== "cancelled");
+    const pieces = cOrders.reduce((s, o) => s + orderTotalQty(o), 0);
+    return `<div class="list-card" data-cust="${c.id}">
+      <div class="list-main">
+        <div class="list-title">${escapeHtml(c.name)}</div>
+        <div class="list-sub">${escapeHtml(c.phone || "无电话")} · 共买 ${pieces} 件</div>
+      </div>
+    </div>`;
+  }).join("")) +
+  group("📦 订单", orders.map((o) => {
+    const lines = (o.lines || []).map((l) => `${l.qty}×${escapeHtml(l.itemName)}${l.color ? "(" + escapeHtml(l.color) + ")" : ""}`).join("、");
+    return `<div class="list-card" data-order="${o.id}">
+      <div class="list-main">
+        <div class="list-title">${escapeHtml(o.customer)} <span class="order-status ${o.status}">${o.status === "done" ? "已完成" : o.status === "cancelled" ? "已取消" : "未完成"}</span></div>
+        <div class="list-sub">${lines.slice(0, 24)} · ${money(orderTotal(o))}</div>
+        <div class="list-sub">🕐 ${timeStr(o.createdAt)}</div>
+      </div>
+    </div>`;
+  }).join(""));
+  if (!items.length && !custs.length && !orders.length) {
+    el.innerHTML = '<div class="empty"><span class="empty-icon">🔍</span>没有找到「' + escapeHtml(q) + '」</div>';
+    return;
+  }
+  $$("#global-search-result [data-item]").forEach((c) => { c.onclick = () => openDetail(c.dataset.item); });
+  $$("#global-search-result [data-cust]").forEach((c) => { c.onclick = () => openCustomerDetail(c.dataset.cust); });
+  $$("#global-search-result [data-order]").forEach((c) => { c.onclick = () => openOrderDetail(c.dataset.order); });
+  staggerIn(el);
+}
+
 /* ================= 地址簿 ================= */
 
 let editingAddrId = null;
@@ -5574,6 +5814,15 @@ async function logout() {
 /* ================= 事件绑定 ================= */
 
 function bindEvents() {
+  // 全局搜索
+  $("#search-btn").onclick = () => {
+    showView("search");
+    $("#global-search-input").value = "";
+    renderGlobalSearch();
+    setTimeout(() => { try { $("#global-search-input").focus(); } catch {} }, 120);
+  };
+  $("#global-search-input").oninput = debounce(renderGlobalSearch, 200);
+
   // Tab 导航
   $$(".tab").forEach((t) => {
     t.onclick = () => {
@@ -5675,6 +5924,7 @@ function bindEvents() {
 
   // 订单批量操作
   $("#order-import-btn").onclick = openImport;
+  $("#order-ship-list-btn").onclick = generateShipListImage;
   $("#order-batch-done").onclick = batchMarkDone;
   $("#order-batch-cancel").onclick = exitOrderBatchMode;
 
@@ -5708,6 +5958,8 @@ function bindEvents() {
   $("#os-save").onclick = saveOutsource;
   $("#os-cancel").onclick = () => { renderOutsources(); showView("outsource"); };
   $("#os-filter-all").onclick = () => { osFilter = "all"; setOsChips("all"); renderOutsources(); };
+  $("#os-filter-duetoday").onclick = () => { osFilter = "duetoday"; setOsChips("duetoday"); renderOutsources(); };
+  $("#os-filter-owe").onclick = () => { osFilter = "owe"; setOsChips("owe"); renderOutsources(); };
   $("#os-filter-active").onclick = () => { osFilter = "active"; setOsChips("active"); renderOutsources(); };
   $("#os-filter-overdue").onclick = () => { osFilter = "overdue"; setOsChips("overdue"); renderOutsources(); };
   $("#os-filter-settled").onclick = () => { osFilter = "settled"; setOsChips("settled"); renderOutsources(); };
@@ -5934,6 +6186,8 @@ function setStocktakeChips(which) {
 
 function setOsChips(which) {
   $("#os-filter-all").classList.toggle("active", which === "all");
+  $("#os-filter-duetoday").classList.toggle("active", which === "duetoday");
+  $("#os-filter-owe").classList.toggle("active", which === "owe");
   $("#os-filter-active").classList.toggle("active", which === "active");
   $("#os-filter-overdue").classList.toggle("active", which === "overdue");
   $("#os-filter-settled").classList.toggle("active", which === "settled");
