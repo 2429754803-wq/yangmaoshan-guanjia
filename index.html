@@ -75,14 +75,10 @@
           <div id="today-time-text" class="today-time-text"></div>
         </div>
         <div class="stats-summary">
-          <div class="stat-card"><div class="stat-num" id="today-sales">0</div><div class="stat-lbl">今日销售额</div></div>
+          <div class="stat-card"><div class="stat-num" id="today-sales">0</div><div class="stat-lbl">今日营业额</div></div>
           <div class="stat-card"><div class="stat-num" id="today-profit">0</div><div class="stat-lbl">今日利润</div></div>
           <div class="stat-card"><div class="stat-num" id="today-orders">0</div><div class="stat-lbl">今日新订单</div></div>
           <div class="stat-card"><div class="stat-num" id="today-debt">0</div><div class="stat-lbl">未收款合计</div></div>
-        </div>
-        <div class="card" id="today-reminders-card">
-          <h3>📢 今日提醒</h3>
-          <div id="today-reminders"></div>
         </div>
         <div class="card">
           <h3>快捷操作</h3>
@@ -90,7 +86,7 @@
             <button class="quick-btn" data-go="quick-order">⚡ 快速开单</button>
             <button class="quick-btn" data-go="customers">👥 客户</button>
             <button class="quick-btn" data-go="orders">📦 订单</button>
-            <button class="quick-btn" data-go="outsource">🏭 外发</button>
+            <button class="quick-btn" data-go="outsource">🏭 生产</button>
             <button class="quick-btn" data-go="factory-add">➕ 新加工商</button>
             <button class="quick-btn" data-go="stocktake">📋 盘点</button>
             <button class="quick-btn" data-go="purchase">📥 送货入库</button>
@@ -98,6 +94,10 @@
             <button class="quick-btn" data-go="trends">🔥 爆款</button>
             <button class="quick-btn" data-go="addrbook">📮 地址簿</button>
           </div>
+        </div>
+        <div class="card" id="today-reminders-card">
+          <h3>📢 今日提醒</h3>
+          <div id="today-reminders"></div>
         </div>
       </section>
 
@@ -110,7 +110,7 @@
         <div id="report-content"></div>
       </section>
 
-      <!-- ============ 外发加工（工厂） ============ -->
+      <!-- ============ 生产加工（工厂） ============ -->
       <section id="view-outsource" class="view">
         <div class="filter-row">
           <button id="os-filter-all" class="chip active">全部</button>
@@ -120,12 +120,12 @@
         </div>
         <div id="outsource-list" class="list"></div>
         <div class="btn-row">
-          <button id="os-new" class="btn primary">＋ 下外发单</button>
+          <button id="os-new" class="btn primary">＋ 下生产单</button>
           <button id="os-factories" class="btn">🏭 加工商管理</button>
         </div>
       </section>
 
-      <!-- ============ 新建外发单 ============ -->
+      <!-- ============ 新建生产单 ============ -->
       <section id="view-outsource-edit" class="view">
         <div class="card">
           <label class="lbl">加工商 *</label>
@@ -145,13 +145,13 @@
           <label class="lbl">备注</label>
           <input id="os-note" class="input" placeholder="备注">
           <div class="btn-row">
-            <button id="os-save" class="btn primary">下外发单</button>
+            <button id="os-save" class="btn primary">下生产单</button>
             <button id="os-cancel" class="btn">取消</button>
           </div>
         </div>
       </section>
 
-      <!-- ============ 外发单详情 ============ -->
+      <!-- ============ 生产单详情 ============ -->
       <section id="view-outsource-detail" class="view">
         <div id="outsource-detail-body"></div>
       </section>
@@ -174,7 +174,7 @@
           <label class="lbl">擅长工序</label>
           <input id="fa-skill" class="input" placeholder="如：缝纫、套口、后整理">
           <label class="lbl">默认工费（元/件，可选）</label>
-          <input id="fa-price" class="input" type="number" inputmode="decimal" placeholder="下外发单时自动带出">
+          <input id="fa-price" class="input" type="number" inputmode="decimal" placeholder="下生产单时自动带出">
           <label class="lbl">备注</label>
           <input id="fa-note" class="input" placeholder="备注">
           <div class="btn-row">
@@ -254,6 +254,10 @@
         <div class="search-bar">
           <input id="customer-search" class="input" placeholder="搜索客户名称 / 电话…">
         </div>
+        <div class="filter-row">
+          <button id="customer-sort-qty" class="chip active">🧶 按买货件数</button>
+          <button id="customer-sort-debt" class="chip">💰 按欠款</button>
+        </div>
         <div id="customer-list" class="list"></div>
       </section>
 
@@ -294,11 +298,11 @@
           <hr>
           <label class="lbl">🎤 语音/文字快速加商品</label>
           <div class="addr-row">
-            <input id="qo-voice-text" class="input" placeholder="例：黑色 3件 38元">
-            <button id="qo-voice-btn" class="btn small">🎤 说</button>
+            <input id="qo-voice-text" class="input" placeholder="例：圆领毛衣 3件">
+            <button id="qo-voice-btn" class="btn small voice-btn">🎤 按住说</button>
             <button id="qo-text-btn" class="btn small">识别</button>
           </div>
-          <div class="hint" style="margin-bottom:6px">说或输入「颜色 + 数量件 + 单价元」，自动匹配款式加入下方清单；也支持长按输入法麦克风键说话。</div>
+          <div class="hint" style="margin-bottom:6px">按住「🎤 按住说」说话，松开自动识别；说「款式名 + 数量」，如"圆领毛衣 3件"。也支持打字后点识别，或用输入法麦克风键说话。</div>
           <hr>
           <label class="lbl">商品</label>
           <div id="qo-lines" class="order-lines"></div>
@@ -433,7 +437,7 @@
             <select id="pu-supplier" class="input"><option value="">— 选择加工商 —</option></select>
             <button id="pu-new-supplier" class="btn small">＋ 新加工商</button>
           </div>
-          <div class="hint">加工商即你的外发加工合作伙伴，在「加工商管理」中可增删改。</div>
+          <div class="hint">加工商即你的生产加工合作伙伴，在「加工商管理」中可增删改。</div>
           <div class="btn-row">
             <button id="pu-confirm" class="btn primary">确认入库</button>
           </div>
