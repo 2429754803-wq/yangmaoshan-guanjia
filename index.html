@@ -72,7 +72,10 @@
       <!-- ============ 全局搜索 ============ -->
       <section id="view-search" class="view">
         <div class="search-bar">
-          <input id="global-search-input" class="input" placeholder="搜款式 / 客户 / 订单…" autocomplete="off">
+          <div class="addr-row">
+            <input id="global-search-input" class="input" placeholder="搜款式 / 客户 / 订单…" autocomplete="off" enterkeyhint="search">
+            <button id="global-search-btn" class="btn small">🔍 搜索</button>
+          </div>
         </div>
         <div id="global-search-result" class="list"></div>
       </section>
@@ -310,11 +313,11 @@
           <hr>
           <label class="lbl">🎤 语音/文字快速加商品</label>
           <div class="addr-row">
-            <input id="qo-voice-text" class="input" placeholder="例：圆领毛衣 3件">
+            <input id="qo-voice-text" class="input" placeholder="例：圆领毛衣 红色 3件">
             <button id="qo-voice-btn" class="btn small voice-btn">🎤 按住说</button>
             <button id="qo-text-btn" class="btn small">识别</button>
           </div>
-          <div class="hint" style="margin-bottom:6px">按住「🎤 按住说」说话，松开自动识别；说「款式名 + 数量」，如"圆领毛衣 3件"。也支持打字后点识别，或用输入法麦克风键说话。</div>
+          <div class="hint" style="margin-bottom:6px">按住「🎤 按住说」说话，松开自动识别；说「款式 + 颜色 + 数量」，如"圆领毛衣 红色 3件"。也支持打字后点识别，或用输入法麦克风键说话。</div>
           <hr>
           <label class="lbl">商品</label>
           <div id="qo-lines" class="order-lines"></div>
