@@ -588,7 +588,7 @@ const Sync = {
 
 /* ---------------- 授权与版本（2.4 工厂版） ---------------- */
 
-const APP_VERSION = "2.9";
+const APP_VERSION = "3.0";
 
 const License = {
   /** 当前账号绑定的授权码（本地记录） */
