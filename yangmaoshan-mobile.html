@@ -1,0 +1,4352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" id="meta-theme" content="#b91c2e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="羊毛衫管家">
+<title>羊毛衫管家</title>
+
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAYAAAA9zQYyAAADBElEQVR4nO3dUU7iYBSA0WLYSRPc/3JM6FqYzCQ+mMyLApZ+95x3E7n347dgldP1crktEPG29zcAjyRoUgRNiqBJETQpgiZF0KQImhRBkyJoUgRNiqBJETQpgiZF0KQImhRBkyJoUgRNiqBJETQpgiZF0KQImhRBkyJoUgRNiqBJETQpgiZF0KQImhRBkyJoUgRNiqBJETQpgiZF0KQImhRBkyJoUgRNiqBJETQpgiZF0KQImhRBkyJoUgRNiqBJETQp52Wo9eNjqdve35dpTtfL5bYMMiHkyWGPCXpiyBPDHnENLeY5c8gHPWGJ37HG55EPmlnSQddPo59aw3NJB8082aDLp9AjrNH5ZINmJkGTImhSBE2KoEk5H/3V94T7E37beuAdnI/+NtLn173SUI9qDezgXHk/9JWGejRraAdvtTf3q78weJY1tgMvCknZ7QZ/J2nftsOlhxOalF2CdjrPsO5wLe2EJkXQpAiaFEGTImhSBE2KoEkRNCmCJkXQpAiaFEGTImhSBE2KoEkRNCmCJkXQpAiaFEGTImhSBE2KoEkRNCmCJkXQpAiaFEGTImhSBE3KLkH7HJQZNv/wHA56yfHMZ6+fAHN34BqalF2Dfsaz2Ok8ewe7f/Dm54O/9/M4hGwHLxH0vWEL2Q5eMuhPAt3fduCPl/aikBRBkyJoUgRNiqBJETQpgiZF0KQImhRBkyJoUgRNiqBJETQpgiZF0KQImhRBkyJoUrJBH/nv4n7DFp1PNmhmSgddPYXutYXnkg6aWTGPCLq+QIYF/Zeol38zmDCHEUFPWuj/THrcp+vlclvi7v1HkBXbgLDzJ7SYv86iPo900PXl/dQanks26PLSHmGNzicbNDMJmhRBkyJoUgRNiqBJETQpgiYlG/SE+xbusUXnkw2amdJBV0+he23huaSDri/vu7YB94SPuB+aOfInNLMImhRBkyJoUgRNiqBJETQpgiZF0KQImhRBkyJoUgRNiqBJETQpgiZF0KQImhRBkyJoUgRNiqBJETRLyR86HpIJmBdibwAAAABJRU5ErkJggg==">
+<link rel="icon" type="image/png" sizes="192x192" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAADWUlEQVR4nO3d0UrjUBRA0Tj0TwL1/z9H8H6LwzwIgxR1Ora5vXutd6Gck53EWNun1/P5bYOoX0e/ADiSAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBEDa6egXMJP95WWrGM/PR7+EKTy9ns9vW1jpoL9kxENI3wLVD/73GZTnkA2gvPRL9ug8kgFUl/2VPTiXXADFJf+LPTafVAC15V5rD80pFQB8JADSMgGULus/YY/MKxMAXCIA0gRAmgBIEwBpp9WeQtTf3XgP+0K7Oa32+O3952cc9qPbF9zNr1WfPVeeY9/LvuhupgngFkOZadCPbF94N1MEcMthzDLoR7UvvpvD/yVyhiFwrCN/J5jiCgDJAJz9Ofo4cAUgTQCkCYA0AZAmANIEQJoASBMAaQIgTQCkCYA0AZAmANIEQJoASBMAaQIgTQCkCYA0AZAmANIEQJoASBMAaQIgTQCkCYA0AZAmANIEQJoASBMAaYcGMNPXZXIcX5EE1Vuge9TvSjPv3MbBdwGHB3DrIRw94Ec3Ft/NFAHcahgzDHgFY+HdTBPATw9llgGvYiy6m9M2mffhXPvVmTMNdzVjwd1MF8DMw2K93Ux1CwT3JgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGmZAFb6JIN7GJF5ZQKArR5A5az2v0ZoTqkAYKsHUDq7XWPE5pMLoLjk7xrBuSQDqC77MyM6j2wA5aV/nMEIz+Hp9Xx+24Ku/YjvlY1gCLkAHPhfG6EQUrdADn5zSgcA2QCc/c0rHQBcIgDSBECaAEgTAGkCIE0ApGUCKP15/yeMyLwyAfB9I3Lw5wIoLfZaIzajVAB/1N///pkRnEvu7dCQvgLA3wRAmgBIEwBpAiBNAKQJgDQBkCYA0gRAmgBIEwBpAiBNAKQJgDQBkCYA0gRAmgBIEwBpAiBNAKQJgDQBkCYAtrLf4PCeHVXsdBEAAAAASUVORK5CYII=">
+<style>/* ============================================================
+   羊毛衫管家 - 高级质感设计系统
+   亮色 / 暗色双主题
+   ============================================================ */
+
+:root {
+  --primary: #b91c2e;
+  --primary-deep: #7f1020;
+  --primary-soft: #fbe9ec;
+  --accent: #e8b04b;
+  --accent-soft: rgba(232,176,75,.14);
+  --bg: #f5f2ee;
+  --bg2: #ece8e3;
+  --card: #ffffff;
+  --text: #1c1917;
+  --text2: #78716c;
+  --text3: #a8a29e;
+  --border: #e7e5e4;
+  --ok: #15803d;
+  --ok-bg: #dcfce7;
+  --warn: #b45309;
+  --warn-bg: #fef3c7;
+  --danger: #b91c2e;
+  --danger-bg: #fee2e2;
+  --header-grad: linear-gradient(135deg, #8f1122 0%, #b91c2e 45%, #c2253a 100%);
+  --radius-lg: 20px;
+  --radius-md: 14px;
+  --radius-sm: 10px;
+  /* 精致阴影体系：柔和高斯 + 环境光 + 内高光 */
+  --shadow-sm: 0 1px 2px rgba(28,25,23,.04), 0 2px 8px rgba(28,25,23,.04), inset 0 1px 0 rgba(255,255,255,.6);
+  --shadow-md: 0 2px 6px rgba(28,25,23,.05), 0 8px 24px rgba(28,25,23,.08), inset 0 1px 0 rgba(255,255,255,.65);
+  --shadow-lg: 0 4px 12px rgba(28,25,23,.08), 0 20px 48px rgba(28,25,23,.14), inset 0 1px 0 rgba(255,255,255,.7);
+  --shadow-press: 0 1px 2px rgba(28,25,23,.06), inset 0 2px 6px rgba(28,25,23,.06);
+  /* 动效曲线 */
+  --ease: cubic-bezier(.22,.8,.36,1);
+  --ease-spring: cubic-bezier(.34,1.4,.5,1);
+  /* 玻璃拟态 */
+  --glass-bg: rgba(255,255,255,.78);
+  --glass-border: rgba(255,255,255,.55);
+}
+
+/* 暗色主题 */
+[data-theme="dark"] {
+  --primary: #ef4444;
+  --primary-deep: #b91c2e;
+  --primary-soft: #3f1d24;
+  --accent: #f0c674;
+  --accent-soft: rgba(240,198,116,.12);
+  --bg: #14120f;
+  --bg2: #1d1a17;
+  --card: #221f1b;
+  --text: #f5f5f4;
+  --text2: #a8a29e;
+  --text3: #6b6560;
+  --border: #35312c;
+  --ok: #4ade80;
+  --ok-bg: rgba(74,222,128,.12);
+  --warn: #fbbf24;
+  --warn-bg: rgba(251,191,36,.12);
+  --danger: #f87171;
+  --danger-bg: rgba(248,113,113,.12);
+  --header-grad: linear-gradient(135deg, #450a0a 0%, #7f1020 50%, #991b1b 100%);
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.03);
+  --shadow-md: 0 2px 6px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.04);
+  --shadow-lg: 0 4px 12px rgba(0,0,0,.5), 0 20px 48px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.05);
+  --shadow-press: 0 1px 2px rgba(0,0,0,.4), inset 0 2px 6px rgba(0,0,0,.3);
+  --glass-bg: rgba(30,27,23,.82);
+  --glass-border: rgba(255,255,255,.08);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+html { height: 100%; }
+body {
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overscroll-behavior-y: none;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  transition: background .3s var(--ease), color .3s var(--ease);
+}
+
+#app { display: flex; flex-direction: column; min-height: 100vh; max-width: 480px; margin: 0 auto; }
+
+/* ============ 头部 ============ */
+.app-header {
+  background: var(--header-grad);
+  color: #fff;
+  padding: calc(env(safe-area-inset-top, 0px) + 16px) 18px 18px;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  box-shadow: 0 4px 20px rgba(143,17,34,.28);
+  position: relative;
+  overflow: hidden;
+}
+/* 头部装饰光斑 */
+.app-header::before {
+  content: "";
+  position: absolute;
+  top: -60%;
+  right: -20%;
+  width: 70%;
+  height: 200%;
+  background: radial-gradient(circle at 70% 30%, rgba(255,255,255,.16), transparent 60%);
+  pointer-events: none;
+}
+.app-header::after {
+  content: "";
+  position: absolute;
+  bottom: -40%;
+  left: -15%;
+  width: 60%;
+  height: 150%;
+  background: radial-gradient(circle at 30% 70%, rgba(232,176,75,.13), transparent 55%);
+  pointer-events: none;
+}
+.header-inner { display: flex; align-items: center; justify-content: space-between; gap: 12px; position: relative; }
+.header-title-wrap { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.app-header h1 {
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: .5px;
+  text-shadow: 0 1px 2px rgba(0,0,0,.12);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.header-sub {
+  font-size: 11px;
+  opacity: .78;
+  letter-spacing: .3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.header-right { display: flex; gap: 8px; align-items: center; flex: none; }
+.header-btn {
+  background: rgba(255,255,255,.16);
+  backdrop-filter: blur(8px) saturate(1.2);
+  -webkit-backdrop-filter: blur(8px) saturate(1.2);
+  border: 1px solid rgba(255,255,255,.25);
+  color: #fff;
+  border-radius: 20px;
+  padding: 7px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s var(--ease), transform .15s var(--ease-spring), box-shadow .15s;
+  box-shadow: 0 2px 8px rgba(0,0,0,.12);
+  will-change: transform;
+}
+.header-btn:active { background: rgba(255,255,255,.3); transform: scale(.94); box-shadow: 0 1px 3px rgba(0,0,0,.15); }
+.header-btn.ghost { background: transparent; border-color: rgba(255,255,255,.35); box-shadow: none; }
+.hidden { display: none !important; }
+
+/* ============ 登录页 ============ */
+.auth-wrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(1200px 500px at 80% -10%, rgba(232,176,75,.25), transparent 60%),
+    radial-gradient(800px 400px at -20% 110%, rgba(127,16,32,.55), transparent 55%),
+    linear-gradient(165deg, #6f0e1d 0%, #8f1122 40%, #a4162a 70%, #b91c2e 100%);
+  padding: 24px;
+}
+.auth-box {
+  background: rgba(255,255,255,.97);
+  backdrop-filter: blur(24px) saturate(1.3);
+  -webkit-backdrop-filter: blur(24px) saturate(1.3);
+  border-radius: 28px;
+  padding: 34px 26px 26px;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: 0 24px 60px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.12), inset 0 1px 0 rgba(255,255,255,.7);
+  animation: authIn .55s var(--ease);
+  position: relative;
+  overflow: hidden;
+}
+.auth-box::before {
+  content: "";
+  position: absolute;
+  top: -30%;
+  right: -25%;
+  width: 80%;
+  height: 80%;
+  background: radial-gradient(circle at 70% 30%, rgba(185,28,46,.06), transparent 60%);
+  pointer-events: none;
+}
+@keyframes authIn { from { opacity: 0; transform: translateY(24px) scale(.98); } to { opacity: 1; transform: none; } }
+.auth-logo { font-size: 46px; text-align: center; margin-bottom: 6px; filter: drop-shadow(0 4px 8px rgba(143,17,34,.25)); }
+.auth-box h2 {
+  text-align: center;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: .3px;
+  margin-bottom: 4px;
+  background: linear-gradient(120deg, #7f1020, #b91c2e);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.auth-tagline { text-align: center; font-size: 12px; color: var(--text3); margin-bottom: 22px; }
+.auth-tabs { display: flex; gap: 6px; margin-bottom: 14px; background: #f5f5f4; border-radius: 12px; padding: 4px; }
+[data-theme="dark"] .auth-tabs { background: var(--bg2); }
+.auth-tab {
+  flex: 1;
+  padding: 9px;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--text2);
+  transition: all .2s var(--ease);
+}
+.auth-tab.active { background: #fff; color: var(--primary); box-shadow: 0 2px 6px rgba(28,25,23,.08); }
+[data-theme="dark"] .auth-tab.active { background: var(--card); }
+.auth-error { background: var(--danger-bg); color: var(--danger); border-radius: 12px; padding: 10px 14px; font-size: 13px; margin-top: 12px; border: 1px solid rgba(185,28,46,.15); }
+.auth-hint { font-size: 12px; color: var(--text3); margin-top: 18px; line-height: 1.7; text-align: center; }
+
+/* ============ 内容区 ============ */
+body {
+  background-image:
+    radial-gradient(circle at 15% 20%, rgba(185,28,46,.03), transparent 40%),
+    radial-gradient(circle at 85% 70%, rgba(232,176,75,.04), transparent 45%);
+  background-attachment: fixed;
+}
+#content { flex: 1; padding: 14px 14px calc(env(safe-area-inset-bottom, 0px) + 80px); }
+.view { display: none; }
+.view.active { display: block; animation: viewIn .3s var(--ease); }
+@keyframes viewIn { from { opacity: 0; transform: translateY(10px) scale(.995); } to { opacity: 1; transform: none; } }
+@keyframes itemIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+/* ============ 搜索 ============ */
+.search-bar { margin-bottom: 12px; }
+.search-bar .input {
+  background: var(--card);
+  border-radius: 14px;
+  padding: 12px 16px 12px 42px;
+  border: 1px solid transparent;
+  box-shadow: var(--shadow-sm);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a8a29e' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 14px center;
+  background-size: 17px;
+}
+.search-bar .input:focus { border-color: rgba(185,28,46,.35); box-shadow: 0 0 0 4px rgba(185,28,46,.08); }
+
+/* ============ 筛选 chips ============ */
+.filter-row { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+.chip {
+  padding: 7px 16px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all .18s var(--ease);
+}
+.chip:active { transform: scale(.95); }
+.chip.active {
+  background: linear-gradient(135deg, #a4162a, #b91c2e);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 3px 10px rgba(185,28,46,.3);
+}
+
+/* ============ 列表卡片 ============ */
+.list { display: flex; flex-direction: column; gap: 12px; }
+.list-card {
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+  padding: 14px;
+  cursor: pointer;
+  display: flex;
+  gap: 14px;
+  transition: transform .18s var(--ease-spring), box-shadow .22s var(--ease), background .3s var(--ease), border-color .3s var(--ease);
+  will-change: transform;
+  position: relative;
+}
+.list-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255,255,255,.5), transparent 45%);
+  pointer-events: none;
+  opacity: .5;
+}
+[data-theme="dark"] .list-card::after { background: linear-gradient(180deg, rgba(255,255,255,.04), transparent 45%); opacity: .5; }
+.list-card:active {
+  transform: scale(.98);
+  box-shadow: var(--shadow-press);
+}
+.list-card:hover { box-shadow: var(--shadow-md); }
+.thumb {
+  width: 72px; height: 72px;
+  border-radius: 14px;
+  background: linear-gradient(145deg, var(--bg2), var(--bg));
+  flex: none;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text3); font-size: 30px;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px rgba(28,25,23,.04);
+  transition: transform .25s var(--ease-spring);
+}
+.list-card:active .thumb { transform: scale(.94); }
+.thumb img { width: 100%; height: 100%; object-fit: cover; animation: imgIn .35s var(--ease); }
+@keyframes imgIn { from { opacity: 0; } to { opacity: 1; } }
+.list-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.list-title { font-size: 15.5px; font-weight: 600; letter-spacing: .2px; word-break: break-all; }
+.list-sub { font-size: 12px; color: var(--text3); }
+.list-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 2px; }
+.tag {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 9px;
+  border-radius: 8px;
+  background: var(--bg2);
+  color: var(--text2);
+  transition: transform .15s var(--ease-spring);
+}
+.tag.green { background: var(--ok-bg); color: var(--ok); }
+.tag.red { background: var(--danger-bg); color: var(--danger); font-weight: 600; }
+.tag.blue { background: rgba(59,130,246,.12); color: #3b82f6; }
+.list-side { text-align: right; flex: none; display: flex; flex-direction: column; justify-content: center; gap: 3px; padding-left: 6px; }
+.list-side .num { font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.3px; }
+.list-side .lbl { font-size: 11px; color: var(--text3); }
+
+/* ============ 卡片 ============ */
+.card {
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+  padding: 18px;
+  margin-bottom: 14px;
+  transition: background .3s var(--ease), border-color .3s var(--ease), box-shadow .3s var(--ease);
+  position: relative;
+}
+.card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255,255,255,.45), transparent 40%);
+  pointer-events: none;
+  opacity: .45;
+}
+[data-theme="dark"] .card::after { background: linear-gradient(180deg, rgba(255,255,255,.03), transparent 40%); opacity: .5; }
+.card > * { position: relative; }
+.card h3 {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card h3::before {
+  content: "";
+  width: 4px; height: 15px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, var(--accent), var(--primary));
+}
+hr { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+/* ============ 表单 ============ */
+.lbl { display: block; font-size: 12px; font-weight: 600; color: var(--text2); margin: 14px 0 7px; letter-spacing: .3px; }
+.lbl:first-child { margin-top: 0; }
+.input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: 15px;
+  background: var(--card);
+  color: var(--text);
+  outline: none;
+  transition: border-color .15s, box-shadow .15s, background .3s, transform .15s;
+  font-family: inherit;
+}
+.input::placeholder { color: var(--text3); }
+.input:focus { border-color: rgba(185,28,46,.5); box-shadow: 0 0 0 4px rgba(185,28,46,.08); }
+.ta { min-height: 84px; resize: vertical; line-height: 1.6; }
+select.input { appearance: auto; }
+
+/* ============ 按钮 ============ */
+.btn {
+  width: 100%;
+  padding: 13px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--card);
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: transform .18s var(--ease-spring), box-shadow .2s var(--ease), background .3s, border-color .2s;
+  font-family: inherit;
+  will-change: transform;
+}
+.btn:active { transform: scale(.97); box-shadow: var(--shadow-press); }
+.btn.primary {
+  background: linear-gradient(135deg, #a4162a, #b91c2e);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(185,28,46,.28), inset 0 1px 0 rgba(255,255,255,.18);
+}
+.btn.primary:active { box-shadow: 0 2px 6px rgba(185,28,46,.3), inset 0 1px 0 rgba(255,255,255,.1); transform: scale(.97); }
+.btn.small { width: auto; padding: 8px 16px; font-size: 13px; margin-top: 10px; border-radius: 12px; }
+.btn-row { display: flex; gap: 10px; margin-top: 16px; }
+.btn-row .btn { flex: 1; margin-top: 0; }
+.btn.danger { color: var(--danger); border-color: rgba(185,28,46,.25); }
+.hint { font-size: 12px; color: var(--text3); margin-top: 8px; line-height: 1.7; }
+
+/* ============ 底部导航 ============ */
+.tabbar {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px) saturate(1.6);
+  -webkit-backdrop-filter: blur(24px) saturate(1.6);
+  display: flex;
+  border-top: 1px solid var(--glass-border);
+  padding: 6px 8px calc(env(safe-area-inset-bottom, 0px) + 6px);
+  z-index: 50;
+  box-shadow: 0 -8px 32px rgba(28,25,23,.08);
+  transition: background .3s var(--ease);
+}
+.tab {
+  flex: 1;
+  padding: 7px 0 6px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text3);
+  cursor: pointer;
+  user-select: none;
+  background: none;
+  border: none;
+  border-radius: 14px;
+  transition: color .18s var(--ease), transform .18s var(--ease-spring);
+  font-family: inherit;
+  will-change: transform;
+}
+.tab .t-icon { font-size: 21px; display: block; margin-bottom: 2px; filter: grayscale(.35) opacity(.7); transition: filter .22s var(--ease), transform .22s var(--ease-spring); }
+.tab:active { transform: scale(.9); }
+.tab.active { color: var(--primary); font-weight: 700; }
+.tab.active .t-icon { filter: none; transform: translateY(-2px) scale(1.08); }
+.tab:not(.active) .t-icon:active { transform: scale(.85); }
+
+/* ============ 图片选择 ============ */
+.img-picker { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.img-thumbs { display: flex; gap: 10px; flex-wrap: wrap; }
+.img-thumb {
+  width: 68px; height: 68px;
+  border-radius: 14px;
+  overflow: hidden;
+  position: relative;
+  background: var(--bg2) center/cover no-repeat;
+  box-shadow: var(--shadow-sm);
+}
+.img-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.img-thumb .rm {
+  position: absolute; top: 4px; right: 4px;
+  background: rgba(0,0,0,.55);
+  backdrop-filter: blur(4px);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 22px; height: 22px;
+  font-size: 12px;
+  line-height: 22px;
+  cursor: pointer;
+}
+.img-thumb .rm:active { background: rgba(0,0,0,.8); }
+
+/* ============ 颜色编辑器 ============ */
+.color-editor { display: flex; flex-direction: column; gap: 9px; }
+.color-row { display: flex; gap: 9px; align-items: center; }
+.color-row .c-name { flex: 2; }
+.color-row .c-qty { flex: 1; }
+.color-row .rm {
+  flex: none;
+  width: 38px; height: 38px;
+  background: var(--danger-bg);
+  border: none;
+  border-radius: 10px;
+  color: var(--danger);
+  font-size: 16px;
+  cursor: pointer;
+}
+.color-row .rm:active { opacity: .8; }
+
+/* ============ 详情 ============ */
+.detail-imgs { display: flex; gap: 10px; overflow-x: auto; padding: 2px 0 8px; -webkit-overflow-scrolling: touch; }
+.detail-imgs .img-thumb { flex: none; width: 120px; height: 120px; }
+.detail-color-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 2px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+  gap: 12px;
+}
+.detail-color-row:last-child { border-bottom: none; }
+.detail-color-row .v { font-weight: 600; font-variant-numeric: tabular-nums; }
+.detail-actions { display: flex; flex-direction: column; gap: 0; }
+
+/* ============ 二维码 ============ */
+.qr-row { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.qr-row #detail-qr { background: #fff; padding: 10px; border-radius: 12px; }
+.qr-row .hint { text-align: center; }
+
+/* ============ 订单 ============ */
+.order-lines { display: flex; flex-direction: column; gap: 10px; }
+.order-line { border: 1px solid var(--border); border-radius: var(--radius-md); padding: 12px; background: var(--bg2); }
+.order-line .ol-row { display: flex; gap: 9px; margin-bottom: 8px; }
+.order-line .ol-row:last-child { margin-bottom: 0; }
+.order-line .ol-qty { width: 76px; flex: none; }
+.order-line .rm { background: none; border: none; color: var(--danger); font-size: 16px; cursor: pointer; width: 38px; flex: none; }
+.addr-row { display: flex; gap: 9px; align-items: center; }
+.addr-row .input { flex: 1; }
+.addr-row .btn { width: auto; margin-top: 0; }
+
+.order-card { flex-direction: column; }
+.order-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.order-customer { font-size: 15.5px; font-weight: 700; }
+.order-status { font-size: 12px; font-weight: 600; padding: 3px 12px; border-radius: 20px; }
+.order-status.pending { background: var(--warn-bg); color: var(--warn); }
+.order-status.done { background: var(--ok-bg); color: var(--ok); }
+.order-status.cancelled { background: var(--bg2); color: var(--text3); }
+.order-lines-preview { font-size: 13px; color: var(--text2); margin-bottom: 4px; }
+.order-addr { font-size: 12px; color: var(--text3); }
+.order-foot { display: flex; gap: 8px; margin-top: 10px; }
+.order-foot .btn { margin-top: 0; flex: 1; }
+
+/* 收款 */
+.pay-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.pay-info { font-size: 14px; font-weight: 600; }
+
+/* ============ 今日概览 ============ */
+.stats-summary { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 14px; }
+.stat-card {
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+  padding: 16px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.stat-card::after {
+  content: "";
+  position: absolute;
+  top: -30px; right: -30px;
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(185,28,46,.07), transparent 70%);
+}
+.stat-num {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.5px;
+  font-variant-numeric: tabular-nums;
+  background: linear-gradient(120deg, var(--primary-deep), var(--primary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  transition: transform .25s var(--ease-spring);
+}
+.stat-num:hover { transform: scale(1.05); }
+.stat-lbl { font-size: 12px; color: var(--text3); margin-top: 3px; font-weight: 500; }
+
+/* 快捷操作 */
+.quick-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.quick-btn {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  transition: all .18s var(--ease);
+  font-family: inherit;
+}
+.quick-btn:active { transform: scale(.96); background: var(--primary-soft); }
+
+/* ============ 盘点 ============ */
+.st-card h3 { margin-bottom: 8px; }
+.st-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.st-row:last-child { margin-bottom: 0; }
+.st-name { width: 60px; font-size: 14px; font-weight: 600; flex: none; }
+.st-book { font-size: 12px; color: var(--text3); flex: none; }
+.st-input { flex: 1; text-align: center; padding: 9px; }
+
+/* ============ 进货 ============ */
+.purchase-list .detail-color-row { font-size: 13px; }
+
+/* ============ 批量改价 ============ */
+.batch-list { display: flex; flex-direction: column; gap: 6px; max-height: 300px; overflow-y: auto; }
+.batch-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg2);
+  cursor: pointer;
+}
+.batch-item input { width: 18px; height: 18px; accent-color: var(--primary); flex: none; }
+.batch-name { flex: 1; font-size: 14px; font-weight: 500; }
+.batch-price { font-size: 14px; font-weight: 700; color: var(--primary); }
+
+/* ============ 统计 ============ */
+.stat-list-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.stat-list-row:last-child { border-bottom: none; }
+
+/* ============ 订单批量操作 ============ */
+.batch-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow-sm);
+}
+.batch-bar .btn { width: auto; margin-top: 0; flex: none; }
+.batch-bar span { flex: 1; font-size: 14px; font-weight: 600; }
+.order-check {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--primary);
+  flex: none;
+  align-self: center;
+  cursor: pointer;
+}
+
+/* ============ 空状态 ============ */
+.empty {
+  text-align: center;
+  color: var(--text3);
+  font-size: 14px;
+  padding: 48px 20px;
+  line-height: 1.8;
+}
+.empty .empty-icon { font-size: 44px; display: block; margin-bottom: 12px; opacity: .7; }
+
+/* ============ 弹窗 ============ */
+.modal-mask {
+  position: fixed; inset: 0;
+  background: rgba(28,25,23,.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100;
+  animation: fadeIn .2s ease;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.modal {
+  background: var(--card);
+  border-radius: 22px;
+  padding: 24px;
+  width: 86%;
+  max-width: 380px;
+  box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255,255,255,.6);
+  animation: modalIn .32s var(--ease-spring);
+  transition: background .3s var(--ease);
+}
+@keyframes modalIn { from { opacity: 0; transform: scale(.92) translateY(14px); } to { opacity: 1; transform: none; } }
+.modal h3 { margin-bottom: 10px; font-size: 17px; font-weight: 700; }
+.modal-text { font-size: 14px; color: var(--text2); line-height: 1.7; margin-bottom: 4px; }
+
+/* ============ Toast ============ */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 92px;
+  transform: translateX(-50%) translateY(14px) scale(.96);
+  background: rgba(28,25,23,.92);
+  backdrop-filter: blur(12px) saturate(1.3);
+  -webkit-backdrop-filter: blur(12px) saturate(1.3);
+  color: #fff;
+  padding: 11px 20px;
+  border-radius: 22px;
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 200;
+  opacity: 0;
+  transition: opacity .28s var(--ease), transform .3s var(--ease-spring);
+  pointer-events: none;
+  max-width: 82%;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.08);
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+
+/* 数字闪烁提醒 */
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .55; } }
+.low-blink { animation: pulse 1.2s ease-in-out infinite; }
+
+/* 滚动条美化 */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+</style>
+<script>const m={name:"羊毛衫管家",short_name:"羊毛衫管家",description:"洪合羊毛衫商家专用：库存、销售、订单、盘点、进货、欠款一站管理",start_url:"./",display:"standalone",orientation:"portrait",background_color:"#f6f4f1",theme_color:"#b91c2e",lang:"zh-CN",icons:[{src:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAADWUlEQVR4nO3d0UrjUBRA0Tj0TwL1/z9H8H6LwzwIgxR1Ora5vXutd6Gck53EWNun1/P5bYOoX0e/ADiSAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBEDa6egXMJP95WWrGM/PR7+EKTy9ns9vW1jpoL9kxENI3wLVD/73GZTnkA2gvPRL9ug8kgFUl/2VPTiXXADFJf+LPTafVAC15V5rD80pFQB8JADSMgGULus/YY/MKxMAXCIA0gRAmgBIEwBpp9WeQtTf3XgP+0K7Oa32+O3952cc9qPbF9zNr1WfPVeeY9/LvuhupgngFkOZadCPbF94N1MEcMthzDLoR7UvvpvD/yVyhiFwrCN/J5jiCgDJAJz9Ofo4cAUgTQCkCYA0AZAmANIEQJoASBMAaQIgTQCkCYA0AZAmANIEQJoASBMAaQIgTQCkCYA0AZAmANIEQJoASBMAaQIgTQCkCYA0AZAmANIEQJoASBMAaYcGMNPXZXIcX5EE1Vuge9TvSjPv3MbBdwGHB3DrIRw94Ec3Ft/NFAHcahgzDHgFY+HdTBPATw9llgGvYiy6m9M2mffhXPvVmTMNdzVjwd1MF8DMw2K93Ux1CwT3JgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGmZAFb6JIN7GJF5ZQKArR5A5az2v0ZoTqkAYKsHUDq7XWPE5pMLoLjk7xrBuSQDqC77MyM6j2wA5aV/nMEIz+Hp9Xx+24Ku/YjvlY1gCLkAHPhfG6EQUrdADn5zSgcA2QCc/c0rHQBcIgDSBECaAEgTAGkCIE0ApGUCKP15/yeMyLwyAfB9I3Lw5wIoLfZaIzajVAB/1N///pkRnEvu7dCQvgLA3wRAmgBIEwBpAiBNAKQJgDQBkCYA0gRAmgBIEwBpAiBNAKQJgDQBkCYA0gRAmgBIEwBpAiBNAKQJgDQBkCYAtrLf4PCeHVXsdBEAAAAASUVORK5CYII=",sizes:"192x192",type:"image/png",purpose:"any"},{src:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAYAAAD0eNT6AAALM0lEQVR4nO3dXW7cNhSA0bjITgzM7H85A9hrcdGHvhRFflqJvNJ3zgISccBLftY4yNvH4/H1DQBI+WP3AwAA6wkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABH3f/QBwpPfXywfKqT6fT58wt/D28Xh87X4I+K9c+OwmCLgqAcDluPSZSgxwJQKAy3DxcxVCgCsQAIzn4ueqhACT+VcAjOby58rsXybzBoCRHJzcjbcBTOMNAOO4/Lkj+5ppBACjOCS5M/ubSQQAYzgcKbDPmUIAMIJDkRL7nQkEANs5DCmy79lNALCVQ5Ay+5+dBAAABAkAtvHTD5gD9hEAbOHyB/PAXgIAAIIEAMv56R/MBfsJAAAIEgAs5ad/MB/MIAAAIEgAAECQAGAZr//BnDCHAACAIAEAAEECAACCBABL+P4fzAuzCAAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQd93PwAz/wvdz+dz298NHM95wj8JgEF2DuiPnkUMwPU4T/gZATDApEH9N2IArsN5wq8SABtNH9QfPbO3AjCL84Tf5ZcAN7nisN7p+eFOrj6PV3/+q/IGYLE7bXRvA2DGDN6B82Q9bwAWutOwFtYFk9117u66rokEwCJ339R3Xx9Mcvd5u/v6phAAC1Q2c2WdsFNlzirr3EkAnKy2iWvrhZVq81Vb72oC4ETVzVtdN5ypOlfVda8gAAAgSACcpF6t9fXDkerzVF//WQTACWxWnwM4T5yr0wkAAAgSAAfz07/PA5wn53C+HksAAEDQ28fj8bX7Ie5CnQKcz/9GegxvAAAgSAAAQJAAAIAgAXAQ3/8DrOG8PYYAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAOMjn83nUHwWA8/Z0AgAAggQAAAQJgAP5GsDnAs6TczlnjyMAACBIAABAkAA4mNdTPg9wnpzD+XosAQAAQQLgBCrV5wDOE+fqdALgJPUIqK8fjlSfp/r6zyIAOJxhBZwn8wmAE7kIAecJUwmAk9UioLZeWKk2X7X1riYAFqhs4so6YafKnFXWuZMAWOTum/nu64NJ7j5vd1/fFAJgoTtu6r/WdMd1wXR3nDvnyVoCYLE7bfC7rAOuynnC/yEANrn65Xn154c7ufo8Xv35r+r77gco+3vTv79e367CoMJMzhN+lwAYYPrguvThOpwn/CoBMPii3RkELn24NucJPyMABnMJA84TzuKXAAEgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIALPH5fPqkwbwwiAAAgCABAABBAgAAggQAy/g9ADAnzCEAACBIAABAkABgKV8DgPlgBgEAAEECgOW8BQBzwX4CAACCBABbeAsA5oG9BADbiAAwB+wjAAA2EcHsJADYygEIsIcAYDsRQJF9z24CgBEchpTY70wgABjDoUiBfc4UAoBRHI7cmf3NJAKAcRyS3HFP29dMIwAYyYHJXbj4mUoAMJrDkyuzf5ns7ePx+Nr9EPAr3l8vHxSX4OLnCgQAlyMEmMrFz5UIAC5NDLCbS5+rEgCM5GLnboQC0wgAxnDpUyEGmEAAsJ2LnyohwE7+GSBbufwps//ZSQCwjcMPzAH7CAC2cPmDeWAvAcByLn8wF+wnAFjK5Q/mgxkEAAAECQCW8dM/mBPmEAAAECQAACBIALCE1/9gXphFAABAkAAAgCABAABBAgAAggQAAAQJAAAIEgAAECQAACBIAABAkAAAgCABAABBAgAAggQAAAQJAAAIEgAAECQAACBIAABAkABgic/n0ycN5oVBBAAABAkAAAgSACzjawAwJ8whAACGEMmsJABYygEHMIMAYDkRAOaC/QQAW4gAMA/sJQDYRgSAOWAfAcBWIoDy3rf/2UkAsJ2DkBoXPxO8fTweX7sfAv7p/fXyoXArLn2mEQAAEOQrAAAIEgAAECQAACBIAABAkAAAgCABAABBAgAAggQAAAQJAAAIEgAAECQAACBIAABAkAAAgCABAABBAgAAggQAAAQJAAAIEgAAECQAACBIAABAkAAAgCABAABBAgAAggQAAAQJAAAIEgAAECQAACBIAABAkAAAgCABAABBAgAAggQAAAQJAAAIEgAAECQAACBIAABAkAAAgCABAABBAgAAggQAAAQJAAAIEgAAECQAACBIAABAkAAAgCABAABBAgAAggQAAAQJAAAIEgAAECQAACBIAABAkAAAgCABAABBAgAAggQAAAQJAAAIEgAAECQAACBIAABAkAAAgCABAABBAgAAggQAAAQJAAAIEgAAECQAACBIAABAkAAAgCABAADfev4EqvuXup6IGkUAAAAASUVORK5CYII=",sizes:"512x512",type:"image/png",purpose:"any"},{src:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAADWUlEQVR4nO3d0UrjUBRA0Tj0TwL1/z9H8H6LwzwIgxR1Ora5vXutd6Gck53EWNun1/P5bYOoX0e/ADiSAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBEDa6egXMJP95WWrGM/PR7+EKTy9ns9vW1jpoL9kxENI3wLVD/73GZTnkA2gvPRL9ug8kgFUl/2VPTiXXADFJf+LPTafVAC15V5rD80pFQB8JADSMgGULus/YY/MKxMAXCIA0gRAmgBIEwBpp9WeQtTf3XgP+0K7Oa32+O3952cc9qPbF9zNr1WfPVeeY9/LvuhupgngFkOZadCPbF94N1MEcMthzDLoR7UvvpvD/yVyhiFwrCN/J5jiCgDJAJz9Ofo4cAUgTQCkCYA0AZAmANIEQJoASBMAaQIgTQCkCYA0AZAmANIEQJoASBMAaQIgTQCkCYA0AZAmANIEQJoASBMAaQIgTQCkCYA0AZAmANIEQJoASBMAaYcGMNPXZXIcX5EE1Vuge9TvSjPv3MbBdwGHB3DrIRw94Ec3Ft/NFAHcahgzDHgFY+HdTBPATw9llgGvYiy6m9M2mffhXPvVmTMNdzVjwd1MF8DMw2K93Ux1CwT3JgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGmZAFb6JIN7GJF5ZQKArR5A5az2v0ZoTqkAYKsHUDq7XWPE5pMLoLjk7xrBuSQDqC77MyM6j2wA5aV/nMEIz+Hp9Xx+24Ku/YjvlY1gCLkAHPhfG6EQUrdADn5zSgcA2QCc/c0rHQBcIgDSBECaAEgTAGkCIE0ApGUCKP15/yeMyLwyAfB9I3Lw5wIoLfZaIzajVAB/1N///pkRnEvu7dCQvgLA3wRAmgBIEwBpAiBNAKQJgDQBkCYA0gRAmgBIEwBpAiBNAKQJgDQBkCYA0gRAmgBIEwBpAiBNAKQJgDQBkCYAtrLf4PCeHVXsdBEAAAAASUVORK5CYII=",sizes:"192x192",type:"image/png",purpose:"maskable"}]};const b=new Blob([JSON.stringify(m)],{type:"application/json"});const l=document.createElement("link");l.rel="manifest";l.href=URL.createObjectURL(b);document.head.appendChild(l);</script></head>
+<body>
+<div id="app">
+  <!-- ============ 登录 / 注册 ============ -->
+  <section id="view-auth" class="auth-wrap">
+    <div class="auth-box">
+      <div class="auth-logo">🧥</div>
+      <h2>羊毛衫管家</h2>
+      <div class="auth-tagline">洪合商家 · 库存 · 销售 · 订单一站管理</div>
+      <div class="auth-tabs">
+        <button id="auth-tab-login" class="auth-tab active">登录</button>
+        <button id="auth-tab-register" class="auth-tab">注册</button>
+      </div>
+      <div id="auth-form">
+        <label class="lbl">用户名</label>
+        <input id="auth-username" class="input" placeholder="用户名" autocomplete="username">
+        <label class="lbl">密码</label>
+        <input id="auth-password" class="input" type="password" placeholder="密码（至少 4 位）" autocomplete="current-password">
+        <div id="auth-error" class="auth-error hidden"></div>
+        <button id="auth-submit" class="btn primary">登录</button>
+      </div>
+      <div class="auth-hint">账号数据保存在本机浏览器；同一账号可登录多台手机，开启云同步后数据自动同步。</div>
+    </div>
+  </section>
+
+  <!-- ============ 授权激活 ============ -->
+  <section id="view-license" class="auth-wrap hidden">
+    <div class="auth-box">
+      <div class="auth-logo">🔑</div>
+      <h2>输入授权码</h2>
+      <div class="auth-tagline" id="license-tagline">请向软件管理方索取授权码</div>
+      <div id="license-form">
+        <label class="lbl">授权码</label>
+        <input id="license-code" class="input" placeholder="如：ABCD-1234-EFGH" autocomplete="off" autocapitalize="characters" style="text-transform:uppercase">
+        <div id="license-info" class="hint" style="text-align:center;margin-top:12px"></div>
+        <button id="license-submit" class="btn primary">激活</button>
+      </div>
+      <div class="auth-hint">激活一次即可使用。授权码由管理方发放，如有疑问请联系管理员。</div>
+    </div>
+  </section>
+
+  <section id="view-main" class="hidden">
+    <header class="app-header">
+      <div class="header-inner">
+        <div class="header-title-wrap">
+          <h1 id="page-title">款式库存</h1>
+          <div class="header-sub" id="header-sub">羊毛衫 · 库存订单管理</div>        </div>
+        <div class="header-right">
+          <button id="theme-toggle" class="header-btn ghost" title="切换主题">🌙</button>
+          <button id="header-btn" class="header-btn hidden">＋ 新增</button>
+          <button id="user-btn" class="header-btn ghost" title="账号">👤</button>
+        </div>
+      </div>
+    </header>
+
+    <main id="content">
+      <!-- ============ 今日概览 ============ -->
+      <section id="view-today" class="view">
+        <div class="stats-summary">
+          <div class="stat-card"><div class="stat-num" id="today-sales">0</div><div class="stat-lbl">今日销售额</div></div>
+          <div class="stat-card"><div class="stat-num" id="today-profit">0</div><div class="stat-lbl">今日利润</div></div>
+          <div class="stat-card"><div class="stat-num" id="today-orders">0</div><div class="stat-lbl">今日新订单</div></div>
+          <div class="stat-card"><div class="stat-num" id="today-debt">0</div><div class="stat-lbl">未收款合计</div></div>
+        </div>
+        <div class="card">
+          <h3>快捷操作</h3>
+          <div class="quick-grid">
+            <button class="quick-btn" data-go="quick-order">⚡ 快速开单</button>
+            <button class="quick-btn" data-go="customers">👥 客户</button>
+            <button class="quick-btn" data-go="orders">📦 订单</button>
+            <button class="quick-btn" data-go="outsource">🏭 外发</button>
+            <button class="quick-btn" data-go="stocktake">📋 盘点</button>
+            <button class="quick-btn" data-go="purchase">📥 进货</button>
+            <button class="quick-btn" data-go="stats">📊 统计</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 外发加工（工厂） ============ -->
+      <section id="view-outsource" class="view">
+        <div class="filter-row">
+          <button id="os-filter-all" class="chip active">全部</button>
+          <button id="os-filter-active" class="chip">生产中</button>
+          <button id="os-filter-overdue" class="chip">已逾期</button>
+          <button id="os-filter-settled" class="chip">未结算</button>
+        </div>
+        <div id="outsource-list" class="list"></div>
+        <div class="btn-row">
+          <button id="os-new" class="btn primary">＋ 下外发单</button>
+          <button id="os-factories" class="btn">🏭 加工厂管理</button>
+        </div>
+      </section>
+
+      <!-- ============ 新建外发单 ============ -->
+      <section id="view-outsource-edit" class="view">
+        <div class="card">
+          <label class="lbl">加工厂 *</label>
+          <select id="os-factory" class="input"></select>
+          <label class="lbl">款式 *</label>
+          <select id="os-item" class="input"></select>
+          <label class="lbl">颜色</label>
+          <input id="os-color" class="input" placeholder="颜色（如：红色）">
+          <label class="lbl">发出数量（件）*</label>
+          <input id="os-qty" class="input" type="number" inputmode="numeric" min="1" value="100">
+          <label class="lbl">工费（元/件）*</label>
+          <input id="os-price" class="input" type="number" inputmode="decimal" placeholder="如：8">
+          <label class="lbl">领料说明（发的纱线/原料，可选）</label>
+          <input id="os-material" class="input" placeholder="如：红色纱线 30 斤">
+          <label class="lbl">预计交期</label>
+          <input id="os-due" class="input" type="date">
+          <label class="lbl">备注</label>
+          <input id="os-note" class="input" placeholder="备注">
+          <div class="btn-row">
+            <button id="os-save" class="btn primary">下外发单</button>
+            <button id="os-cancel" class="btn">取消</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 外发单详情 ============ -->
+      <section id="view-outsource-detail" class="view">
+        <div id="outsource-detail-body"></div>
+      </section>
+
+      <!-- ============ 加工厂管理 ============ -->
+      <section id="view-factories" class="view">
+        <div id="factory-list" class="list"></div>
+        <div class="btn-row">
+          <button id="fa-new" class="btn primary">＋ 新增加工厂</button>
+        </div>
+      </section>
+
+      <!-- ============ 加工厂编辑 ============ -->
+      <section id="view-factory-edit" class="view">
+        <div class="card">
+          <label class="lbl">加工厂名称 *</label>
+          <input id="fa-name" class="input" placeholder="如：张师傅加工厂">
+          <label class="lbl">电话</label>
+          <input id="fa-phone" class="input" type="tel" placeholder="联系电话">
+          <label class="lbl">擅长工序</label>
+          <input id="fa-skill" class="input" placeholder="如：缝纫、套口、后整理">
+          <label class="lbl">默认工费（元/件，可选）</label>
+          <input id="fa-price" class="input" type="number" inputmode="decimal" placeholder="下外发单时自动带出">
+          <label class="lbl">备注</label>
+          <input id="fa-note" class="input" placeholder="备注">
+          <div class="btn-row">
+            <button id="fa-save" class="btn primary">保存</button>
+            <button id="fa-cancel" class="btn">取消</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 款式库存 ============ -->
+      <section id="view-items" class="view">
+        <div class="search-bar">
+          <input id="item-search" class="input" placeholder="搜索款式 / 颜色…">
+        </div>
+        <div class="filter-row">
+          <button id="filter-all" class="chip active">全部</button>
+          <button id="filter-low" class="chip">低库存</button>
+          <button id="filter-out" class="chip">售罄</button>
+        </div>
+        <div id="item-list" class="list"></div>
+      </section>
+
+      <!-- ============ 新增/编辑款式 ============ -->
+      <section id="view-item-edit" class="view">
+        <div class="card">
+          <label class="lbl">款式名称 *</label>
+          <input id="ie-name" class="input" placeholder="如：圆领羊毛衫">
+          <label class="lbl">售价（元）*</label>
+          <input id="ie-price" class="input" type="number" inputmode="decimal" placeholder="0.00">
+          <label class="lbl">成本（元）*</label>
+          <input id="ie-cost" class="input" type="number" inputmode="decimal" placeholder="0.00">
+          <label class="lbl">低库存警告线（件）</label>
+          <input id="ie-lowstock" class="input" type="number" inputmode="numeric" placeholder="留空则使用全局设置">
+          <div class="hint">某颜色库存 ≤ 该数值时显示警告。留空 = 跟随全局设置（设置页可改）。</div>
+          <label class="lbl">款式图片</label>
+          <div class="img-picker">
+            <div id="ie-images" class="img-thumbs"></div>
+            <button id="ie-add-img" class="btn small">＋ 拍照/选图</button>
+          </div>
+          <label class="lbl">颜色与库存</label>
+          <div id="ie-colors" class="color-editor"></div>
+          <button id="ie-add-color" class="btn small">＋ 添加颜色</button>
+          <div class="btn-row">
+            <button id="ie-save" class="btn primary">保存</button>
+            <button id="ie-cancel" class="btn">取消</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 款式详情 ============ -->
+      <section id="view-item-detail" class="view">
+        <div id="detail-body"></div>
+      </section>
+
+      <!-- ============ 销售 ============ -->
+      <section id="view-sales" class="view">
+        <div class="card">
+          <label class="lbl">选择款式</label>
+          <select id="sale-item" class="input"></select>
+          <label class="lbl">颜色</label>
+          <select id="sale-color" class="input"></select>
+          <label class="lbl">销售数量 *</label>
+          <input id="sale-qty" class="input" type="number" inputmode="numeric" min="1" value="1">
+          <label class="lbl">售价（元）*</label>
+          <input id="sale-price" class="input" type="number" inputmode="decimal">
+          <label class="lbl">客户（可选）</label>
+          <input id="sale-customer" class="input" placeholder="客户姓名/称呼">
+          <label class="check"><input type="checkbox" id="sale-on-credit"> 赊账（未收款）</label>
+          <div class="btn-row">
+            <button id="sale-confirm" class="btn primary">确认销售</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 客户列表 ============ -->
+      <section id="view-customers" class="view">
+        <div class="search-bar">
+          <input id="customer-search" class="input" placeholder="搜索客户名称 / 电话…">
+        </div>
+        <div id="customer-list" class="list"></div>
+      </section>
+
+      <!-- ============ 客户详情 ============ -->
+      <section id="view-customer-detail" class="view">
+        <div id="customer-detail-body"></div>
+      </section>
+
+      <!-- ============ 客户编辑 ============ -->
+      <section id="view-customer-edit" class="view">
+        <div class="card">
+          <label class="lbl">客户名称 *</label>
+          <input id="ce-name" class="input" placeholder="网店/客户名称">
+          <label class="lbl">电话</label>
+          <input id="ce-phone" class="input" type="tel" placeholder="联系电话">
+          <label class="lbl">收货地址</label>
+          <textarea id="ce-address" class="input ta" placeholder="默认收货地址"></textarea>
+          <label class="lbl">备注</label>
+          <input id="ce-note" class="input" placeholder="备注（拿货偏好等）">
+          <div class="btn-row">
+            <button id="ce-save" class="btn primary">保存客户</button>
+            <button id="ce-cancel" class="btn">取消</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 快速开单（散单） ============ -->
+      <section id="view-quick-order" class="view">
+        <div class="card">
+          <div class="hint" style="margin-bottom:10px">快速开单：选客户（自动带出电话地址）→ 加商品 → 保存。连续开单更快。</div>
+          <label class="lbl">客户 *</label>
+          <select id="qo-customer" class="input"></select>
+          <button id="qo-new-customer" class="btn small">＋ 新客户</button>
+          <label class="lbl">电话</label>
+          <input id="qo-phone" class="input" type="tel" placeholder="自动带出，可改">
+          <label class="lbl">收货地址</label>
+          <textarea id="qo-address" class="input ta" placeholder="自动带出，可改"></textarea>
+          <hr>
+          <label class="lbl">商品</label>
+          <div id="qo-lines" class="order-lines"></div>
+          <button id="qo-add-line" class="btn small">＋ 添加商品</button>
+          <hr>
+          <label class="check"><input type="checkbox" id="qo-paid" checked> 已收款（网店一般线上已付）</label>
+          <div class="btn-row">
+            <button id="qo-save" class="btn primary">保存订单</button>
+            <button id="qo-save-continue" class="btn">保存并继续开单</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 批量导入订单 ============ -->
+      <section id="view-import" class="view">
+        <div class="card">
+          <h3>批量导入订单</h3>
+          <div class="hint" style="margin-bottom:8px">从网店后台导出的订单，整理成下面格式粘贴即可（每行一单）。<br>格式：<b>客户名,电话,地址,商品名,颜色,数量,单价</b></div>
+          <textarea id="import-text" class="input ta" style="min-height:200px;font-family:ui-monospace,Consolas,monospace;font-size:13px" placeholder="张店,13800000000,浙江杭州xx路,圆领羊毛衫,红色,5,60&#10;李店,13900000000,江苏苏州xx街,高领毛衣,黑色,10,75&#10;王店,13700000000,上海xx区,圆领羊毛衫,蓝色,8,60"></textarea>
+          <div class="hint" style="margin-top:8px">商品名需与库存里的款式名一致才能自动匹配；不匹配的会提示。</div>
+          <div class="btn-row">
+            <button id="import-preview" class="btn">预览解析</button>
+            <button id="import-do" class="btn primary">导入全部</button>
+          </div>
+          <div id="import-result" class="hint"></div>
+        </div>
+      </section>
+
+      <!-- ============ 订单 ============ -->
+      <section id="view-orders" class="view">
+        <div class="filter-row">
+          <button id="order-filter-all" class="chip active">全部</button>
+          <button id="order-filter-pending" class="chip">未完成</button>
+          <button id="order-filter-done" class="chip">已完成</button>
+          <button id="order-filter-debt" class="chip">有欠款</button>
+          <button id="order-filter-custom" class="chip">定制单</button>
+        </div>
+        <div id="order-batch-bar" class="batch-bar hidden">
+          <span id="order-batch-count">已选 0 单</span>
+          <button id="order-batch-done" class="btn small">批量完成</button>
+          <button id="order-batch-cancel" class="btn small">退出</button>
+        </div>
+        <div id="order-list" class="list"></div>
+        <div class="btn-row">
+          <button id="order-import-btn" class="btn">📥 批量导入订单</button>
+        </div>
+      </section>
+
+      <!-- ============ 新建订单 ============ -->
+      <section id="view-order-edit" class="view">
+        <div class="card">
+          <label class="lbl">订单类型</label>
+          <div class="filter-row">
+            <button id="oe-type-stock" class="chip active">现货单</button>
+            <button id="oe-type-custom" class="chip">定制单</button>
+          </div>
+          <div id="oe-custom-fields" class="hidden">
+            <label class="lbl">交货期</label>
+            <input id="oe-due" class="input" type="date">
+            <label class="lbl">工艺/定制要求</label>
+            <textarea id="oe-craft" class="input ta" placeholder="如：尺寸、颜色、绣字等定制要求"></textarea>
+          </div>
+          <label class="lbl">客户姓名 *</label>
+          <input id="oe-customer" class="input" placeholder="客户姓名">
+          <label class="lbl">客户电话（可选）</label>
+          <input id="oe-phone" class="input" type="tel" placeholder="联系电话">
+          <label class="lbl">收货地址</label>
+          <div class="addr-row">
+            <select id="oe-addr-book" class="input"></select>
+            <button id="oe-addr-pick" class="btn small">调用</button>
+          </div>
+          <textarea id="oe-address" class="input ta" placeholder="详细收货地址"></textarea>
+          <button id="oe-save-addr" class="btn small">保存到地址簿</button>
+          <hr>
+          <label class="lbl">订单商品</label>
+          <div id="oe-lines" class="order-lines"></div>
+          <button id="oe-add-line" class="btn small">＋ 添加商品</button>
+          <hr>
+          <label class="check"><input type="checkbox" id="oe-on-credit"> 赊账（下单未收款）</label>
+          <div class="btn-row">
+            <button id="oe-save" class="btn primary">保存订单</button>
+            <button id="oe-cancel" class="btn">取消</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 盘点 ============ -->
+      <section id="view-stocktake" class="view">
+        <div class="card">
+          <div class="hint" style="margin-bottom:8px">输入每个颜色的<b>实际数量</b>，完成后自动修正库存并记录差异。不填的保持账面不变。</div>
+          <div class="filter-row">
+            <button id="st-filter-all" class="chip active">全部款式</button>
+            <button id="st-filter-stocked" class="chip">仅有库存</button>
+          </div>
+        </div>
+        <div id="stocktake-list" class="list"></div>
+        <div class="card">
+          <button id="st-finish" class="btn primary">完成盘点</button>
+          <button id="st-history" class="btn">查看盘点记录</button>
+        </div>
+      </section>
+
+      <!-- ============ 盘点记录 ============ -->
+      <section id="view-stocktake-history" class="view">
+        <div id="stocktake-history-list" class="list"></div>
+      </section>
+
+      <!-- ============ 进货 ============ -->
+      <section id="view-purchase" class="view">
+        <div class="card">
+          <label class="lbl">选择款式</label>
+          <select id="pu-item" class="input"></select>
+          <label class="lbl">颜色</label>
+          <select id="pu-color" class="input"></select>
+          <label class="lbl">进货数量 *</label>
+          <input id="pu-qty" class="input" type="number" inputmode="numeric" min="1" value="1">
+          <label class="lbl">进价（元/件，可选）</label>
+          <input id="pu-price" class="input" type="number" inputmode="decimal" placeholder="留空则不记录进价">
+          <label class="lbl">供应商（可选）</label>
+          <input id="pu-supplier" class="input" placeholder="供应商名称">
+          <div class="btn-row">
+            <button id="pu-confirm" class="btn primary">确认进货</button>
+          </div>
+        </div>
+        <div class="card">
+          <h3>最近进货记录</h3>
+          <div id="purchase-list" class="purchase-list"></div>
+        </div>
+      </section>
+
+      <!-- ============ 批量改价 ============ -->
+      <section id="view-batch-price" class="view">
+        <div class="card">
+          <div class="hint" style="margin-bottom:8px">选择要调整的款式（可多选），然后统一调整售价。</div>
+          <div id="batch-item-list" class="batch-list"></div>
+        </div>
+        <div class="card">
+          <label class="lbl">调整方式</label>
+          <select id="bp-mode" class="input">
+            <option value="set">设为固定价</option>
+            <option value="percent">按百分比调整</option>
+            <option value="add">加/减固定金额</option>
+          </select>
+          <label class="lbl" id="bp-value-lbl">新售价（元）</label>
+          <input id="bp-value" class="input" type="number" inputmode="decimal">
+          <div class="hint" id="bp-hint"></div>
+          <div class="btn-row">
+            <button id="bp-apply" class="btn primary">应用调整</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 统计 ============ -->
+      <section id="view-stats" class="view">
+        <div class="stats-summary">
+          <div class="stat-card"><div class="stat-num" id="stat-items">0</div><div class="stat-lbl">款式数</div></div>
+          <div class="stat-card"><div class="stat-num" id="stat-total-stock">0</div><div class="stat-lbl">总库存</div></div>
+          <div class="stat-card"><div class="stat-num" id="stat-total-sold">0</div><div class="stat-lbl">总销量</div></div>
+          <div class="stat-card"><div class="stat-num" id="stat-profit">0</div><div class="stat-lbl">利润(元)</div></div>
+        </div>
+        <div class="card">
+          <label class="lbl">排序</label>
+          <select id="stats-sort" class="input">
+            <option value="sold">按销量</option>
+            <option value="profit">按利润</option>
+            <option value="stock">按库存</option>
+          </select>
+        </div>
+        <div id="stats-list" class="list"></div>
+      </section>
+
+      <!-- ============ 客户欠款 ============ -->
+      <section id="view-debt" class="view">
+        <div class="card">
+          <h3>客户欠款汇总</h3>
+          <div class="hint">统计所有未收款的订单与赊账销售。</div>
+        </div>
+        <div id="debt-list" class="list"></div>
+      </section>
+
+      <!-- ============ 设置 ============ -->
+      <section id="view-settings" class="view">
+        <div class="card">
+          <label class="lbl">全局低库存警告线（件）</label>
+          <input id="set-lowstock" class="input" type="number" inputmode="numeric" placeholder="如：5">
+          <div class="hint">某颜色库存 ≤ 该数值时在库存列表显示红色警告。单个款式可在编辑里单独覆盖。</div>
+          <button id="set-lowstock-save" class="btn primary">保存设置</button>
+        </div>
+        <div class="card">
+          <label class="lbl">字体大小</label>
+          <div class="filter-row" id="fontsize-row">
+            <button class="chip fontsize-chip" data-size="s">小</button>
+            <button class="chip fontsize-chip active" data-size="m">标准</button>
+            <button class="chip fontsize-chip" data-size="l">大</button>
+            <button class="chip fontsize-chip" data-size="xl">特大</button>
+          </div>
+          <div class="hint">调整界面文字大小，方便查看。选择后立即生效。</div>
+        </div>
+        <div class="card">
+          <h3>云同步</h3>
+          <div class="hint">云同步已内置配置，<b>无需手动填写</b>，换网址/换手机自动生效。下面的配置仅供需要修改时使用。</div>
+          <label class="lbl">Supabase URL</label>
+          <input id="set-sync-url" class="input" type="url" placeholder="https://xxxx.supabase.co">
+          <label class="lbl">publishable / anon key</label>
+          <input id="set-sync-key" class="input" type="password" placeholder="sb_publishable_... 或 eyJ...">
+          <label class="check"><input type="checkbox" id="set-sync-auto"> 登录时自动从云端拉取</label>
+          <div class="btn-row">
+            <button id="set-sync-save" class="btn">保存配置</button>
+            <button id="set-sync-test" class="btn primary">测试连接</button>
+          </div>
+          <div class="btn-row">
+            <button id="set-sync-upload" class="btn">上传到云端</button>
+            <button id="set-sync-pull" class="btn">从云端拉取</button>
+          </div>
+          <div id="sync-status" class="hint"></div>
+        </div>
+        <div class="card">
+          <label class="lbl">数据备份</label>
+          <div class="btn-row">
+            <button id="set-export" class="btn primary">导出数据</button>
+            <button id="set-import" class="btn">导入数据</button>
+          </div>
+          <input id="set-import-file" type="file" accept=".json" class="hidden">
+          <div class="hint">导出为 JSON 文件保存，换机或清缓存后可导入恢复。</div>
+        </div>
+        <div class="card">
+          <label class="lbl">授权</label>
+          <div id="license-info-setting" class="hint"></div>
+          <div class="btn-row">
+            <button id="set-reactivate" class="btn">重新激活</button>
+            <button id="set-check-update" class="btn primary">检查更新</button>
+          </div>
+          <div id="update-result" class="hint"></div>
+        </div>
+        <div class="card">
+          <label class="lbl">账号</label>
+          <div id="account-info" class="hint"></div>
+          <button id="set-logout" class="btn danger">退出登录</button>
+        </div>
+        <div class="card">
+          <label class="lbl">关于</label>
+          <div class="hint" id="about-text">羊毛衫管家 · 数据保存在本机浏览器 · 支持云同步</div>
+        </div>
+      </section>
+    </main>
+
+    <nav class="tabbar" id="tabbar">
+      <button class="tab active" data-view="today"><span class="t-icon">🏠</span>今日</button>
+      <button class="tab" data-view="items"><span class="t-icon">🧥</span>库存</button>
+      <button class="tab" data-view="customers"><span class="t-icon">👥</span>客户</button>
+      <button class="tab" data-view="orders"><span class="t-icon">📦</span>订单</button>
+      <button class="tab" data-view="settings"><span class="t-icon">⚙️</span>设置</button>
+    </nav>
+  </section>
+</div>
+
+<!-- 通用确认弹窗 -->
+<div id="modal-mask" class="modal-mask hidden">
+  <div class="modal">
+    <h3 id="modal-title">确认</h3>
+    <div id="modal-text"></div>
+    <div class="btn-row">
+      <button id="modal-cancel" class="btn">取消</button>
+      <button id="modal-ok" class="btn primary">确定</button>
+    </div>
+  </div>
+</div>
+
+<script>var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this.parsedData=[];for(var b=[],d=0,e=this.data.length;e>d;d++){var f=this.data.charCodeAt(d);f>65536?(b[0]=240|(1835008&f)>>>18,b[1]=128|(258048&f)>>>12,b[2]=128|(4032&f)>>>6,b[3]=128|63&f):f>2048?(b[0]=224|(61440&f)>>>12,b[1]=128|(4032&f)>>>6,b[2]=128|63&f):f>128?(b[0]=192|(1984&f)>>>6,b[1]=128|63&f):b[0]=f,this.parsedData=this.parsedData.concat(b)}this.parsedData.length!=this.data.length&&(this.parsedData.unshift(191),this.parsedData.unshift(187),this.parsedData.unshift(239))}function b(a,b){this.typeNumber=a,this.errorCorrectLevel=b,this.modules=null,this.moduleCount=0,this.dataCache=null,this.dataList=[]}function i(a,b){if(void 0==a.length)throw new Error(a.length+"/"+b);for(var c=0;c<a.length&&0==a[c];)c++;this.num=new Array(a.length-c+b);for(var d=0;d<a.length-c;d++)this.num[d]=a[d+c]}function j(a,b){this.totalCount=a,this.dataCount=b}function k(){this.buffer=[],this.length=0}function m(){return"undefined"!=typeof CanvasRenderingContext2D}function n(){var a=!1,b=navigator.userAgent;return/android/i.test(b)&&(a=!0,aMat=b.toString().match(/android ([0-9]\.[0-9])/i),aMat&&aMat[1]&&(a=parseFloat(aMat[1]))),a}function r(a,b){for(var c=1,e=s(a),f=0,g=l.length;g>=f;f++){var h=0;switch(b){case d.L:h=l[f][0];break;case d.M:h=l[f][1];break;case d.Q:h=l[f][2];break;case d.H:h=l[f][3]}if(h>=e)break;c++}if(c>l.length)throw new Error("Too long data");return c}function s(a){var b=encodeURI(a).toString().replace(/\%[0-9a-fA-F]{2}/g,"a");return b.length+(b.length!=a?3:0)}a.prototype={getLength:function(){return this.parsedData.length},write:function(a){for(var b=0,c=this.parsedData.length;c>b;b++)a.put(this.parsedData[b],8)}},b.prototype={addData:function(b){var c=new a(b);this.dataList.push(c),this.dataCache=null},isDark:function(a,b){if(0>a||this.moduleCount<=a||0>b||this.moduleCount<=b)throw new Error(a+","+b);return this.modules[a][b]},getModuleCount:function(){return this.moduleCount},make:function(){this.makeImpl(!1,this.getBestMaskPattern())},makeImpl:function(a,c){this.moduleCount=4*this.typeNumber+17,this.modules=new Array(this.moduleCount);for(var d=0;d<this.moduleCount;d++){this.modules[d]=new Array(this.moduleCount);for(var e=0;e<this.moduleCount;e++)this.modules[d][e]=null}this.setupPositionProbePattern(0,0),this.setupPositionProbePattern(this.moduleCount-7,0),this.setupPositionProbePattern(0,this.moduleCount-7),this.setupPositionAdjustPattern(),this.setupTimingPattern(),this.setupTypeInfo(a,c),this.typeNumber>=7&&this.setupTypeNumber(a),null==this.dataCache&&(this.dataCache=b.createData(this.typeNumber,this.errorCorrectLevel,this.dataList)),this.mapData(this.dataCache,c)},setupPositionProbePattern:function(a,b){for(var c=-1;7>=c;c++)if(!(-1>=a+c||this.moduleCount<=a+c))for(var d=-1;7>=d;d++)-1>=b+d||this.moduleCount<=b+d||(this.modules[a+c][b+d]=c>=0&&6>=c&&(0==d||6==d)||d>=0&&6>=d&&(0==c||6==c)||c>=2&&4>=c&&d>=2&&4>=d?!0:!1)},getBestMaskPattern:function(){for(var a=0,b=0,c=0;8>c;c++){this.makeImpl(!0,c);var d=f.getLostPoint(this);(0==c||a>d)&&(a=d,b=c)}return b},createMovieClip:function(a,b,c){var d=a.createEmptyMovieClip(b,c),e=1;this.make();for(var f=0;f<this.modules.length;f++)for(var g=f*e,h=0;h<this.modules[f].length;h++){var i=h*e,j=this.modules[f][h];j&&(d.beginFill(0,100),d.moveTo(i,g),d.lineTo(i+e,g),d.lineTo(i+e,g+e),d.lineTo(i,g+e),d.endFill())}return d},setupTimingPattern:function(){for(var a=8;a<this.moduleCount-8;a++)null==this.modules[a][6]&&(this.modules[a][6]=0==a%2);for(var b=8;b<this.moduleCount-8;b++)null==this.modules[6][b]&&(this.modules[6][b]=0==b%2)},setupPositionAdjustPattern:function(){for(var a=f.getPatternPosition(this.typeNumber),b=0;b<a.length;b++)for(var c=0;c<a.length;c++){var d=a[b],e=a[c];if(null==this.modules[d][e])for(var g=-2;2>=g;g++)for(var h=-2;2>=h;h++)this.modules[d+g][e+h]=-2==g||2==g||-2==h||2==h||0==g&&0==h?!0:!1}},setupTypeNumber:function(a){for(var b=f.getBCHTypeNumber(this.typeNumber),c=0;18>c;c++){var d=!a&&1==(1&b>>c);this.modules[Math.floor(c/3)][c%3+this.moduleCount-8-3]=d}for(var c=0;18>c;c++){var d=!a&&1==(1&b>>c);this.modules[c%3+this.moduleCount-8-3][Math.floor(c/3)]=d}},setupTypeInfo:function(a,b){for(var c=this.errorCorrectLevel<<3|b,d=f.getBCHTypeInfo(c),e=0;15>e;e++){var g=!a&&1==(1&d>>e);6>e?this.modules[e][8]=g:8>e?this.modules[e+1][8]=g:this.modules[this.moduleCount-15+e][8]=g}for(var e=0;15>e;e++){var g=!a&&1==(1&d>>e);8>e?this.modules[8][this.moduleCount-e-1]=g:9>e?this.modules[8][15-e-1+1]=g:this.modules[8][15-e-1]=g}this.modules[this.moduleCount-8][8]=!a},mapData:function(a,b){for(var c=-1,d=this.moduleCount-1,e=7,g=0,h=this.moduleCount-1;h>0;h-=2)for(6==h&&h--;;){for(var i=0;2>i;i++)if(null==this.modules[d][h-i]){var j=!1;g<a.length&&(j=1==(1&a[g]>>>e));var k=f.getMask(b,d,h-i);k&&(j=!j),this.modules[d][h-i]=j,e--,-1==e&&(g++,e=7)}if(d+=c,0>d||this.moduleCount<=d){d-=c,c=-c;break}}}},b.PAD0=236,b.PAD1=17,b.createData=function(a,c,d){for(var e=j.getRSBlocks(a,c),g=new k,h=0;h<d.length;h++){var i=d[h];g.put(i.mode,4),g.put(i.getLength(),f.getLengthInBits(i.mode,a)),i.write(g)}for(var l=0,h=0;h<e.length;h++)l+=e[h].dataCount;if(g.getLengthInBits()>8*l)throw new Error("code length overflow. ("+g.getLengthInBits()+">"+8*l+")");for(g.getLengthInBits()+4<=8*l&&g.put(0,4);0!=g.getLengthInBits()%8;)g.putBit(!1);for(;;){if(g.getLengthInBits()>=8*l)break;if(g.put(b.PAD0,8),g.getLengthInBits()>=8*l)break;g.put(b.PAD1,8)}return b.createBytes(g,e)},b.createBytes=function(a,b){for(var c=0,d=0,e=0,g=new Array(b.length),h=new Array(b.length),j=0;j<b.length;j++){var k=b[j].dataCount,l=b[j].totalCount-k;d=Math.max(d,k),e=Math.max(e,l),g[j]=new Array(k);for(var m=0;m<g[j].length;m++)g[j][m]=255&a.buffer[m+c];c+=k;var n=f.getErrorCorrectPolynomial(l),o=new i(g[j],n.getLength()-1),p=o.mod(n);h[j]=new Array(n.getLength()-1);for(var m=0;m<h[j].length;m++){var q=m+p.getLength()-h[j].length;h[j][m]=q>=0?p.get(q):0}}for(var r=0,m=0;m<b.length;m++)r+=b[m].totalCount;for(var s=new Array(r),t=0,m=0;d>m;m++)for(var j=0;j<b.length;j++)m<g[j].length&&(s[t++]=g[j][m]);for(var m=0;e>m;m++)for(var j=0;j<b.length;j++)m<h[j].length&&(s[t++]=h[j][m]);return s};for(var c={MODE_NUMBER:1,MODE_ALPHA_NUM:2,MODE_8BIT_BYTE:4,MODE_KANJI:8},d={L:1,M:0,Q:3,H:2},e={PATTERN000:0,PATTERN001:1,PATTERN010:2,PATTERN011:3,PATTERN100:4,PATTERN101:5,PATTERN110:6,PATTERN111:7},f={PATTERN_POSITION_TABLE:[[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50],[6,30,54],[6,32,58],[6,34,62],[6,26,46,66],[6,26,48,70],[6,26,50,74],[6,30,54,78],[6,30,56,82],[6,30,58,86],[6,34,62,90],[6,28,50,72,94],[6,26,50,74,98],[6,30,54,78,102],[6,28,54,80,106],[6,32,58,84,110],[6,30,58,86,114],[6,34,62,90,118],[6,26,50,74,98,122],[6,30,54,78,102,126],[6,26,52,78,104,130],[6,30,56,82,108,134],[6,34,60,86,112,138],[6,30,58,86,114,142],[6,34,62,90,118,146],[6,30,54,78,102,126,150],[6,24,50,76,102,128,154],[6,28,54,80,106,132,158],[6,32,58,84,110,136,162],[6,26,54,82,110,138,166],[6,30,58,86,114,142,170]],G15:1335,G18:7973,G15_MASK:21522,getBCHTypeInfo:function(a){for(var b=a<<10;f.getBCHDigit(b)-f.getBCHDigit(f.G15)>=0;)b^=f.G15<<f.getBCHDigit(b)-f.getBCHDigit(f.G15);return(a<<10|b)^f.G15_MASK},getBCHTypeNumber:function(a){for(var b=a<<12;f.getBCHDigit(b)-f.getBCHDigit(f.G18)>=0;)b^=f.G18<<f.getBCHDigit(b)-f.getBCHDigit(f.G18);return a<<12|b},getBCHDigit:function(a){for(var b=0;0!=a;)b++,a>>>=1;return b},getPatternPosition:function(a){return f.PATTERN_POSITION_TABLE[a-1]},getMask:function(a,b,c){switch(a){case e.PATTERN000:return 0==(b+c)%2;case e.PATTERN001:return 0==b%2;case e.PATTERN010:return 0==c%3;case e.PATTERN011:return 0==(b+c)%3;case e.PATTERN100:return 0==(Math.floor(b/2)+Math.floor(c/3))%2;case e.PATTERN101:return 0==b*c%2+b*c%3;case e.PATTERN110:return 0==(b*c%2+b*c%3)%2;case e.PATTERN111:return 0==(b*c%3+(b+c)%2)%2;default:throw new Error("bad maskPattern:"+a)}},getErrorCorrectPolynomial:function(a){for(var b=new i([1],0),c=0;a>c;c++)b=b.multiply(new i([1,g.gexp(c)],0));return b},getLengthInBits:function(a,b){if(b>=1&&10>b)switch(a){case c.MODE_NUMBER:return 10;case c.MODE_ALPHA_NUM:return 9;case c.MODE_8BIT_BYTE:return 8;case c.MODE_KANJI:return 8;default:throw new Error("mode:"+a)}else if(27>b)switch(a){case c.MODE_NUMBER:return 12;case c.MODE_ALPHA_NUM:return 11;case c.MODE_8BIT_BYTE:return 16;case c.MODE_KANJI:return 10;default:throw new Error("mode:"+a)}else{if(!(41>b))throw new Error("type:"+b);switch(a){case c.MODE_NUMBER:return 14;case c.MODE_ALPHA_NUM:return 13;case c.MODE_8BIT_BYTE:return 16;case c.MODE_KANJI:return 12;default:throw new Error("mode:"+a)}}},getLostPoint:function(a){for(var b=a.getModuleCount(),c=0,d=0;b>d;d++)for(var e=0;b>e;e++){for(var f=0,g=a.isDark(d,e),h=-1;1>=h;h++)if(!(0>d+h||d+h>=b))for(var i=-1;1>=i;i++)0>e+i||e+i>=b||(0!=h||0!=i)&&g==a.isDark(d+h,e+i)&&f++;f>5&&(c+=3+f-5)}for(var d=0;b-1>d;d++)for(var e=0;b-1>e;e++){var j=0;a.isDark(d,e)&&j++,a.isDark(d+1,e)&&j++,a.isDark(d,e+1)&&j++,a.isDark(d+1,e+1)&&j++,(0==j||4==j)&&(c+=3)}for(var d=0;b>d;d++)for(var e=0;b-6>e;e++)a.isDark(d,e)&&!a.isDark(d,e+1)&&a.isDark(d,e+2)&&a.isDark(d,e+3)&&a.isDark(d,e+4)&&!a.isDark(d,e+5)&&a.isDark(d,e+6)&&(c+=40);for(var e=0;b>e;e++)for(var d=0;b-6>d;d++)a.isDark(d,e)&&!a.isDark(d+1,e)&&a.isDark(d+2,e)&&a.isDark(d+3,e)&&a.isDark(d+4,e)&&!a.isDark(d+5,e)&&a.isDark(d+6,e)&&(c+=40);for(var k=0,e=0;b>e;e++)for(var d=0;b>d;d++)a.isDark(d,e)&&k++;var l=Math.abs(100*k/b/b-50)/5;return c+=10*l}},g={glog:function(a){if(1>a)throw new Error("glog("+a+")");return g.LOG_TABLE[a]},gexp:function(a){for(;0>a;)a+=255;for(;a>=256;)a-=255;return g.EXP_TABLE[a]},EXP_TABLE:new Array(256),LOG_TABLE:new Array(256)},h=0;8>h;h++)g.EXP_TABLE[h]=1<<h;for(var h=8;256>h;h++)g.EXP_TABLE[h]=g.EXP_TABLE[h-4]^g.EXP_TABLE[h-5]^g.EXP_TABLE[h-6]^g.EXP_TABLE[h-8];for(var h=0;255>h;h++)g.LOG_TABLE[g.EXP_TABLE[h]]=h;i.prototype={get:function(a){return this.num[a]},getLength:function(){return this.num.length},multiply:function(a){for(var b=new Array(this.getLength()+a.getLength()-1),c=0;c<this.getLength();c++)for(var d=0;d<a.getLength();d++)b[c+d]^=g.gexp(g.glog(this.get(c))+g.glog(a.get(d)));return new i(b,0)},mod:function(a){if(this.getLength()-a.getLength()<0)return this;for(var b=g.glog(this.get(0))-g.glog(a.get(0)),c=new Array(this.getLength()),d=0;d<this.getLength();d++)c[d]=this.get(d);for(var d=0;d<a.getLength();d++)c[d]^=g.gexp(g.glog(a.get(d))+b);return new i(c,0).mod(a)}},j.RS_BLOCK_TABLE=[[1,26,19],[1,26,16],[1,26,13],[1,26,9],[1,44,34],[1,44,28],[1,44,22],[1,44,16],[1,70,55],[1,70,44],[2,35,17],[2,35,13],[1,100,80],[2,50,32],[2,50,24],[4,25,9],[1,134,108],[2,67,43],[2,33,15,2,34,16],[2,33,11,2,34,12],[2,86,68],[4,43,27],[4,43,19],[4,43,15],[2,98,78],[4,49,31],[2,32,14,4,33,15],[4,39,13,1,40,14],[2,121,97],[2,60,38,2,61,39],[4,40,18,2,41,19],[4,40,14,2,41,15],[2,146,116],[3,58,36,2,59,37],[4,36,16,4,37,17],[4,36,12,4,37,13],[2,86,68,2,87,69],[4,69,43,1,70,44],[6,43,19,2,44,20],[6,43,15,2,44,16],[4,101,81],[1,80,50,4,81,51],[4,50,22,4,51,23],[3,36,12,8,37,13],[2,116,92,2,117,93],[6,58,36,2,59,37],[4,46,20,6,47,21],[7,42,14,4,43,15],[4,133,107],[8,59,37,1,60,38],[8,44,20,4,45,21],[12,33,11,4,34,12],[3,145,115,1,146,116],[4,64,40,5,65,41],[11,36,16,5,37,17],[11,36,12,5,37,13],[5,109,87,1,110,88],[5,65,41,5,66,42],[5,54,24,7,55,25],[11,36,12],[5,122,98,1,123,99],[7,73,45,3,74,46],[15,43,19,2,44,20],[3,45,15,13,46,16],[1,135,107,5,136,108],[10,74,46,1,75,47],[1,50,22,15,51,23],[2,42,14,17,43,15],[5,150,120,1,151,121],[9,69,43,4,70,44],[17,50,22,1,51,23],[2,42,14,19,43,15],[3,141,113,4,142,114],[3,70,44,11,71,45],[17,47,21,4,48,22],[9,39,13,16,40,14],[3,135,107,5,136,108],[3,67,41,13,68,42],[15,54,24,5,55,25],[15,43,15,10,44,16],[4,144,116,4,145,117],[17,68,42],[17,50,22,6,51,23],[19,46,16,6,47,17],[2,139,111,7,140,112],[17,74,46],[7,54,24,16,55,25],[34,37,13],[4,151,121,5,152,122],[4,75,47,14,76,48],[11,54,24,14,55,25],[16,45,15,14,46,16],[6,147,117,4,148,118],[6,73,45,14,74,46],[11,54,24,16,55,25],[30,46,16,2,47,17],[8,132,106,4,133,107],[8,75,47,13,76,48],[7,54,24,22,55,25],[22,45,15,13,46,16],[10,142,114,2,143,115],[19,74,46,4,75,47],[28,50,22,6,51,23],[33,46,16,4,47,17],[8,152,122,4,153,123],[22,73,45,3,74,46],[8,53,23,26,54,24],[12,45,15,28,46,16],[3,147,117,10,148,118],[3,73,45,23,74,46],[4,54,24,31,55,25],[11,45,15,31,46,16],[7,146,116,7,147,117],[21,73,45,7,74,46],[1,53,23,37,54,24],[19,45,15,26,46,16],[5,145,115,10,146,116],[19,75,47,10,76,48],[15,54,24,25,55,25],[23,45,15,25,46,16],[13,145,115,3,146,116],[2,74,46,29,75,47],[42,54,24,1,55,25],[23,45,15,28,46,16],[17,145,115],[10,74,46,23,75,47],[10,54,24,35,55,25],[19,45,15,35,46,16],[17,145,115,1,146,116],[14,74,46,21,75,47],[29,54,24,19,55,25],[11,45,15,46,46,16],[13,145,115,6,146,116],[14,74,46,23,75,47],[44,54,24,7,55,25],[59,46,16,1,47,17],[12,151,121,7,152,122],[12,75,47,26,76,48],[39,54,24,14,55,25],[22,45,15,41,46,16],[6,151,121,14,152,122],[6,75,47,34,76,48],[46,54,24,10,55,25],[2,45,15,64,46,16],[17,152,122,4,153,123],[29,74,46,14,75,47],[49,54,24,10,55,25],[24,45,15,46,46,16],[4,152,122,18,153,123],[13,74,46,32,75,47],[48,54,24,14,55,25],[42,45,15,32,46,16],[20,147,117,4,148,118],[40,75,47,7,76,48],[43,54,24,22,55,25],[10,45,15,67,46,16],[19,148,118,6,149,119],[18,75,47,31,76,48],[34,54,24,34,55,25],[20,45,15,61,46,16]],j.getRSBlocks=function(a,b){var c=j.getRsBlockTable(a,b);if(void 0==c)throw new Error("bad rs block @ typeNumber:"+a+"/errorCorrectLevel:"+b);for(var d=c.length/3,e=[],f=0;d>f;f++)for(var g=c[3*f+0],h=c[3*f+1],i=c[3*f+2],k=0;g>k;k++)e.push(new j(h,i));return e},j.getRsBlockTable=function(a,b){switch(b){case d.L:return j.RS_BLOCK_TABLE[4*(a-1)+0];case d.M:return j.RS_BLOCK_TABLE[4*(a-1)+1];case d.Q:return j.RS_BLOCK_TABLE[4*(a-1)+2];case d.H:return j.RS_BLOCK_TABLE[4*(a-1)+3];default:return void 0}},k.prototype={get:function(a){var b=Math.floor(a/8);return 1==(1&this.buffer[b]>>>7-a%8)},put:function(a,b){for(var c=0;b>c;c++)this.putBit(1==(1&a>>>b-c-1))},getLengthInBits:function(){return this.length},putBit:function(a){var b=Math.floor(this.length/8);this.buffer.length<=b&&this.buffer.push(0),a&&(this.buffer[b]|=128>>>this.length%8),this.length++}};var l=[[17,14,11,7],[32,26,20,14],[53,42,32,24],[78,62,46,34],[106,84,60,44],[134,106,74,58],[154,122,86,64],[192,152,108,84],[230,180,130,98],[271,213,151,119],[321,251,177,137],[367,287,203,155],[425,331,241,177],[458,362,258,194],[520,412,292,220],[586,450,322,250],[644,504,364,280],[718,560,394,310],[792,624,442,338],[858,666,482,382],[929,711,509,403],[1003,779,565,439],[1091,857,611,461],[1171,911,661,511],[1273,997,715,535],[1367,1059,751,593],[1465,1125,805,625],[1528,1190,868,658],[1628,1264,908,698],[1732,1370,982,742],[1840,1452,1030,790],[1952,1538,1112,842],[2068,1628,1168,898],[2188,1722,1228,958],[2303,1809,1283,983],[2431,1911,1351,1051],[2563,1989,1423,1093],[2699,2099,1499,1139],[2809,2213,1579,1219],[2953,2331,1663,1273]],o=function(){var a=function(a,b){this._el=a,this._htOption=b};return a.prototype.draw=function(a){function g(a,b){var c=document.createElementNS("http://www.w3.org/2000/svg",a);for(var d in b)b.hasOwnProperty(d)&&c.setAttribute(d,b[d]);return c}var b=this._htOption,c=this._el,d=a.getModuleCount();Math.floor(b.width/d),Math.floor(b.height/d),this.clear();var h=g("svg",{viewBox:"0 0 "+String(d)+" "+String(d),width:"100%",height:"100%",fill:b.colorLight});h.setAttributeNS("http://www.w3.org/2000/xmlns/","xmlns:xlink","http://www.w3.org/1999/xlink"),c.appendChild(h),h.appendChild(g("rect",{fill:b.colorDark,width:"1",height:"1",id:"template"}));for(var i=0;d>i;i++)for(var j=0;d>j;j++)if(a.isDark(i,j)){var k=g("use",{x:String(i),y:String(j)});k.setAttributeNS("http://www.w3.org/1999/xlink","href","#template"),h.appendChild(k)}},a.prototype.clear=function(){for(;this._el.hasChildNodes();)this._el.removeChild(this._el.lastChild)},a}(),p="svg"===document.documentElement.tagName.toLowerCase(),q=p?o:m()?function(){function a(){this._elImage.src=this._elCanvas.toDataURL("image/png"),this._elImage.style.display="block",this._elCanvas.style.display="none"}function d(a,b){var c=this;if(c._fFail=b,c._fSuccess=a,null===c._bSupportDataURI){var d=document.createElement("img"),e=function(){c._bSupportDataURI=!1,c._fFail&&_fFail.call(c)},f=function(){c._bSupportDataURI=!0,c._fSuccess&&c._fSuccess.call(c)};return d.onabort=e,d.onerror=e,d.onload=f,d.src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==",void 0}c._bSupportDataURI===!0&&c._fSuccess?c._fSuccess.call(c):c._bSupportDataURI===!1&&c._fFail&&c._fFail.call(c)}if(this._android&&this._android<=2.1){var b=1/window.devicePixelRatio,c=CanvasRenderingContext2D.prototype.drawImage;CanvasRenderingContext2D.prototype.drawImage=function(a,d,e,f,g,h,i,j){if("nodeName"in a&&/img/i.test(a.nodeName))for(var l=arguments.length-1;l>=1;l--)arguments[l]=arguments[l]*b;else"undefined"==typeof j&&(arguments[1]*=b,arguments[2]*=b,arguments[3]*=b,arguments[4]*=b);c.apply(this,arguments)}}var e=function(a,b){this._bIsPainted=!1,this._android=n(),this._htOption=b,this._elCanvas=document.createElement("canvas"),this._elCanvas.width=b.width,this._elCanvas.height=b.height,a.appendChild(this._elCanvas),this._el=a,this._oContext=this._elCanvas.getContext("2d"),this._bIsPainted=!1,this._elImage=document.createElement("img"),this._elImage.style.display="none",this._el.appendChild(this._elImage),this._bSupportDataURI=null};return e.prototype.draw=function(a){var b=this._elImage,c=this._oContext,d=this._htOption,e=a.getModuleCount(),f=d.width/e,g=d.height/e,h=Math.round(f),i=Math.round(g);b.style.display="none",this.clear();for(var j=0;e>j;j++)for(var k=0;e>k;k++){var l=a.isDark(j,k),m=k*f,n=j*g;c.strokeStyle=l?d.colorDark:d.colorLight,c.lineWidth=1,c.fillStyle=l?d.colorDark:d.colorLight,c.fillRect(m,n,f,g),c.strokeRect(Math.floor(m)+.5,Math.floor(n)+.5,h,i),c.strokeRect(Math.ceil(m)-.5,Math.ceil(n)-.5,h,i)}this._bIsPainted=!0},e.prototype.makeImage=function(){this._bIsPainted&&d.call(this,a)},e.prototype.isPainted=function(){return this._bIsPainted},e.prototype.clear=function(){this._oContext.clearRect(0,0,this._elCanvas.width,this._elCanvas.height),this._bIsPainted=!1},e.prototype.round=function(a){return a?Math.floor(1e3*a)/1e3:a},e}():function(){var a=function(a,b){this._el=a,this._htOption=b};return a.prototype.draw=function(a){for(var b=this._htOption,c=this._el,d=a.getModuleCount(),e=Math.floor(b.width/d),f=Math.floor(b.height/d),g=['<table style="border:0;border-collapse:collapse;">'],h=0;d>h;h++){g.push("<tr>");for(var i=0;d>i;i++)g.push('<td style="border:0;border-collapse:collapse;padding:0;margin:0;width:'+e+"px;height:"+f+"px;background-color:"+(a.isDark(h,i)?b.colorDark:b.colorLight)+';"></td>');g.push("</tr>")}g.push("</table>"),c.innerHTML=g.join("");var j=c.childNodes[0],k=(b.width-j.offsetWidth)/2,l=(b.height-j.offsetHeight)/2;k>0&&l>0&&(j.style.margin=l+"px "+k+"px")},a.prototype.clear=function(){this._el.innerHTML=""},a}();QRCode=function(a,b){if(this._htOption={width:256,height:256,typeNumber:4,colorDark:"#000000",colorLight:"#ffffff",correctLevel:d.H},"string"==typeof b&&(b={text:b}),b)for(var c in b)this._htOption[c]=b[c];"string"==typeof a&&(a=document.getElementById(a)),this._android=n(),this._el=a,this._oQRCode=null,this._oDrawing=new q(this._el,this._htOption),this._htOption.text&&this.makeCode(this._htOption.text)},QRCode.prototype.makeCode=function(a){this._oQRCode=new b(r(a,this._htOption.correctLevel),this._htOption.correctLevel),this._oQRCode.addData(a),this._oQRCode.make(),this._el.title=a,this._oDrawing.draw(this._oQRCode),this.makeImage()},QRCode.prototype.makeImage=function(){"function"==typeof this._oDrawing.makeImage&&(!this._android||this._android>=3)&&this._oDrawing.makeImage()},QRCode.prototype.clear=function(){this._oDrawing.clear()},QRCode.CorrectLevel=d}();
+/**
+ * 数据层：IndexedDB 封装（2.0 版）
+ *
+ * 账号架构：
+ *  - meta 库 (knit-stock-meta)：账号列表 {id, username, salt, hash} + 设置
+ *  - 每账号一个数据库 (knit-stock-<accountId>)：
+ *      items      - 款式 { id, name, price, cost, images:[dataURL], colors:[{name, stock, sold}], lowStock, createdAt }
+ *      sales      - 销售记录 { id, itemId, itemName, color, qty, price, customer, time }
+ *      orders     - 订单 { id, customer, phone, address, lines:[...], status:'pending'|'done'|'cancelled',
+ *                          payStatus:'unpaid'|'partial'|'paid', paidAmount, createdAt, doneAt }
+ *      addrs      - 地址簿 { id, name, phone, address }
+ *      stocktakes - 盘点记录 { id, time, lines:[{itemId, itemName, color, book, actual, diff}] }
+ *      purchases  - 进货记录 { id, itemId, itemName, color, qty, unitPrice, supplier, time }
+ *  - 同步接口：每账号数据 export/import（未来接 Supabase）
+ */
+
+const META_DB = "knit-stock-meta";
+const META_VERSION = 1;
+const DATA_VERSION = 4;
+
+/* ---------------- 通用 IndexedDB 封装 ---------------- */
+
+function openDB(name, version, upgrade) {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(name, version);
+    req.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if (upgrade) upgrade(db, e);
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function tx(dbP, store, mode, fn) {
+  return dbP.then((d) => new Promise((resolve, reject) => {
+    const t = d.transaction(store, mode);
+    const s = t.objectStore(store);
+    let out;
+    try { out = fn(s); } catch (err) { reject(err); return; }
+    t.oncomplete = () => resolve(out);
+    t.onerror = () => reject(t.error);
+    t.onabort = () => reject(t.error);
+  }));
+}
+
+function getAll(dbP, store) {
+  return tx(dbP, store, "readonly", (s) => s.getAll()).then((req) => req.result || []);
+}
+
+function get(dbP, store, id) {
+  return tx(dbP, store, "readonly", (s) => s.get(id)).then((req) => req.result);
+}
+
+function put(dbP, store, obj) {
+  return tx(dbP, store, "readwrite", (s) => s.put(obj));
+}
+
+function del(dbP, store, id) {
+  return tx(dbP, store, "readwrite", (s) => s.delete(id));
+}
+
+function clearStore(dbP, store) {
+  return tx(dbP, store, "readwrite", (s) => s.clear());
+}
+
+function uid() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+}
+
+/* ---------------- 密码哈希 ---------------- */
+
+async function sha256(text) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+function randomSalt() {
+  const arr = new Uint8Array(16);
+  crypto.getRandomValues(arr);
+  return Array.from(arr).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+/* ---------------- Meta 库 ---------------- */
+
+let _metaDb = null;
+function metaDb() {
+  if (!_metaDb) {
+    _metaDb = openDB(META_DB, META_VERSION, (db) => {
+      if (!db.objectStoreNames.contains("accounts")) db.createObjectStore("accounts", { keyPath: "id" });
+      if (!db.objectStoreNames.contains("settings")) db.createObjectStore("settings", { keyPath: "key" });
+    });
+  }
+  return _metaDb;
+}
+
+async function getAllAccounts() {
+  return getAll(metaDb(), "accounts");
+}
+
+async function getSetting(key, fallback) {
+  const v = await get(metaDb(), "settings", key);
+  return v ? v.value : fallback;
+}
+
+async function setSetting(key, value) {
+  await put(metaDb(), "settings", { key, value });
+}
+
+/* ---------------- 当前账号数据库 ---------------- */
+
+let _currentAccountId = null;
+let _dataDb = null;
+
+function currentAccountId() {
+  return _currentAccountId;
+}
+
+function setCurrentAccount(accountId) {
+  _currentAccountId = accountId;
+  _dataDb = null;
+}
+
+function dataDb(accountId) {
+  const aid = accountId || _currentAccountId;
+  if (!aid) throw new Error("未登录");
+  if (_dataDb && _currentAccountId === aid) return _dataDb;
+  _currentAccountId = aid;
+  _dataDb = openDB(`knit-stock-${aid}`, DATA_VERSION, (db, e) => {
+    if (!db.objectStoreNames.contains("items")) db.createObjectStore("items", { keyPath: "id" });
+    if (!db.objectStoreNames.contains("sales")) db.createObjectStore("sales", { keyPath: "id" });
+    if (!db.objectStoreNames.contains("orders")) db.createObjectStore("orders", { keyPath: "id" });
+    if (!db.objectStoreNames.contains("addrs")) db.createObjectStore("addrs", { keyPath: "id" });
+    if (!db.objectStoreNames.contains("stocktakes")) db.createObjectStore("stocktakes", { keyPath: "id" });
+    if (!db.objectStoreNames.contains("purchases")) db.createObjectStore("purchases", { keyPath: "id" });
+    if (!db.objectStoreNames.contains("customers")) db.createObjectStore("customers", { keyPath: "id" });
+    if (!db.objectStoreNames.contains("factories")) db.createObjectStore("factories", { keyPath: "id" });
+    if (!db.objectStoreNames.contains("outsources")) db.createObjectStore("outsources", { keyPath: "id" });
+  });
+  return _dataDb;
+}
+
+/* ---------------- 账号 API（云端注册/登录，多手机共用同一账号） ---------------- */
+
+const Auth = {
+  /**
+   * 注册：用户名全局唯一（云端）。
+   * 密码只传哈希（SHA-256 加盐），明文不上传。
+   */
+  async register(username, password) {
+    try {
+      username = (username || "").trim();
+      if (!username) return { ok: false, error: "请输入用户名" };
+      if ((password || "").length < 4) return { ok: false, error: "密码至少 4 位" };
+      // 本地先建（离线可用），同时尝试云端注册
+      const localAccounts = await getAllAccounts();
+      if (localAccounts.some((a) => a.username === username)) {
+        return { ok: false, error: "该用户名已在本地注册过，请直接登录" };
+      }
+      const salt = randomSalt();
+      const hash = await sha256(password + ":" + salt);
+      // 尝试云端注册（未配置云端则纯本地模式）
+      let cloudOk = false;
+      try {
+        const rows = await Sync.request("/rest/v1/cloud_users?username=eq." + encodeURIComponent(username) + "&select=username", {});
+        if (rows && rows.length) {
+          return { ok: false, error: "该用户名已被注册，请直接登录" };
+        }
+        await Sync.request("/rest/v1/cloud_users", {
+          method: "POST",
+          headers: { "Prefer": "return=minimal" },
+          body: JSON.stringify({ username, salt, hash })
+        });
+        cloudOk = true;
+      } catch (e) {
+        // 云端不可用：降级为本地注册
+      }
+      const account = { id: uid(), username, salt, hash, createdAt: Date.now(), cloud: cloudOk };
+      await put(metaDb(), "accounts", account);
+      return { ok: true, account, cloud: cloudOk };
+    } catch (e) {
+      return { ok: false, error: "注册失败：" + e.message };
+    }
+  },
+
+  /**
+   * 登录：优先云端验证（支持多手机同一账号），云端不可用时用本地。
+   */
+  async login(username, password) {
+    try {
+      username = (username || "").trim();
+      const localAccounts = await getAllAccounts();
+      // 尝试云端验证
+      try {
+        const rows = await Sync.request("/rest/v1/cloud_users?username=eq." + encodeURIComponent(username) + "&select=username,salt,hash", {});
+        if (rows && rows.length) {
+          const cu = rows[0];
+          const hash = await sha256(password + ":" + cu.salt);
+          if (hash !== cu.hash) return { ok: false, error: "密码错误" };
+          // 云端验证通过：本地建档（若不存在）
+          let account = localAccounts.find((a) => a.username === username);
+          if (!account) {
+            account = { id: uid(), username, salt: cu.salt, hash: cu.hash, createdAt: Date.now(), cloud: true };
+            await put(metaDb(), "accounts", account);
+          }
+          return { ok: true, account, cloud: true };
+        }
+      } catch (e) {
+        // 云端不可用：走本地
+      }
+      // 本地验证
+      const account = localAccounts.find((a) => a.username === username);
+      if (!account) return { ok: false, error: "用户名不存在（离线状态下仅能登录本机注册过的账号）" };
+      const hash = await sha256(password + ":" + account.salt);
+      if (hash !== account.hash) return { ok: false, error: "密码错误" };
+      return { ok: true, account, cloud: false };
+    } catch (e) {
+      return { ok: false, error: "登录失败：" + e.message };
+    }
+  },
+
+  async remember(accountId) {
+    await setSetting("currentAccount", accountId);
+  },
+
+  async restore() {
+    const id = await getSetting("currentAccount", null);
+    if (!id) return null;
+    const accounts = await getAllAccounts();
+    return accounts.find((a) => a.id === id) || null;
+  },
+
+  async logout() {
+    await setSetting("currentAccount", null);
+    setCurrentAccount(null);
+  }
+};
+
+/* ---------------- 数据 API ---------------- */
+
+let _globalLowStock = 5;
+
+const Store = {
+  async refreshGlobalLowStock() {
+    const v = await getSetting("lowStockGlobal", 5);
+    _globalLowStock = (typeof v === "number" && v >= 0) ? v : 5;
+    return _globalLowStock;
+  },
+  async getGlobalLowStock() {
+    return this.refreshGlobalLowStock();
+  },
+  async setGlobalLowStock(n) {
+    await setSetting("lowStockGlobal", n);
+    _globalLowStock = n;
+  },
+
+  isLowStock(item, colorName) {
+    const hasPerItem = item.lowStock !== undefined && item.lowStock !== null && item.lowStock !== "";
+    const threshold = hasPerItem ? item.lowStock : _globalLowStock;
+    const color = (item.colors || []).find((c) => c.name === colorName);
+    return color !== undefined && color.stock <= threshold;
+  },
+  isItemLowStock(item) {
+    return (item.colors || []).some((c) => this.isLowStock(item, c.name));
+  },
+
+  /* ---- 款式 ---- */
+  async listItems() { return getAll(dataDb(), "items"); },
+  async getItem(id) { return get(dataDb(), "items", id); },
+  async saveItem(item) {
+    if (!item.id) item.id = uid();
+    if (!item.createdAt) item.createdAt = Date.now();
+    await put(dataDb(), "items", item);
+    return item;
+  },
+  async deleteItem(id) { await del(dataDb(), "items", id); },
+  async batchUpdateItems(updater) {
+    const d = dataDb();
+    const items = await getAll(d, "items");
+    for (const it of items) {
+      const next = updater(it);
+      if (next) await put(d, "items", next);
+    }
+    return items.length;
+  },
+
+  /* ---- 销售 ---- */
+  async listSales() { return getAll(dataDb(), "sales"); },
+  async addSale(sale) {
+    sale.id = uid();
+    sale.time = Date.now();
+    await put(dataDb(), "sales", sale);
+    return sale;
+  },
+
+  /* ---- 订单 ---- */
+  async listOrders() { return getAll(dataDb(), "orders"); },
+  async getOrder(id) { return get(dataDb(), "orders", id); },
+  async saveOrder(order) {
+    if (!order.id) order.id = uid();
+    if (!order.createdAt) order.createdAt = Date.now();
+    await put(dataDb(), "orders", order);
+    return order;
+  },
+  async setOrderStatus(id, status) {
+    const o = await get(dataDb(), "orders", id);
+    if (!o) throw new Error("订单不存在");
+    o.status = status;
+    o.doneAt = status === "done" ? Date.now() : null;
+    await put(dataDb(), "orders", o);
+    return o;
+  },
+  async setOrderPay(id, payStatus, paidAmount) {
+    const o = await get(dataDb(), "orders", id);
+    if (!o) throw new Error("订单不存在");
+    o.payStatus = payStatus;
+    o.paidAmount = paidAmount;
+    await put(dataDb(), "orders", o);
+    return o;
+  },
+  async deleteOrder(id) { await del(dataDb(), "orders", id); },
+
+  /* ---- 地址簿 ---- */
+  async listAddrs() { return getAll(dataDb(), "addrs"); },
+  async saveAddr(addr) {
+    if (!addr.id) addr.id = uid();
+    await put(dataDb(), "addrs", addr);
+    return addr;
+  },
+  async deleteAddr(id) { await del(dataDb(), "addrs", id); },
+
+  /* ---- 客户档案（2.2 散单改善） ---- */
+  async listCustomers() { return getAll(dataDb(), "customers"); },
+  async getCustomer(id) { return get(dataDb(), "customers", id); },
+  async saveCustomer(c) {
+    if (!c.id) c.id = uid();
+    if (!c.createdAt) c.createdAt = Date.now();
+    await put(dataDb(), "customers", c);
+    return c;
+  },
+  async deleteCustomer(id) { await del(dataDb(), "customers", id); },
+
+  /** 按名字找客户（用于导入时自动匹配） */
+  async findCustomerByName(name) {
+    const list = await getAll(dataDb(), "customers");
+    return list.find((c) => c.name === name) || null;
+  },
+
+  /* ---- 盘点 ---- */
+  async listStocktakes() { return getAll(dataDb(), "stocktakes"); },
+  async saveStocktake(st) {
+    if (!st.id) st.id = uid();
+    if (!st.time) st.time = Date.now();
+    await put(dataDb(), "stocktakes", st);
+    return st;
+  },
+
+  /* ---- 进货 ---- */
+  async listPurchases() { return getAll(dataDb(), "purchases"); },
+  async savePurchase(p) {
+    if (!p.id) p.id = uid();
+    if (!p.time) p.time = Date.now();
+    await put(dataDb(), "purchases", p);
+    return p;
+  },
+
+  /* ---- 加工厂（外发加工 2.3） ---- */
+  async listFactories() { return getAll(dataDb(), "factories"); },
+  async getFactory(id) { return get(dataDb(), "factories", id); },
+  async saveFactory(f) {
+    if (!f.id) f.id = uid();
+    if (!f.createdAt) f.createdAt = Date.now();
+    await put(dataDb(), "factories", f);
+    return f;
+  },
+  async deleteFactory(id) { await del(dataDb(), "factories", id); },
+
+  /* ---- 外发单 ---- */
+  async listOutsources() { return getAll(dataDb(), "outsources"); },
+  async getOutsource(id) { return get(dataDb(), "outsources", id); },
+  async saveOutsource(o) {
+    if (!o.id) o.id = uid();
+    if (!o.createdAt) o.createdAt = Date.now();
+    await put(dataDb(), "outsources", o);
+    return o;
+  },
+  async deleteOutsource(id) { await del(dataDb(), "outsources", id); },
+
+  /* ---- 导出/导入/同步 payload ---- */
+  async exportAll() {
+    const [items, sales, orders, addrs, stocktakes, purchases, customers, factories, outsources] = await Promise.all([
+      getAll(dataDb(), "items"), getAll(dataDb(), "sales"), getAll(dataDb(), "orders"),
+      getAll(dataDb(), "addrs"), getAll(dataDb(), "stocktakes"), getAll(dataDb(), "purchases"),
+      getAll(dataDb(), "customers"), getAll(dataDb(), "factories"), getAll(dataDb(), "outsources")
+    ]);
+    return { app: "knit-stock", version: 4, exportedAt: Date.now(), items, sales, orders, addrs, stocktakes, purchases, customers, factories, outsources };
+  },
+
+  async importAll(data) {
+    if (!data || data.app !== "knit-stock") throw new Error("不是有效的备份文件");
+    const d = dataDb();
+    await Promise.all([
+      (async () => { for (const x of data.items || []) await put(d, "items", x); })(),
+      (async () => { for (const x of data.sales || []) await put(d, "sales", x); })(),
+      (async () => { for (const x of data.orders || []) await put(d, "orders", x); })(),
+      (async () => { for (const x of data.addrs || []) await put(d, "addrs", x); })(),
+      (async () => { for (const x of data.stocktakes || []) await put(d, "stocktakes", x); })(),
+      (async () => { for (const x of data.purchases || []) await put(d, "purchases", x); })(),
+      (async () => { for (const x of data.customers || []) await put(d, "customers", x); })(),
+      (async () => { for (const x of data.factories || []) await put(d, "factories", x); })(),
+      (async () => { for (const x of data.outsources || []) await put(d, "outsources", x); })()
+    ]);
+  },
+
+  /** 合并导入：按 id 去重，云端优先，保留本地独有的（多设备合并用） */
+  async mergeImport(cloud) {
+    if (!cloud || cloud.app !== "knit-stock") return;
+    const d = dataDb();
+    const merge = async (store, list) => {
+      const local = await getAll(d, store);
+      const byId = new Map(local.map((x) => [x.id, x]));
+      for (const x of list || []) {
+        if (x && x.id) byId.set(x.id, x); // 云端覆盖同 id
+      }
+      for (const x of byId.values()) await put(d, store, x);
+    };
+    await Promise.all([
+      merge("items", cloud.items), merge("sales", cloud.sales), merge("orders", cloud.orders),
+      merge("addrs", cloud.addrs), merge("stocktakes", cloud.stocktakes), merge("purchases", cloud.purchases),
+      merge("customers", cloud.customers), merge("factories", cloud.factories), merge("outsources", cloud.outsources)
+    ]);
+  },
+
+  async clearAll() {
+    const d = dataDb();
+    await Promise.all([
+      clearStore(d, "items"), clearStore(d, "sales"), clearStore(d, "orders"),
+      clearStore(d, "addrs"), clearStore(d, "stocktakes"), clearStore(d, "purchases"),
+      clearStore(d, "customers"), clearStore(d, "factories"), clearStore(d, "outsources")
+    ]);
+  }
+};
+
+/* ---------------- 云同步（Supabase 可配置） ----------------
+ * 用户可在设置页填入 Supabase URL + key 启用。
+ * 兼容新旧 key：eyJ...(JWT) 或 sb_publishable_/sb_secret_ 新版格式。
+ * 认证规则：key 放 apikey header；JWT 格式额外放 Authorization: Bearer。
+ * 每次导出全部数据为一个 JSON 文档，存到 supabase 表 `knit_sync`（行键 = 账号 id）。
+ */
+const Sync = {
+  /** 内置默认配置（发布时内置，换网址自动生效，无需手动配置）
+   *  用户在设置页手动填写的配置会覆盖内置值 */
+  BUILTIN: {
+    url: "https://qdbwjkwhrftaovqbnxha.supabase.co",
+    key: "sb_publishable_HUI_HJChS3_Hc6iZMDibLQ_fC7teUbl"
+  },
+
+  async config() {
+    const savedUrl = await getSetting("supabaseUrl", "");
+    const savedKey = await getSetting("supabaseKey", "");
+    return {
+      url: savedUrl || this.BUILTIN.url,
+      key: savedKey || this.BUILTIN.key,
+      autoPull: await getSetting("syncAutoPull", false)
+    };
+  },
+  async saveConfig(cfg) {
+    if (cfg.url) await setSetting("supabaseUrl", cfg.url.trim().replace(/\/+$/, ""));
+    if (cfg.key) await setSetting("supabaseKey", cfg.key.trim());
+    await setSetting("syncAutoPull", !!cfg.autoPull);
+  },
+  async isConfigured() {
+    const c = await this.config();
+    return !!(c.url && c.key);
+  },
+
+  /** 统一请求封装：正确处理新旧 key 认证，带超时（防止网络问题卡死） */
+  async request(path, options = {}) {
+    const c = await this.config();
+    if (!c.url || !c.key) throw new Error("未配置云同步");
+    const key = c.key.trim();
+    const headers = {
+      "Content-Type": "application/json",
+      "apikey": key,
+      ...(options.headers || {})
+    };
+    // 新版 key（sb_ 开头）不是 JWT，不能放 Bearer；旧版 JWT 需要放
+    if (!key.startsWith("sb_")) {
+      headers["Authorization"] = "Bearer " + key;
+    }
+    // 8 秒超时：网络异常时快速失败，不卡死界面
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 8000);
+    let res;
+    try {
+      res = await fetch(c.url + path, { ...options, headers, signal: controller.signal });
+    } catch (e) {
+      throw new Error("网络连接失败（" + (e.name === "AbortError" ? "超时" : e.message) + "）");
+    } finally {
+      clearTimeout(timer);
+    }
+    if (!res.ok) {
+      const body = await res.text().catch(() => "");
+      throw new Error("请求失败 (" + res.status + ")" + (body ? ": " + body.slice(0, 120) : ""));
+    }
+    const ct = res.headers.get("content-type") || "";
+    return ct.includes("json") ? res.json() : res.text();
+  },
+
+  /** 测试连接：查询 licenses 表，验证 URL + key 是否有效 */
+  async testConnection() {
+    await this.request("/rest/v1/licenses?select=code&limit=1");
+    return true;
+  },
+
+  async upload() {
+    const username = currentAccount ? currentAccount.username : null;
+    if (!username) throw new Error("未登录");
+    const payload = await Store.exportAll();
+    const row = { username, data: payload, updated_at: new Date().toISOString() };
+    await this.request("/rest/v1/knit_sync", {
+      method: "POST",
+      headers: { "Prefer": "resolution=merge-duplicates,return=minimal" },
+      body: JSON.stringify(row)
+    });
+    return true;
+  },
+  async pull() {
+    const username = currentAccount ? currentAccount.username : null;
+    if (!username) throw new Error("未登录");
+    const rows = await this.request("/rest/v1/knit_sync?username=eq." + encodeURIComponent(username) + "&select=data");
+    if (!rows || !rows.length || !rows[0].data) throw new Error("云端暂无数据");
+    await Store.importAll(rows[0].data);
+    return rows[0].data;
+  },
+
+  /** 登录时安全拉取：云端有该用户数据才拉（避免本地数据被空覆盖） */
+  async pullIfExists() {
+    const username = currentAccount ? currentAccount.username : null;
+    if (!username) return false;
+    try {
+      const rows = await this.request("/rest/v1/knit_sync?username=eq." + encodeURIComponent(username) + "&select=data");
+      if (rows && rows.length && rows[0].data) {
+        const cloud = rows[0].data;
+        const cloudHasData = (cloud.items && cloud.items.length) || (cloud.orders && cloud.orders.length) || (cloud.customers && cloud.customers.length) || (cloud.outsources && cloud.outsources.length);
+        if (cloudHasData) {
+          const local = await Store.exportAll();
+          const localHasData = (local.items && local.items.length) || (local.orders && local.orders.length) || (local.customers && local.customers.length) || (local.outsources && local.outsources.length);
+          if (!localHasData) {
+            // 本地为空：直接用云端数据
+            await Store.importAll(cloud);
+          } else {
+            // 两端都有：合并去重（以 id 为键，云端优先，保留本地独有的）
+            await Store.mergeImport(cloud);
+          }
+          return true;
+        }
+      }
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
+};
+
+/* ---------------- 授权与版本（2.4 工厂版） ---------------- */
+
+const APP_VERSION = "2.4";
+
+const License = {
+  /** 当前账号绑定的授权码（本地记录） */
+  async localCode() {
+    return getSetting("licenseCode:" + currentAccountId(), null);
+  },
+  async saveLocalCode(code) {
+    await setSetting("licenseCode:" + currentAccountId(), code);
+  },
+  async clearLocalCode() {
+    await setSetting("licenseCode:" + currentAccountId(), null);
+  },
+
+  /** 验证授权码：{ok, error, name, code, offline} */
+  async verify(code) {
+    const c = await Sync.config();
+    if (!c.url || !c.key) {
+      // 未配置云端时：放行（本地单机模式）
+      return { ok: true, name: "本地模式", offline: true };
+    }
+    code = (code || "").trim().toUpperCase();
+    if (!code) return { ok: false, error: "请输入授权码" };
+    try {
+      const rows = await Sync.request("/rest/v1/licenses?code=eq." + encodeURIComponent(code) + "&select=code,name,revoked_at");
+      if (!rows || !rows.length) return { ok: false, error: "授权码不存在" };
+      const lic = rows[0];
+      if (lic.revoked_at) return { ok: false, error: "该授权码已被吊销" };
+      // 记录激活
+      try {
+        await Sync.request("/rest/v1/license_activations", {
+          method: "POST",
+          headers: { "Prefer": "return=minimal" },
+          body: JSON.stringify({
+            license_code: code,
+            account_id: currentAccountId(),
+            username: currentAccount ? currentAccount.username : "",
+            activated_at: new Date().toISOString()
+          })
+        });
+      } catch {}
+      return { ok: true, name: lic.name, code: code };
+    } catch (e) {
+      return { ok: false, error: e.message };
+    }
+  },
+
+  /** 检查已绑定授权是否仍有效：{ok, name} 或 {ok:false,error} */
+  async checkActive() {
+    // 未配置云端：本地单机模式，无需授权
+    const c = await Sync.config();
+    if (!c.url || !c.key) return { ok: true, name: "本地模式" };
+    const code = await this.localCode();
+    if (!code) return { ok: false, error: "未激活" };
+    try {
+      const rows = await Sync.request("/rest/v1/licenses?code=eq." + encodeURIComponent(code) + "&select=code,name,revoked_at");
+      if (!rows || !rows.length) return { ok: false, error: "授权码不存在，请联系管理方" };
+      if (rows[0].revoked_at) return { ok: false, error: "授权已被吊销，请联系管理方" };
+      return { ok: true, name: rows[0].name };
+    } catch (e) {
+      // 网络失败：不阻塞使用（本地已激活过）
+      return { ok: true, name: "本地模式" };
+    }
+  },
+
+  /** 检查是否有新版本：返回 {hasNew, version, url, notes} */
+  async checkUpdate() {
+    const c = await Sync.config();
+    if (!c.url || !c.key) return { hasNew: false };
+    try {
+      const rows = await Sync.request("/rest/v1/app_versions?select=version,url,notes&order=created_at.desc&limit=1");
+      if (!rows || !rows.length) return { hasNew: false };
+      const v = rows[0];
+      const hasNew = v.version !== APP_VERSION;
+      return { hasNew, version: v.version, url: v.url, notes: v.notes };
+    } catch (e) {
+      return { hasNew: false };
+    }
+  }
+};
+
+/* ================= 工具函数 ================= */
+
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+
+function fmt(n) {
+  return (Number(n) || 0).toLocaleString("zh-CN", { maximumFractionDigits: 2 });
+}
+
+function money(n) {
+  return "¥" + fmt(n);
+}
+
+function escapeHtml(s) {
+  return String(s == null ? "" : s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+
+function todayStr() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
+
+function isToday(ts) {
+  const d = new Date(ts);
+  const n = new Date();
+  return d.getFullYear() === n.getFullYear() && d.getMonth() === n.getMonth() && d.getDate() === n.getDate();
+}
+
+function timeStr(ts) {
+  const d = new Date(ts);
+  return `${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
+}
+
+function toast(msg) {
+  const el = document.createElement("div");
+  el.className = "toast";
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.classList.add("show"), 10);
+  setTimeout(() => { el.classList.remove("show"); setTimeout(() => el.remove(), 300); }, 2200);
+}
+
+/** 防抖：搜索输入等高频事件用 */
+function debounce(fn, ms = 250) {
+  let t;
+  return function (...args) {
+    clearTimeout(t);
+    t = setTimeout(() => fn.apply(this, args), ms);
+  };
+}
+
+/** 列表项进场动画（交错淡入，提升观感但不卡顿） */
+function staggerIn(container) {
+  if (!container) return;
+  const items = container.children;
+  for (let i = 0; i < items.length; i++) {
+    const el = items[i];
+    if (i > 30) break; // 大量数据只给前 30 个加动画，避免卡顿
+    el.style.animation = `itemIn .3s var(--ease) ${Math.min(i * 0.025, 0.4)}s both`;
+  }
+}
+
+function confirmModal(title, text) {
+  return new Promise((resolve) => {
+    const mask = $("#modal-mask");
+    $("#modal-title").textContent = title;
+    $("#modal-text").textContent = text;
+    mask.classList.remove("hidden");
+    const done = (v) => {
+      mask.classList.add("hidden");
+      $("#modal-ok").onclick = null;
+      $("#modal-cancel").onclick = null;
+      resolve(v);
+    };
+    $("#modal-ok").onclick = () => done(true);
+    $("#modal-cancel").onclick = () => done(false);
+  });
+}
+
+/* ================= 状态 ================= */
+
+let currentAccount = null;
+let itemsCache = [];
+let ordersCache = [];
+let addrCache = [];
+let stocktakeCache = [];
+let purchaseCache = [];
+let salesCache = [];
+let customersCache = [];
+let factoriesCache = [];
+let outsourcesCache = [];
+let osFilter = "all";
+let editingFactoryId = null;
+
+let itemFilter = "all";
+let itemSearch = "";
+let orderFilter = "all";
+let orderType = "stock";   // stock=现货单 custom=定制单
+let editingItemId = null;
+let editingOrderId = null;
+let editingImages = [];
+let editingColors = [];
+let editingLines = [];
+let stocktakeDraft = {};   // {itemId: {colorName: actualQty}}
+let stocktakeOnlyStocked = false;
+let batchSelected = new Set();
+let isDark = false;
+
+/* ================= 视图导航 ================= */
+
+const VIEW_TITLES = {
+  today: "今日概览", items: "款式库存", sales: "销售", orders: "订单", stats: "统计",
+  settings: "设置", "item-edit": "编辑款式", "item-detail": "款式详情", "order-edit": "订单",
+  stocktake: "盘点", "stocktake-history": "盘点记录", purchase: "进货", "batch-price": "批量改价",
+  debt: "客户欠款", customers: "客户", "customer-detail": "客户详情", "customer-edit": "编辑客户",
+  "quick-order": "快速开单", import: "批量导入",
+  outsource: "外发加工", "outsource-edit": "下外发单", "outsource-detail": "外发单详情",
+  factories: "加工厂管理", "factory-edit": "编辑加工厂"
+};
+
+const TAB_VIEWS = ["today", "items", "customers", "orders", "settings"];
+
+function showView(name) {
+  $$(".view").forEach((v) => v.classList.remove("active"));
+  const target = $("#view-" + name);
+  if (target) target.classList.add("active");
+  $("#page-title").textContent = VIEW_TITLES[name] || "款式库存";
+  const sub = $("#header-sub");
+  if (sub) {
+    const map = {
+      today: "今日销售 · 欠款 · 快捷入口",
+      items: "款式 · 颜色 · 库存 · 图片",
+      "item-edit": "填写款式信息",
+      "item-detail": "款式详情与操作",
+      sales: "记录销售 · 自动扣库存",
+      orders: "客户订单 · 配送 · 收款",
+      "order-edit": "创建客户订单",
+      stats: "销量 · 利润 · 库存统计",
+      stocktake: "账面 vs 实际 · 自动修正",
+      "stocktake-history": "历史盘点差异",
+      purchase: "进货入库 · 记录进价",
+      "batch-price": "多款式统一调价",
+      debt: "客户欠款 · 收款管理",
+      customers: "网店客户 · 档案 · 历史订单",
+      "customer-detail": "客户档案与订单",
+      "customer-edit": "编辑客户信息",
+      "quick-order": "选客户 → 加商品 → 保存",
+      import: "粘贴订单 → 一键导入",
+      outsource: "外发单 · 领料 · 回货 · 结算",
+      "outsource-edit": "下外发单给加工厂",
+      "outsource-detail": "外发单详情与操作",
+      factories: "加工厂档案 · 工费标准",
+      "factory-edit": "编辑加工厂",
+      settings: "警告线 · 同步 · 备份 · 账号"
+    };
+    sub.textContent = map[name] || "羊毛衫 · 库存订单管理";
+  }
+  const headerBtn = $("#header-btn");
+  if (name === "items") {
+    headerBtn.textContent = "＋ 新增";
+    headerBtn.classList.remove("hidden");
+  } else if (name === "orders") {
+    headerBtn.textContent = "＋ 新订单";
+    headerBtn.classList.remove("hidden");
+  } else if (name === "customers") {
+    headerBtn.textContent = "＋ 新客户";
+    headerBtn.classList.remove("hidden");
+  } else {
+    headerBtn.classList.add("hidden");
+  }
+  $$(".tab").forEach((t) => t.classList.toggle("active", t.dataset.view === name));
+}
+
+function showMain() {
+  $("#view-auth").classList.add("hidden");
+  $("#view-main").classList.remove("hidden");
+}
+
+/* ================= 主题 ================= */
+
+function applyTheme(dark) {
+  isDark = dark;
+  document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+  $("#theme-toggle").textContent = dark ? "☀️" : "🌙";
+  const mt = $("#meta-theme");
+  if (mt) mt.content = dark ? "#1c1917" : "#b91c2e";
+  try { localStorage.setItem("knit-theme", dark ? "dark" : "light"); } catch {}
+}
+
+/* ================= 字体大小 ================= */
+
+const FONT_SIZES = { s: "13px", m: "15px", l: "17px", xl: "19px" };
+
+function applyFontSize(size) {
+  const px = FONT_SIZES[size] || FONT_SIZES.m;
+  document.documentElement.style.setProperty("--base-font-size", px);
+  document.body.style.fontSize = px;
+  try { localStorage.setItem("knit-fontsize", size); } catch {}
+  $$(".fontsize-chip").forEach((c) => c.classList.toggle("active", c.dataset.size === size));
+}
+
+function initFontSize() {
+  let size = "m";
+  try { size = localStorage.getItem("knit-fontsize") || "m"; } catch {}
+  applyFontSize(size);
+  $$(".fontsize-chip").forEach((c) => {
+    c.onclick = () => applyFontSize(c.dataset.size);
+  });
+}
+
+/* ================= 数据刷新 ================= */
+
+let _autoUploadTimer = null;
+
+/** 数据变更后自动上传到云端（防抖 2 秒），实现多设备实时同步 */
+function scheduleAutoUpload() {
+  if (!currentAccount) return;
+  clearTimeout(_autoUploadTimer);
+  _autoUploadTimer = setTimeout(async () => {
+    try {
+      if (await Sync.isConfigured()) {
+        await Sync.upload();
+      }
+    } catch (e) {
+      // 上传失败静默（下次变更再试）
+    }
+  }, 2000);
+}
+
+async function reloadAll() {
+  const [items, orders, addrs, stocktakes, purchases, sales, customers, factories, outsources] = await Promise.all([
+    Store.listItems(), Store.listOrders(), Store.listAddrs(),
+    Store.listStocktakes(), Store.listPurchases(), Store.listSales(),
+    Store.listCustomers(), Store.listFactories(), Store.listOutsources(),
+    Store.refreshGlobalLowStock()
+  ]);
+  itemsCache = items.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  ordersCache = orders.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  addrCache = addrs;
+  stocktakeCache = stocktakes.sort((a, b) => (b.time || 0) - (a.time || 0));
+  purchaseCache = purchases.sort((a, b) => (b.time || 0) - (a.time || 0));
+  salesCache = sales;
+  customersCache = customers.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  factoriesCache = factories.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  outsourcesCache = outsources.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  // 数据变更后自动上传（登录初始加载不触发）
+  if (currentAccount && !window.__initialLoad) {
+    scheduleAutoUpload();
+  }
+}
+
+/* ================= 今日概览 ================= */
+
+function orderTotal(o) {
+  return (o.lines || []).reduce((s, l) => s + (l.qty * l.price), 0);
+}
+
+function orderDebt(o) {
+  const total = orderTotal(o);
+  const paid = o.paidAmount || 0;
+  return Math.max(0, total - paid);
+}
+
+function renderToday() {
+  const now = Date.now();
+  let todaySales = 0, todayProfit = 0, todayOrders = 0, todayDebt = 0;
+  // 销售
+  for (const s of salesCache) {
+    if (isToday(s.time)) {
+      todaySales += s.qty * s.price;
+      todayProfit += (s.profit || 0);
+      if (s.onCredit) todayDebt += s.qty * s.price;
+    }
+  }
+  // 订单（今日创建的）
+  for (const o of ordersCache) {
+    if (isToday(o.createdAt)) {
+      todayOrders++;
+      if (o.status !== "cancelled") todayDebt += orderDebt(o);
+    }
+  }
+  $("#today-sales").textContent = fmt(todaySales);
+  $("#today-profit").textContent = fmt(todayProfit);
+  $("#today-orders").textContent = todayOrders;
+  $("#today-debt").textContent = fmt(todayDebt);
+}
+
+/* ================= 款式列表页 ================= */
+
+function filteredItems() {
+  let list = itemsCache;
+  if (itemSearch) {
+    const q = itemSearch.toLowerCase();
+    list = list.filter((it) =>
+      it.name.toLowerCase().includes(q) ||
+      (it.colors || []).some((c) => c.name.toLowerCase().includes(q))
+    );
+  }
+  if (itemFilter === "low") list = list.filter((it) => Store.isItemLowStock(it));
+  if (itemFilter === "out") list = list.filter((it) => (it.colors || []).some((c) => c.stock === 0));
+  return list;
+}
+
+function renderItems() {
+  const list = filteredItems();
+  const el = $("#item-list");
+  if (!list.length) {
+    el.innerHTML = '<div class="empty"><span class="empty-icon">' + (itemsCache.length ? "🔍" : "🧥") + "</span>" + (itemsCache.length ? "没有匹配的款式<br>换个关键词试试" : "还没有款式<br>点右上角 ＋ 新增第一个款式") + "</div>";
+    return;
+  }
+  el.innerHTML = list.map((it) => {
+    const totalStock = (it.colors || []).reduce((s, c) => s + (c.stock || 0), 0);
+    const totalSold = (it.colors || []).reduce((s, c) => s + (c.sold || 0), 0);
+    const low = Store.isItemLowStock(it);
+    const img = (it.images && it.images[0]) ? `<img src="${it.images[0]}" alt="" loading="lazy" decoding="async">` : "🧥";
+    const colors = (it.colors || []).map((c) => {
+      const isLow = Store.isLowStock(it, c.name);
+      const cls = c.stock === 0 ? "red low-blink" : isLow ? "red low-blink" : "green";
+      return `<span class="tag ${cls}">${escapeHtml(c.name)} ${c.stock}</span>`;
+    }).join("");
+    const sideNumCls = low ? "num low-blink" : "num";
+    return `
+      <div class="list-card" data-id="${it.id}">
+        <div class="thumb">${img}</div>
+        <div class="list-main">
+          <div class="list-title">${escapeHtml(it.name)}</div>
+          <div class="list-sub">售价 ${money(it.price)} · 成本 ${money(it.cost)}</div>
+          <div class="list-tags">${colors}</div>
+        </div>
+        <div class="list-side">
+          <div class="${sideNumCls}">${totalStock}</div>
+          <div class="lbl">库存 · 已售 ${totalSold}</div>
+        </div>
+      </div>`;
+  }).join("");
+  $$("#item-list .list-card").forEach((card) => {
+    card.onclick = () => openDetail(card.dataset.id);
+  });
+  staggerIn($("#item-list"));
+}
+
+/* ================= 款式编辑 ================= */
+
+function renderColorEditor() {
+  const el = $("#ie-colors");
+  el.innerHTML = editingColors.map((c, i) => `
+    <div class="color-row">
+      <input class="input c-name" data-i="${i}" placeholder="颜色（如：红色）" value="${escapeHtml(c.name)}">
+      <input class="input c-qty" data-i="${i}" type="number" inputmode="numeric" min="0" placeholder="库存" value="${c.stock}">
+      <button class="rm" data-i="${i}">✕</button>
+    </div>`).join("");
+  $$("#ie-colors .c-name").forEach((inp) => {
+    inp.oninput = () => { editingColors[Number(inp.dataset.i)].name = inp.value; };
+  });
+  $$("#ie-colors .c-qty").forEach((inp) => {
+    inp.oninput = () => { editingColors[Number(inp.dataset.i)].stock = Number(inp.value) || 0; };
+  });
+  $$("#ie-colors .rm").forEach((btn) => {
+    btn.onclick = () => { editingColors.splice(Number(btn.dataset.i), 1); renderColorEditor(); };
+  });
+}
+
+function renderImageThumbs() {
+  const el = $("#ie-images");
+  el.innerHTML = editingImages.map((src, i) => `
+    <div class="img-thumb"><img src="${src}"><button class="rm" data-i="${i}">✕</button></div>`).join("");
+  $$("#ie-images .rm").forEach((btn) => {
+    btn.onclick = () => { editingImages.splice(Number(btn.dataset.i), 1); renderImageThumbs(); };
+  });
+}
+
+function openItemEdit(id) {
+  editingItemId = id || null;
+  const it = id ? itemsCache.find((x) => x.id === id) : null;
+  $("#ie-name").value = it ? it.name : "";
+  $("#ie-price").value = it ? it.price : "";
+  $("#ie-cost").value = it ? it.cost : "";
+  $("#ie-lowstock").value = it && it.lowStock !== undefined && it.lowStock !== null ? it.lowStock : "";
+  editingImages = it ? (it.images || []).slice() : [];
+  editingColors = it ? (it.colors || []).map((c) => ({ name: c.name, stock: c.stock })) : [];
+  renderImageThumbs();
+  renderColorEditor();
+  showView("item-edit");
+}
+
+async function saveItemEdit() {
+  const name = $("#ie-name").value.trim();
+  const price = Number($("#ie-price").value);
+  const cost = Number($("#ie-cost").value);
+  const lowStockRaw = $("#ie-lowstock").value.trim();
+  if (!name) return toast("请填写款式名称");
+  if (!(price >= 0)) return toast("请填写售价");
+  if (!(cost >= 0)) return toast("请填写成本");
+  if (!editingColors.length) return toast("请至少添加一个颜色");
+  const lowStock = lowStockRaw === "" ? null : Number(lowStockRaw);
+  const existing = editingItemId ? itemsCache.find((x) => x.id === editingItemId) : null;
+  const item = {
+    id: editingItemId || undefined,
+    name,
+    price,
+    cost,
+    lowStock,
+    images: editingImages,
+    colors: editingColors.map((c) => {
+      const old = existing ? (existing.colors || []).find((oc) => oc.name === c.name) : null;
+      return { name: c.name, stock: c.stock, sold: old ? old.sold || 0 : 0 };
+    }),
+    createdAt: existing ? existing.createdAt : undefined
+  };
+  await Store.saveItem(item);
+  toast("已保存");
+  await reloadAll();
+  renderItems();
+  showView("items");
+}
+
+/* ================= 款式详情 ================= */
+
+async function openDetail(id) {
+  const it = itemsCache.find((x) => x.id === id);
+  if (!it) return;
+  const totalStock = (it.colors || []).reduce((s, c) => s + (c.stock || 0), 0);
+  const totalSold = (it.colors || []).reduce((s, c) => s + (c.sold || 0), 0);
+  const profit = ((it.price || 0) - (it.cost || 0)) * totalSold;
+  const imgs = (it.images || []).length
+    ? `<div class="detail-imgs">${it.images.map((s) => `<div class="img-thumb"><img src="${s}"></div>`).join("")}</div>`
+    : '<div class="empty" style="padding:16px">暂无图片</div>';
+  const colorRows = (it.colors || []).map((c) => {
+    const isLow = Store.isLowStock(it, c.name);
+    return `<div class="detail-color-row">
+      <span>${escapeHtml(c.name)} ${isLow ? "⚠️" : ""}</span>
+      <span class="v">库存 ${c.stock} · 已售 ${c.sold || 0}</span>
+    </div>`;
+  }).join("");
+  // 该款进货记录
+  const purs = purchaseCache.filter((p) => p.itemId === id).slice(0, 5);
+  const purHtml = purs.length
+    ? `<div class="card"><h3>最近进货</h3>${purs.map((p) =>
+        `<div class="detail-color-row"><span>${escapeHtml(p.color || "")} ${p.qty}件${p.supplier ? " · " + escapeHtml(p.supplier) : ""}</span><span class="v">${p.unitPrice ? money(p.unitPrice) + "/件" : ""} · ${timeStr(p.time)}</span></div>`).join("")}</div>`
+    : "";
+  $("#detail-body").innerHTML = `
+    ${imgs}
+    <div class="card">
+      <h3>${escapeHtml(it.name)}</h3>
+      <div class="detail-color-row"><span>售价</span><span class="v">${money(it.price)}</span></div>
+      <div class="detail-color-row"><span>成本</span><span class="v">${money(it.cost)}</span></div>
+      <div class="detail-color-row"><span>单件利润</span><span class="v">${money((it.price||0)-(it.cost||0))}</span></div>
+      <div class="detail-color-row"><span>总库存</span><span class="v">${totalStock} 件</span></div>
+      <div class="detail-color-row"><span>累计已售</span><span class="v">${totalSold} 件</span></div>
+      <div class="detail-color-row"><span>累计利润</span><span class="v">${money(profit)}</span></div>
+    </div>
+    <div class="card">
+      <h3>颜色库存</h3>
+      ${colorRows || '<div class="hint">未添加颜色</div>'}
+    </div>
+    ${purHtml}
+    <div class="card">
+      <h3>款式二维码</h3>
+      <div class="qr-row">
+        <div id="detail-qr"></div>
+        <div class="hint">扫码可快速定位该款式（打印贴在本子上）。</div>
+      </div>
+    </div>
+    <div class="card detail-actions">
+      <button class="btn primary" id="detail-edit">编辑款式</button>
+      <button class="btn" id="detail-sell">记一笔销售</button>
+      <button class="btn" id="detail-purchase">进货入库</button>
+      <button class="btn" id="detail-share">分享款式卡片</button>
+      <button class="btn danger" id="detail-delete">删除款式</button>
+    </div>`;
+  $("#detail-edit").onclick = () => openItemEdit(id);
+  $("#detail-sell").onclick = () => openSaleForItem(id);
+  $("#detail-purchase").onclick = () => openPurchaseForItem(id);
+  $("#detail-share").onclick = () => shareItemCard(it);
+  $("#detail-delete").onclick = async () => {
+    if (await confirmModal("删除款式", `确定删除「${it.name}」吗？销售记录会保留，但款式信息将丢失。`)) {
+      await Store.deleteItem(id);
+      toast("已删除");
+      await reloadAll();
+      renderItems();
+      showView("items");
+    }
+  };
+  // 二维码
+  const qrBox = $("#detail-qr");
+  qrBox.innerHTML = "";
+  if (typeof QRCode !== "undefined") {
+    new QRCode(qrBox, { text: "KNIT-STOCK:" + it.id, width: 140, height: 140, correctLevel: QRCode.CorrectLevel.M });
+  } else {
+    qrBox.innerHTML = '<div class="hint">二维码组件不可用</div>';
+  }
+  showView("item-detail");
+}
+
+/* ================= 分享款式卡片 ================= */
+
+async function shareItemCard(it) {
+  try {
+    const totalStock = (it.colors || []).reduce((s, c) => s + (c.stock || 0), 0);
+    const W = 800, H = 1000;
+    const canvas = document.createElement("canvas");
+    canvas.width = W; canvas.height = H;
+    const ctx = canvas.getContext("2d");
+    // 背景渐变
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, "#8f1122");
+    g.addColorStop(0.6, "#b91c2e");
+    g.addColorStop(1, "#7f1020");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+    // 顶部标题
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 44px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("🧥 " + it.name, W / 2, 80);
+    // 图片
+    const img = new Image();
+    await new Promise((resolve) => {
+      if (it.images && it.images[0]) {
+        img.onload = resolve;
+        img.onerror = resolve;
+        img.src = it.images[0];
+      } else resolve();
+    });
+    if (img.width) {
+      const iw = W - 80, ih = 460;
+      const ratio = Math.min(iw / img.width, ih / img.height);
+      const dw = img.width * ratio, dh = img.height * ratio;
+      ctx.drawImage(img, (W - dw) / 2, 130, dw, dh);
+    } else {
+      ctx.fillStyle = "rgba(255,255,255,.2)";
+      ctx.fillRect(40, 130, W - 80, 460);
+      ctx.fillStyle = "#fff";
+      ctx.font = "90px sans-serif";
+      ctx.fillText("🧥", W / 2, 400);
+    }
+    // 价格行
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 52px sans-serif";
+    ctx.fillText("¥" + fmt(it.price), W / 2, 660);
+    ctx.font = "28px sans-serif";
+    ctx.fillStyle = "rgba(255,255,255,.85)";
+    ctx.fillText("库存 " + totalStock + " 件 · 成本 ¥" + fmt(it.cost), W / 2, 710);
+    // 颜色标签
+    const colors = (it.colors || []).map((c) => `${c.name} ${c.stock}`).join("  ·  ");
+    ctx.fillStyle = "rgba(255,255,255,.75)";
+    ctx.font = "26px sans-serif";
+    ctx.fillText(colors || "暂无颜色", W / 2, 770);
+    // 底部
+    ctx.fillStyle = "rgba(255,255,255,.6)";
+    ctx.font = "24px sans-serif";
+    ctx.fillText("羊毛衫管家", W / 2, 940);
+    // 转 blob
+    const blob = await new Promise((r) => canvas.toBlob(r, "image/png"));
+    const file = new File([blob], it.name + ".png", { type: "image/png" });
+    // 尝试 Web Share API（带文件）
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: it.name });
+      return;
+    }
+    // 降级：下载
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = it.name + ".png";
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+    toast("卡片已生成并保存");
+  } catch (e) {
+    toast("分享失败：" + (e.message || "未知错误"));
+  }
+}
+
+/* ================= 销售 ================= */
+
+async function renderSaleSelects(selectedItemId) {
+  const selItem = $("#sale-item");
+  selItem.innerHTML = itemsCache.map((it) => {
+    const totalStock = (it.colors || []).reduce((s, c) => s + (c.stock || 0), 0);
+    return `<option value="${it.id}">${escapeHtml(it.name)}（库存 ${totalStock}）</option>`;
+  }).join("");
+  if (selectedItemId) selItem.value = selectedItemId;
+  updateSaleColor();
+  const it = itemsCache.find((x) => x.id === selItem.value);
+  if (it) $("#sale-price").value = it.price || "";
+}
+
+function updateSaleColor() {
+  const it = itemsCache.find((x) => x.id === $("#sale-item").value);
+  const selColor = $("#sale-color");
+  selColor.innerHTML = (it && it.colors ? it.colors : []).map((c) =>
+    `<option value="${escapeHtml(c.name)}">${escapeHtml(c.name)}（库存 ${c.stock}）</option>`).join("");
+}
+
+function openSaleForItem(id) {
+  showView("sales");
+  renderSaleSelects(id);
+}
+
+async function confirmSale() {
+  const it = itemsCache.find((x) => x.id === $("#sale-item").value);
+  if (!it) return toast("请选择款式");
+  const colorName = $("#sale-color").value;
+  const qty = Number($("#sale-qty").value);
+  const price = Number($("#sale-price").value);
+  const customer = $("#sale-customer").value.trim();
+  const onCredit = $("#sale-on-credit").checked;
+  if (!colorName) return toast("该款式还没有颜色，请先编辑添加");
+  if (!(qty >= 1)) return toast("请填写正确的销售数量");
+  if (!(price >= 0)) return toast("请填写售价");
+  const color = (it.colors || []).find((c) => c.name === colorName);
+  if (!color) return toast("颜色不存在");
+  if (color.stock < qty) return toast(`库存不足（当前 ${color.stock} 件）`);
+  color.stock -= qty;
+  color.sold = (color.sold || 0) + qty;
+  await Store.saveItem(it);
+  await Store.addSale({
+    itemId: it.id, itemName: it.name, color: colorName, qty, price, customer,
+    profit: (price - (it.cost || 0)) * qty,
+    onCredit: onCredit || false
+  });
+  toast(`已销售 ${qty} 件${onCredit ? "（赊账）" : ""}`);
+  $("#sale-qty").value = "1";
+  $("#sale-customer").value = "";
+  $("#sale-on-credit").checked = false;
+  await reloadAll();
+  renderItems();
+  renderSaleSelects();
+  renderToday();
+}
+
+/* ================= 客户管理 ================= */
+
+let customerSearch = "";
+let editingCustomerId = null;
+
+function renderCustomers() {
+  const q = customerSearch.toLowerCase();
+  const list = customersCache.filter((c) =>
+    !q || c.name.toLowerCase().includes(q) || (c.phone || "").includes(q)
+  );
+  const el = $("#customer-list");
+  if (!list.length) {
+    el.innerHTML = '<div class="empty"><span class="empty-icon">👥</span>' + (customersCache.length ? "没有匹配的客户" : "还没有客户<br>点右上角 ＋ 新客户，或从订单/快速开单中自动创建") + "</div>";
+    return;
+  }
+  el.innerHTML = list.map((c) => {
+    // 统计该客户订单
+    const cOrders = ordersCache.filter((o) => o.customer === c.name && o.status !== "cancelled");
+    const total = cOrders.reduce((s, o) => s + orderTotal(o), 0);
+    const count = cOrders.length;
+    const debt = cOrders.reduce((s, o) => s + orderDebt(o), 0);
+    return `
+      <div class="list-card" data-id="${c.id}">
+        <div class="list-main">
+          <div class="list-title">${escapeHtml(c.name)}</div>
+          <div class="list-sub">${escapeHtml(c.phone || "无电话")} · ${count} 单 · 累计 ${money(total)}${debt ? " · 欠 " + money(debt) : ""}</div>
+        </div>
+        <div class="list-side">
+          <div class="num" style="${debt ? "color:var(--danger)" : ""}">${debt ? money(debt) : "✓"}</div>
+          <div class="lbl">${debt ? "欠款" : "已结清"}</div>
+        </div>
+      </div>`;
+  }).join("");
+  $$("#customer-list .list-card").forEach((card) => {
+    card.onclick = () => openCustomerDetail(card.dataset.id);
+  });
+  staggerIn($("#customer-list"));
+}
+
+async function openCustomerDetail(id) {
+  const c = customersCache.find((x) => x.id === id);
+  if (!c) return;
+  const cOrders = ordersCache.filter((o) => o.customer === c.name && o.status !== "cancelled")
+    .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  const total = cOrders.reduce((s, o) => s + orderTotal(o), 0);
+  const debt = cOrders.reduce((s, o) => s + orderDebt(o), 0);
+  const ordersHtml = cOrders.length ? cOrders.slice(0, 20).map((o) => {
+    const lines = (o.lines || []).map((l) => `${l.qty}×${escapeHtml(l.itemName)}${l.color ? "(" + escapeHtml(l.color) + ")" : ""}`).join("、");
+    return `<div class="list-card" data-oid="${o.id}">
+      <div style="flex:1;min-width:0">
+        <div class="order-head"><span class="order-customer">${timeStr(o.createdAt)}</span>
+        <span class="order-status ${o.status}">${o.status === "done" ? "已完成" : o.status === "cancelled" ? "已取消" : "未完成"}</span></div>
+        <div class="order-lines-preview">${lines} · ${money(orderTotal(o))}</div>
+      </div>
+    </div>`;
+  }).join("") : '<div class="hint">暂无订单</div>';
+  $("#customer-detail-body").innerHTML = `
+    <div class="card">
+      <h3>${escapeHtml(c.name)}</h3>
+      <div class="detail-color-row"><span>电话</span><span class="v">${escapeHtml(c.phone || "—")}</span></div>
+      <div class="detail-color-row"><span>地址</span><span class="v">${escapeHtml(c.address || "—")}</span></div>
+      <div class="detail-color-row"><span>备注</span><span class="v">${escapeHtml(c.note || "—")}</span></div>
+      <div class="detail-color-row"><span>累计订单</span><span class="v">${cOrders.length} 单 · ${money(total)}</span></div>
+      <div class="detail-color-row"><span>当前欠款</span><span class="v" style="${debt ? "color:var(--danger)" : ""}">${debt ? money(debt) : "无"}</span></div>
+    </div>
+    <div class="card">
+      <h3>历史订单</h3>
+      ${ordersHtml}
+    </div>
+    <div class="card detail-actions">
+      <button class="btn primary" id="cd-quick-order">⚡ 给 TA 快速开单</button>
+      <button class="btn" id="cd-edit">编辑客户</button>
+      <button class="btn danger" id="cd-delete">删除客户</button>
+    </div>`;
+  $$("#customer-detail-body [data-oid]").forEach((el2) => {
+    el2.onclick = () => openOrderDetail(el2.dataset.oid);
+  });
+  $("#cd-quick-order").onclick = () => openQuickOrder(c.id);
+  $("#cd-edit").onclick = () => openCustomerEdit(id);
+  $("#cd-delete").onclick = async () => {
+    if (await confirmModal("删除客户", "删除客户档案（历史订单保留），确定？")) {
+      await Store.deleteCustomer(id);
+      toast("已删除");
+      await reloadAll();
+      renderCustomers();
+      showView("customers");
+    }
+  };
+  showView("customer-detail");
+}
+
+function openCustomerEdit(id) {
+  editingCustomerId = id || null;
+  const c = id ? customersCache.find((x) => x.id === id) : null;
+  $("#ce-name").value = c ? c.name : "";
+  $("#ce-phone").value = c ? c.phone || "" : "";
+  $("#ce-address").value = c ? c.address || "" : "";
+  $("#ce-note").value = c ? c.note || "" : "";
+  showView("customer-edit");
+}
+
+async function saveCustomerEdit() {
+  const name = $("#ce-name").value.trim();
+  if (!name) return toast("请填写客户名称");
+  const existing = editingCustomerId ? customersCache.find((x) => x.id === editingCustomerId) : null;
+  const c = {
+    id: editingCustomerId || undefined,
+    name,
+    phone: $("#ce-phone").value.trim(),
+    address: $("#ce-address").value.trim(),
+    note: $("#ce-note").value.trim(),
+    createdAt: existing ? existing.createdAt : undefined
+  };
+  await Store.saveCustomer(c);
+  toast("已保存");
+  await reloadAll();
+  renderCustomers();
+  showView("customers");
+}
+
+/* ================= 外发加工（工厂） ================= */
+
+function osStatus(o) {
+  const now = Date.now();
+  if (o.status === "done") return { label: "已回货", cls: "done" };
+  if (o.status === "cancelled") return { label: "已取消", cls: "cancelled" };
+  if (o.due && now > new Date(o.due).getTime()) return { label: "已逾期", cls: "pending" };
+  return { label: "生产中", cls: "pending" };
+}
+
+function osReturned(o) {
+  return (o.returns || []).reduce((s, r) => s + (r.qty || 0), 0);
+}
+
+function osRemaining(o) {
+  return Math.max(0, (o.qty || 0) - osReturned(o));
+}
+
+function osCost(o) {
+  return osReturned(o) * (o.price || 0);
+}
+
+function osFiltered() {
+  let list = outsourcesCache;
+  if (osFilter === "active") list = list.filter((o) => o.status !== "done" && o.status !== "cancelled");
+  if (osFilter === "overdue") {
+    const now = Date.now();
+    list = list.filter((o) => o.status !== "done" && o.status !== "cancelled" && o.due && now > new Date(o.due).getTime());
+  }
+  if (osFilter === "settled") list = list.filter((o) => o.status !== "cancelled" && !o.settled);
+  return list;
+}
+
+function renderOutsources() {
+  const list = osFiltered();
+  const el = $("#outsource-list");
+  if (!list.length) {
+    el.innerHTML = '<div class="empty"><span class="empty-icon">🏭</span>' + (outsourcesCache.length ? "没有匹配的外发单" : "还没有外发单<br>点下方 ＋ 下外发单，发给加工厂生产") + "</div>";
+    return;
+  }
+  el.innerHTML = list.map((o) => {
+    const st = osStatus(o);
+    const it = itemsCache.find((x) => x.id === o.itemId);
+    const fa = factoriesCache.find((f) => f.id === o.factoryId);
+    const name = it ? it.name : o.itemName || "未知款";
+    const returned = osReturned(o);
+    const remaining = osRemaining(o);
+    return `
+      <div class="list-card" data-id="${o.id}">
+        <div style="flex:1;min-width:0">
+          <div class="order-head">
+            <span class="order-customer">${escapeHtml(name)}${o.color ? "（" + escapeHtml(o.color) + "）" : ""}</span>
+            <span class="order-status ${st.cls}">${st.label}</span>
+          </div>
+          <div class="order-lines-preview">🏭 ${escapeHtml(fa ? fa.name : "未知加工厂")} · 发出 ${o.qty} 件 · 工费 ${money(o.price)}/件</div>
+          <div class="order-addr">📤 已回 ${returned} · 待回 ${remaining}${o.due ? " · 交期 " + o.due.slice(5) : ""}</div>
+          <div class="order-addr">${o.settled ? "💰 已结算 " + money(osCost(o)) : "💰 未结算 · 工费 " + money(osCost(o))}</div>
+        </div>
+      </div>`;
+  }).join("");
+  $$("#outsource-list .list-card").forEach((card) => {
+    card.onclick = () => openOutsourceDetail(card.dataset.id);
+  });
+  staggerIn($("#outsource-list"));
+}
+
+function openOutsourceEdit() {
+  // 选工厂（自动带出默认工费）
+  const selF = $("#os-factory");
+  selF.innerHTML = '<option value="">— 选择加工厂 —</option>' + factoriesCache.map((f) =>
+    `<option value="${f.id}">${escapeHtml(f.name)}${f.price ? "（" + money(f.price) + "/件）" : ""}</option>`).join("");
+  // 选款式（自动带出）
+  const selI = $("#os-item");
+  selI.innerHTML = itemsCache.map((it) =>
+    `<option value="${it.id}">${escapeHtml(it.name)}</option>`).join("");
+  $("#os-color").value = "";
+  $("#os-qty").value = "100";
+  $("#os-price").value = "";
+  $("#os-material").value = "";
+  $("#os-due").value = "";
+  $("#os-note").value = "";
+  showView("outsource-edit");
+}
+
+async function saveOutsource() {
+  const factoryId = $("#os-factory").value;
+  const itemId = $("#os-item").value;
+  const color = $("#os-color").value.trim();
+  const qty = Number($("#os-qty").value);
+  const price = Number($("#os-price").value);
+  const material = $("#os-material").value.trim();
+  const due = $("#os-due").value;
+  const note = $("#os-note").value.trim();
+  if (!factoryId) return toast("请选择加工厂");
+  if (!itemId) return toast("请选择款式");
+  if (!(qty >= 1)) return toast("请填写发出数量");
+  if (!(price >= 0)) return toast("请填写工费单价");
+  const it = itemsCache.find((x) => x.id === itemId);
+  await Store.saveOutsource({
+    factoryId,
+    itemId,
+    itemName: it ? it.name : "",
+    color,
+    qty,
+    price,
+    material,
+    due: due || null,
+    note,
+    status: "active",
+    returns: [],
+    settled: false
+  });
+  toast("外发单已下达");
+  await reloadAll();
+  renderOutsources();
+  showView("outsource");
+}
+
+async function openOutsourceDetail(id) {
+  const o = outsourcesCache.find((x) => x.id === id);
+  if (!o) return;
+  const it = itemsCache.find((x) => x.id === o.itemId);
+  const fa = factoriesCache.find((f) => f.id === o.factoryId);
+  const st = osStatus(o);
+  const returned = osReturned(o);
+  const remaining = osRemaining(o);
+  const returnsHtml = (o.returns || []).length ? (o.returns || []).map((r) =>
+    `<div class="detail-color-row"><span>回货 ${r.qty} 件</span><span class="v">${timeStr(r.time)}</span></div>`).join("") : '<div class="hint">暂无回货记录</div>';
+  $("#outsource-detail-body").innerHTML = `
+    <div class="card">
+      <div class="order-head">
+        <span class="order-customer">${escapeHtml(it ? it.name : o.itemName)}${o.color ? "（" + escapeHtml(o.color) + "）" : ""}</span>
+        <span class="order-status ${st.cls}">${st.label}</span>
+      </div>
+      <div class="detail-color-row"><span>加工厂</span><span class="v">${escapeHtml(fa ? fa.name : "—")}</span></div>
+      <div class="detail-color-row"><span>发出数量</span><span class="v">${o.qty} 件</span></div>
+      <div class="detail-color-row"><span>工费</span><span class="v">${money(o.price)}/件 · 已产生 ${money(osCost(o))}</span></div>
+      <div class="detail-color-row"><span>领料</span><span class="v">${escapeHtml(o.material || "—")}</span></div>
+      <div class="detail-color-row"><span>交期</span><span class="v">${o.due ? o.due : "—"}</span></div>
+      <div class="detail-color-row"><span>备注</span><span class="v">${escapeHtml(o.note || "—")}</span></div>
+    </div>
+    <div class="card">
+      <h3>回货记录（已回 ${returned} / ${o.qty}）</h3>
+      ${returnsHtml}
+    </div>
+    <div class="card detail-actions">
+      ${remaining > 0 && o.status !== "cancelled" ? `<button class="btn primary" id="os-return">📥 回货入库（剩 ${remaining} 件）</button>` : ""}
+      ${o.status === "active" ? `<button class="btn" id="os-cancel-order">取消外发单</button>` : ""}
+      ${!o.settled && returned > 0 ? `<button class="btn" id="os-settle">💰 标记已结算 ${money(osCost(o))}</button>` : ""}
+      ${o.settled ? `<div class="hint" style="text-align:center">✅ 已结算 ${money(osCost(o))}</div>` : ""}
+      <button class="btn danger" id="os-delete">删除外发单</button>
+    </div>`;
+  const back = () => { showView("outsource"); renderOutsources(); };
+  const retBtn = $("#os-return");
+  if (retBtn) retBtn.onclick = async () => {
+    const v = prompt(`本次回货数量（件），剩余 ${remaining} 件`, String(remaining));
+    const n = Number(v);
+    if (!(n >= 1)) return;
+    if (n > remaining) return toast(`回货数量不能超过剩余 ${remaining} 件`);
+    o.returns = o.returns || [];
+    o.returns.push({ qty: n, time: Date.now() });
+    if (osRemaining(o) <= 0) o.status = "done";
+    // 回货自动入成品库存
+    if (o.itemId) {
+      const it = itemsCache.find((x) => x.id === o.itemId);
+      if (it) {
+        let color = (it.colors || []).find((c) => c.name === o.color);
+        if (!color) {
+          color = { name: o.color || "默认", stock: 0, sold: 0 };
+          it.colors = it.colors || [];
+          it.colors.push(color);
+        }
+        color.stock += n;
+        await Store.saveItem(it);
+      }
+    }
+    await Store.saveOutsource(o);
+    toast(`已回货 ${n} 件并入库`);
+    await reloadAll();
+    renderItems();
+    openOutsourceDetail(id);
+  };
+  const cancelBtn = $("#os-cancel-order");
+  if (cancelBtn) cancelBtn.onclick = async () => {
+    if (!await confirmModal("取消外发单", "确定取消这张外发单吗？")) return;
+    o.status = "cancelled";
+    await Store.saveOutsource(o);
+    toast("已取消");
+    await reloadAll();
+    back();
+  };
+  const settleBtn = $("#os-settle");
+  if (settleBtn) settleBtn.onclick = async () => {
+    if (!await confirmModal("标记已结算", `确定这笔工费 ${money(osCost(o))} 已结算给加工厂？`)) return;
+    o.settled = true;
+    o.settledAt = Date.now();
+    await Store.saveOutsource(o);
+    toast("已标记结算");
+    await reloadAll();
+    openOutsourceDetail(id);
+  };
+  const delBtn = $("#os-delete");
+  if (delBtn) delBtn.onclick = async () => {
+    if (await confirmModal("删除外发单", "确定删除这条外发单吗？")) {
+      await Store.deleteOutsource(id);
+      toast("已删除");
+      await reloadAll();
+      back();
+    }
+  };
+  showView("outsource-detail");
+}
+
+/* ================= 加工厂管理 ================= */
+
+function renderFactories() {
+  const el = $("#factory-list");
+  if (!factoriesCache.length) {
+    el.innerHTML = '<div class="empty"><span class="empty-icon">🏭</span>还没有加工厂<br>点下方 ＋ 新增加工厂</div>';
+    return;
+  }
+  el.innerHTML = factoriesCache.map((f) => {
+    const active = outsourcesCache.filter((o) => o.factoryId === f.id && o.status !== "done" && o.status !== "cancelled").length;
+    return `
+      <div class="list-card" data-id="${f.id}">
+        <div class="list-main">
+          <div class="list-title">${escapeHtml(f.name)}</div>
+          <div class="list-sub">${escapeHtml(f.phone || "无电话")}${f.skill ? " · " + escapeHtml(f.skill) : ""}</div>
+          <div class="list-sub">工费 ${f.price ? money(f.price) + "/件" : "未设置"} · 进行中 ${active} 单</div>
+        </div>
+        <div class="list-side"><div class="num">${active}</div><div class="lbl">生产中</div></div>
+      </div>`;
+  }).join("");
+  $$("#factory-list .list-card").forEach((card) => {
+    card.onclick = () => openFactoryEdit(card.dataset.id);
+  });
+  staggerIn($("#factory-list"));
+}
+
+function openFactoryEdit(id) {
+  editingFactoryId = id || null;
+  const f = id ? factoriesCache.find((x) => x.id === id) : null;
+  $("#fa-name").value = f ? f.name : "";
+  $("#fa-phone").value = f ? f.phone || "" : "";
+  $("#fa-skill").value = f ? f.skill || "" : "";
+  $("#fa-price").value = f && f.price ? f.price : "";
+  $("#fa-note").value = f ? f.note || "" : "";
+  showView("factory-edit");
+}
+
+async function saveFactoryEdit() {
+  const name = $("#fa-name").value.trim();
+  if (!name) return toast("请填写加工厂名称");
+  const existing = editingFactoryId ? factoriesCache.find((x) => x.id === editingFactoryId) : null;
+  await Store.saveFactory({
+    id: editingFactoryId || undefined,
+    name,
+    phone: $("#fa-phone").value.trim(),
+    skill: $("#fa-skill").value.trim(),
+    price: $("#fa-price").value === "" ? null : Number($("#fa-price").value),
+    note: $("#fa-note").value.trim(),
+    createdAt: existing ? existing.createdAt : undefined
+  });
+  toast("已保存");
+  await reloadAll();
+  renderFactories();
+  showView("factories");
+}
+
+/* ================= 快速开单（散单） ================= */
+
+let quickLines = [];
+let quickCustomerId = null;
+
+function openQuickOrder(customerId) {
+  quickCustomerId = customerId || null;
+  quickLines = [];
+  renderQuickCustomerSelect();
+  renderQuickLines();
+  showView("quick-order");
+}
+
+async function renderQuickCustomerSelect() {
+  const sel = $("#qo-customer");
+  sel.innerHTML = '<option value="">— 选择客户 —</option>' + customersCache.map((c) =>
+    `<option value="${c.id}" ${c.id === quickCustomerId ? "selected" : ""}>${escapeHtml(c.name)}${c.phone ? " · " + escapeHtml(c.phone) : ""}</option>`).join("");
+  updateQuickCustomerInfo();
+}
+
+function updateQuickCustomerInfo() {
+  const id = $("#qo-customer").value;
+  const c = customersCache.find((x) => x.id === id);
+  if (c) {
+    $("#qo-phone").value = c.phone || "";
+    $("#qo-address").value = c.address || "";
+  } else {
+    $("#qo-phone").value = "";
+    $("#qo-address").value = "";
+  }
+}
+
+function renderQuickLines() {
+  const el = $("#qo-lines");
+  if (!quickLines.length) {
+    el.innerHTML = '<div class="hint">还没有商品，点下方添加</div>';
+    return;
+  }
+  el.innerHTML = quickLines.map((l, i) => `
+    <div class="order-line">
+      <div class="ol-row">
+        <select class="input ol-item" data-i="${i}">
+          ${itemsCache.map((it) => `<option value="${it.id}" ${it.id === l.itemId ? "selected" : ""}>${escapeHtml(it.name)}</option>`).join("")}
+        </select>
+        <input class="input ol-color" data-i="${i}" placeholder="颜色" value="${escapeHtml(l.color)}">
+      </div>
+      <div class="ol-row">
+        <input class="input ol-qty" data-i="${i}" type="number" inputmode="numeric" min="1" value="${l.qty}">
+        <input class="input ol-price" data-i="${i}" type="number" inputmode="decimal" value="${l.price}" placeholder="单价">
+        <button class="rm" data-i="${i}">✕</button>
+      </div>
+    </div>`).join("");
+  $$("#qo-lines .ol-item").forEach((sel) => {
+    sel.onchange = () => {
+      quickLines[Number(sel.dataset.i)].itemId = sel.value;
+      const it = itemsCache.find((x) => x.id === sel.value);
+      if (it) {
+        quickLines[Number(sel.dataset.i)].itemName = it.name;
+        quickLines[Number(sel.dataset.i)].price = it.price;
+        renderQuickLines();
+      }
+    };
+  });
+  $$("#qo-lines .ol-color").forEach((inp) => {
+    inp.oninput = () => { quickLines[Number(inp.dataset.i)].color = inp.value; };
+  });
+  $$("#qo-lines .ol-qty").forEach((inp) => {
+    inp.oninput = () => { quickLines[Number(inp.dataset.i)].qty = Number(inp.value) || 1; };
+  });
+  $$("#qo-lines .ol-price").forEach((inp) => {
+    inp.oninput = () => { quickLines[Number(inp.dataset.i)].price = Number(inp.value) || 0; };
+  });
+  $$("#qo-lines .rm").forEach((btn) => {
+    btn.onclick = () => { quickLines.splice(Number(btn.dataset.i), 1); renderQuickLines(); };
+  });
+}
+
+function addQuickLine() {
+  const first = itemsCache[0];
+  quickLines.push({
+    itemId: first ? first.id : "",
+    itemName: first ? first.name : "",
+    color: "",
+    qty: 1,
+    price: first ? first.price || 0 : 0
+  });
+  renderQuickLines();
+}
+
+async function saveQuickOrder(continueNext) {
+  const cid = $("#qo-customer").value;
+  const phone = $("#qo-phone").value.trim();
+  const address = $("#qo-address").value.trim();
+  const paid = $("#qo-paid").checked;
+  let customerName = "";
+  if (cid) {
+    const c = customersCache.find((x) => x.id === cid);
+    if (c) {
+      customerName = c.name;
+      // 更新客户档案（电话/地址可能改了）
+      if (phone && phone !== c.phone) { c.phone = phone; await Store.saveCustomer(c); }
+      if (address && address !== c.address) { c.address = address; await Store.saveCustomer(c); }
+    }
+  } else {
+    customerName = prompt("请输入客户名称（新建客户）") || "";
+    if (!customerName) return toast("请选择或输入客户");
+    const existing = customersCache.find((x) => x.name === customerName);
+    if (existing) {
+      await Store.saveCustomer({ ...existing, phone: phone || existing.phone, address: address || existing.address });
+    } else {
+      await Store.saveCustomer({ name: customerName, phone, address, note: "快速开单创建" });
+    }
+  }
+  const validLines = quickLines.filter((l) => l.itemId && l.qty >= 1);
+  if (!validLines.length) return toast("请至少添加一件商品");
+  // 扣库存
+  for (const l of validLines) {
+    const it = itemsCache.find((x) => x.id === l.itemId);
+    if (!it) continue;
+    const color = (it.colors || []).find((c) => c.name === l.color);
+    if (color && color.stock < l.qty) {
+      return toast(`「${it.name}」${l.color ? "(" + l.color + ")" : ""} 库存不足（当前 ${color.stock} 件）`);
+    }
+  }
+  for (const l of validLines) {
+    const it = itemsCache.find((x) => x.id === l.itemId);
+    if (!it) continue;
+    const color = (it.colors || []).find((c) => c.name === l.color);
+    if (color) {
+      color.stock -= l.qty;
+      color.sold = (color.sold || 0) + l.qty;
+      await Store.saveItem(it);
+    }
+  }
+  const total = validLines.reduce((s, l) => s + l.qty * l.price, 0);
+  await Store.saveOrder({
+    customer: customerName,
+    phone,
+    address,
+    lines: validLines.map((l) => ({ ...l })),
+    status: "pending",
+    payStatus: paid ? "paid" : "unpaid",
+    paidAmount: paid ? total : 0
+  });
+  toast(`已开单 ${customerName} · ${money(total)}`);
+  await reloadAll();
+  renderOrders();
+  renderCustomers();
+  renderToday();
+  if (continueNext) {
+    quickLines = [];
+    renderQuickLines();
+    $("#qo-phone").value = phone;
+    $("#qo-address").value = address;
+  } else {
+    showView("orders");
+    renderOrders();
+  }
+}
+
+/* ================= 批量导入订单 ================= */
+
+function openImport() {
+  $("#import-result").textContent = "";
+  $("#import-text").value = "";
+  showView("import");
+}
+
+function parseImportText() {
+  const text = $("#import-text").value.trim();
+  if (!text) return { ok: false, error: "请粘贴订单内容" };
+  const rows = [];
+  for (const line of text.split("\n")) {
+    const t = line.trim();
+    if (!t) continue;
+    // 支持逗号/制表符/中文逗号分隔
+    const parts = t.split(/[,，\t]/).map((s) => s.trim());
+    if (parts.length < 4) continue;
+    const [cust, phone, addr, itemName, color = "", qtyStr = "1", priceStr = "0"] = parts;
+    const qty = Number(qtyStr) || 1;
+    const price = Number(priceStr) || 0;
+    // 匹配款式
+    const it = itemsCache.find((x) => x.name === itemName);
+    rows.push({
+      customer: cust, phone, address: addr,
+      itemId: it ? it.id : null, itemName: itemName, color,
+      qty, price: price || (it ? it.price || 0 : 0),
+      matched: !!it
+    });
+  }
+  if (!rows.length) return { ok: false, error: "没有解析到有效行（每行至少：客户,电话,地址,商品）" };
+  return { ok: true, rows };
+}
+
+function previewImport() {
+  const res = parseImportText();
+  const out = $("#import-result");
+  if (!res.ok) { out.textContent = res.error; out.style.color = "var(--danger)"; return; }
+  const unmatched = res.rows.filter((r) => !r.matched).length;
+  const total = res.rows.reduce((s, r) => s + r.qty * r.price, 0);
+  out.style.color = "var(--text2)";
+  out.innerHTML = `解析到 <b>${res.rows.length}</b> 单，合计 <b>${money(total)}</b><br>` +
+    (unmatched ? `<span style="color:var(--danger)">⚠ ${unmatched} 单商品名未匹配到库存款式（导入后不会扣库存，需手动处理）</span>` : "全部商品已匹配 ✅");
+}
+
+async function doImport() {
+  const res = parseImportText();
+  const out = $("#import-result");
+  if (!res.ok) { out.textContent = res.error; out.style.color = "var(--danger)"; return; }
+  let imported = 0, createdCustomers = 0;
+  for (const r of res.rows) {
+    // 自动创建/查找客户
+    let cust = customersCache.find((c) => c.name === r.customer);
+    if (!cust) {
+      cust = { name: r.customer, phone: r.phone, address: r.address, note: "批量导入" };
+      await Store.saveCustomer(cust);
+      createdCustomers++;
+    }
+    // 扣库存（匹配到的款式）
+    if (r.matched && r.itemId) {
+      const it = itemsCache.find((x) => x.id === r.itemId);
+      if (it) {
+        const color = (it.colors || []).find((c) => c.name === r.color);
+        if (color) {
+          color.stock = Math.max(0, color.stock - r.qty);
+          color.sold = (color.sold || 0) + r.qty;
+          await Store.saveItem(it);
+        }
+      }
+    }
+    await Store.saveOrder({
+      customer: r.customer,
+      phone: r.phone,
+      address: r.address,
+      lines: [{ itemId: r.itemId, itemName: r.itemName, color: r.color, qty: r.qty, price: r.price }],
+      status: "pending",
+      payStatus: "paid",
+      paidAmount: r.qty * r.price
+    });
+    imported++;
+  }
+  await reloadAll();
+  renderOrders();
+  renderCustomers();
+  renderToday();
+  out.style.color = "var(--ok)";
+  out.textContent = `✅ 成功导入 ${imported} 单${createdCustomers ? "，新建客户 " + createdCustomers + " 个" : ""}`;
+  $("#import-text").value = "";
+}
+
+/* ================= 订单批量操作 ================= */
+
+let orderBatchMode = false;
+let orderBatchSelected = new Set();
+
+function renderOrders() {
+  const list = ordersCache.filter((o) => {
+    if (orderFilter === "pending") return o.status === "pending";
+    if (orderFilter === "done") return o.status === "done";
+    if (orderFilter === "debt") return o.status !== "cancelled" && orderDebt(o) > 0;
+    if (orderFilter === "custom") return o.type === "custom";
+    return true;
+  });
+  const el = $("#order-list");
+  if (!list.length) {
+    el.innerHTML = '<div class="empty"><span class="empty-icon">' + (ordersCache.length ? "📋" : "📦") + "</span>" + (ordersCache.length ? "没有匹配的订单" : "还没有订单<br>点右上角 ＋ 新订单创建第一单") + "</div>";
+    return;
+  }
+  el.innerHTML = list.map((o) => {
+    const lines = (o.lines || []).map((l) => `${l.qty}×${escapeHtml(l.itemName)}${l.color ? "(" + escapeHtml(l.color) + ")" : ""}`).join("、");
+    const total = orderTotal(o);
+    const debt = orderDebt(o);
+    const typeBadge = o.type === "custom"
+      ? `<span class="tag blue">定制</span>${o.due ? `<span class="tag">交期 ${o.due.slice(5)}</span>` : ""}`
+      : `<span class="tag">现货</span>`;
+    const payBadge = o.payStatus === "paid" ? `<span class="order-status done">已收款</span>`
+      : (o.payStatus === "partial" || debt > 0) ? `<span class="order-status pending">欠 ${money(debt)}</span>`
+      : "";
+    const checkBox = orderBatchMode
+      ? `<input type="checkbox" class="order-check" data-id="${o.id}" ${orderBatchSelected.has(o.id) ? "checked" : ""}>`
+      : "";
+    return `
+      <div class="list-card order-card" data-id="${o.id}">
+        ${checkBox}
+        <div style="flex:1;min-width:0">
+          <div class="order-head">
+            <span class="order-customer">${escapeHtml(o.customer)}</span>
+            <span class="order-status ${o.status}">${o.status === "done" ? "已完成" : o.status === "cancelled" ? "已取消" : "未完成"}</span>
+          </div>
+          <div class="list-tags" style="margin-bottom:4px">${typeBadge}</div>
+          <div class="order-lines-preview">${lines}${payBadge ? " · " + payBadge : ""}</div>
+          <div class="order-addr">📮 ${escapeHtml(o.address || "无地址")}</div>
+          <div class="order-addr">🕐 ${timeStr(o.createdAt)} · 合计 ${money(total)}</div>
+        </div>
+      </div>`;
+  }).join("");
+  $$("#order-list .order-card").forEach((card) => {
+    if (orderBatchMode) {
+      card.onclick = (e) => {
+        const cb = card.querySelector(".order-check");
+        if (cb && e.target !== cb) { cb.checked = !cb.checked; cb.dispatchEvent(new Event("change", { bubbles: true })); }
+      };
+    } else {
+      card.onclick = () => openOrderDetail(card.dataset.id);
+    }
+  });
+  $$("#order-list .order-check").forEach((cb) => {
+    cb.onchange = () => {
+      if (cb.checked) orderBatchSelected.add(cb.dataset.id);
+      else orderBatchSelected.delete(cb.dataset.id);
+      updateOrderBatchBar();
+    };
+  });
+  updateOrderBatchBar();
+  if (!orderBatchMode) staggerIn($("#order-list"));
+}
+
+function enterOrderBatchMode() {
+  orderBatchMode = true;
+  orderBatchSelected = new Set();
+  $("#order-batch-bar").classList.remove("hidden");
+  renderOrders();
+}
+
+function exitOrderBatchMode() {
+  orderBatchMode = false;
+  orderBatchSelected = new Set();
+  $("#order-batch-bar").classList.add("hidden");
+  renderOrders();
+}
+
+function updateOrderBatchBar() {
+  const bar = $("#order-batch-bar");
+  if (!bar) return;
+  $("#order-batch-count").textContent = `已选 ${orderBatchSelected.size} 单`;
+}
+
+async function batchMarkDone() {
+  if (!orderBatchSelected.size) return toast("请先勾选订单");
+  const ids = [...orderBatchSelected];
+  for (const id of ids) {
+    const o = ordersCache.find((x) => x.id === id);
+    if (o && o.status !== "done") await Store.setOrderStatus(id, "done");
+  }
+  toast(`已标记 ${ids.length} 单完成`);
+  exitOrderBatchMode();
+  await reloadAll();
+  renderOrders();
+  renderToday();
+}
+
+async function openOrderDetail(id) {
+  const o = ordersCache.find((x) => x.id === id);
+  if (!o) return;
+  const lines = (o.lines || []).map((l) => `${l.qty}× ${escapeHtml(l.itemName)}${l.color ? "（" + escapeHtml(l.color) + "）" : ""} @ ${money(l.price)}`).join("<br>");
+  const total = orderTotal(o);
+  const debt = orderDebt(o);
+  const payStatusHtml = `
+    <div class="card">
+      <h3>收款状态</h3>
+      <div class="pay-row">
+        <span class="pay-info">合计 ${money(total)}${o.paidAmount ? " · 已收 " + money(o.paidAmount) : ""}${debt ? " · 欠 " + money(debt) : ""}</span>
+      </div>
+      <div class="btn-row">
+        <button class="btn" id="od-pay-full">标记全部收款</button>
+        <button class="btn" id="od-pay-partial">部分收款</button>
+      </div>
+    </div>`;
+  const typeRow = o.type === "custom"
+    ? `<div class="detail-color-row"><span>订单类型</span><span class="v">🎨 定制单${o.due ? " · 交期 " + o.due : ""}</span></div>${o.craft ? `<div class="detail-color-row"><span>定制要求</span><span class="v">${escapeHtml(o.craft)}</span></div>` : ""}`
+    : `<div class="detail-color-row"><span>订单类型</span><span class="v">现货单</span></div>`;
+  $("#detail-body").innerHTML = `
+    <div class="card">
+      <div class="order-head">
+        <span class="order-customer">${escapeHtml(o.customer)}</span>
+        <span class="order-status ${o.status}">${o.status === "done" ? "已完成" : o.status === "cancelled" ? "已取消" : "未完成"}</span>
+      </div>
+      ${typeRow}
+      <div class="detail-color-row"><span>电话</span><span class="v">${escapeHtml(o.phone || "—")}</span></div>
+      <div class="detail-color-row"><span>创建时间</span><span class="v">${timeStr(o.createdAt)}</span></div>
+      ${o.doneAt ? `<div class="detail-color-row"><span>完成时间</span><span class="v">${timeStr(o.doneAt)}</span></div>` : ""}
+      <div class="detail-color-row"><span>地址</span><span class="v">${escapeHtml(o.address || "—")}</span></div>
+    </div>
+    <div class="card">
+      <h3>商品明细（合计 ${money(total)}）</h3>
+      <div style="font-size:14px;line-height:1.9">${lines}</div>
+    </div>
+    ${payStatusHtml}
+    <div class="card detail-actions">
+      ${o.status === "pending"
+        ? `<button class="btn primary" id="od-done">标记为已完成配送</button>
+           <button class="btn" id="od-cancel-order">取消订单（库存退回）</button>`
+        : o.status === "done"
+          ? `<button class="btn" id="od-reopen">重新打开订单</button>`
+          : ""}
+      <button class="btn danger" id="od-delete">删除订单记录</button>
+    </div>`;
+  const back = () => { showView("orders"); renderOrders(); };
+  const doneBtn = $("#od-done");
+  if (doneBtn) doneBtn.onclick = async () => {
+    await Store.setOrderStatus(id, "done");
+    toast("订单已完成配送");
+    await reloadAll();
+    openOrderDetail(id);
+  };
+  const cancelBtn = $("#od-cancel-order");
+  if (cancelBtn) cancelBtn.onclick = async () => {
+    if (!await confirmModal("取消订单", "取消后订单商品将退回库存，确定？")) return;
+    await restoreOrderStock(o);
+    o.status = "cancelled";
+    await Store.saveOrder(o);
+    toast("订单已取消，库存已退回");
+    await reloadAll();
+    back();
+  };
+  const reopenBtn = $("#od-reopen");
+  if (reopenBtn) reopenBtn.onclick = async () => {
+    await Store.setOrderStatus(id, "pending");
+    toast("已重新打开");
+    await reloadAll();
+    openOrderDetail(id);
+  };
+  const delBtn = $("#od-delete");
+  if (delBtn) delBtn.onclick = async () => {
+    if (await confirmModal("删除订单", "确定删除这条订单记录吗？")) {
+      await Store.deleteOrder(id);
+      toast("已删除");
+      await reloadAll();
+      back();
+    }
+  };
+  // 收款
+  const payFull = $("#od-pay-full");
+  if (payFull) payFull.onclick = async () => {
+    await Store.setOrderPay(id, "paid", total);
+    toast("已标记全部收款");
+    await reloadAll();
+    openOrderDetail(id);
+  };
+  const payPartial = $("#od-pay-partial");
+  if (payPartial) payPartial.onclick = async () => {
+    const v = prompt("本次收款金额（元），当前欠 " + money(debt), String(debt || ""));
+    const n = Number(v);
+    if (!(n > 0)) return;
+    const newPaid = Math.min(total, (o.paidAmount || 0) + n);
+    const status = newPaid >= total ? "paid" : "partial";
+    await Store.setOrderPay(id, status, newPaid);
+    toast("已记录收款 " + money(n));
+    await reloadAll();
+    openOrderDetail(id);
+  };
+  showView("item-detail");
+}
+
+/** 订单取消时把商品退回库存 */
+async function restoreOrderStock(order) {
+  for (const l of order.lines || []) {
+    const it = itemsCache.find((x) => x.id === l.itemId);
+    if (!it) continue;
+    const color = (it.colors || []).find((c) => c.name === l.color);
+    if (color) {
+      color.stock += l.qty;
+      if (color.sold !== undefined) color.sold = Math.max(0, (color.sold || 0) - l.qty);
+      await Store.saveItem(it);
+    }
+  }
+}
+
+/* ================= 新建订单 ================= */
+
+function openOrderEdit() {
+  editingOrderId = null;
+  editingLines = [];
+  setOrderType("stock");
+  $("#oe-customer").value = "";
+  $("#oe-phone").value = "";
+  $("#oe-address").value = "";
+  $("#oe-due").value = "";
+  $("#oe-craft").value = "";
+  $("#oe-on-credit").checked = true;
+  renderOrderLines();
+  renderAddrBook();
+  showView("order-edit");
+}
+
+function setOrderType(type) {
+  orderType = type;
+  $("#oe-type-stock").classList.toggle("active", type === "stock");
+  $("#oe-type-custom").classList.toggle("active", type === "custom");
+  $("#oe-custom-fields").classList.toggle("hidden", type !== "custom");
+}
+
+function renderOrderLines() {
+  const el = $("#oe-lines");
+  if (!editingLines.length) {
+    el.innerHTML = '<div class="hint">还没有商品，点下方添加</div>';
+    return;
+  }
+  el.innerHTML = editingLines.map((l, i) => `
+    <div class="order-line">
+      <div class="ol-row">
+        <select class="input ol-item" data-i="${i}">
+          ${itemsCache.map((it) => `<option value="${it.id}" ${it.id === l.itemId ? "selected" : ""}>${escapeHtml(it.name)}</option>`).join("")}
+        </select>
+        <input class="input ol-color" data-i="${i}" placeholder="颜色" value="${escapeHtml(l.color)}">
+      </div>
+      <div class="ol-row">
+        <input class="input ol-qty" data-i="${i}" type="number" inputmode="numeric" min="1" value="${l.qty}" placeholder="数量">
+        <input class="input ol-price" data-i="${i}" type="number" inputmode="decimal" value="${l.price}" placeholder="单价">
+        <button class="rm" data-i="${i}">✕</button>
+      </div>
+    </div>`).join("");
+  $$("#oe-lines .ol-item").forEach((sel) => {
+    sel.onchange = () => {
+      editingLines[Number(sel.dataset.i)].itemId = sel.value;
+      const it = itemsCache.find((x) => x.id === sel.value);
+      if (it) {
+        editingLines[Number(sel.dataset.i)].itemName = it.name;
+        editingLines[Number(sel.dataset.i)].price = it.price;
+        renderOrderLines();
+      }
+    };
+  });
+  $$("#oe-lines .ol-color").forEach((inp) => {
+    inp.oninput = () => { editingLines[Number(inp.dataset.i)].color = inp.value; };
+  });
+  $$("#oe-lines .ol-qty").forEach((inp) => {
+    inp.oninput = () => { editingLines[Number(inp.dataset.i)].qty = Number(inp.value) || 1; };
+  });
+  $$("#oe-lines .ol-price").forEach((inp) => {
+    inp.oninput = () => { editingLines[Number(inp.dataset.i)].price = Number(inp.value) || 0; };
+  });
+  $$("#oe-lines .rm").forEach((btn) => {
+    btn.onclick = () => { editingLines.splice(Number(btn.dataset.i), 1); renderOrderLines(); };
+  });
+}
+
+function addOrderLine() {
+  const first = itemsCache[0];
+  editingLines.push({
+    itemId: first ? first.id : "",
+    itemName: first ? first.name : "",
+    color: "",
+    qty: 1,
+    price: first ? first.price || 0 : 0
+  });
+  renderOrderLines();
+}
+
+async function renderAddrBook() {
+  const sel = $("#oe-addr-book");
+  sel.innerHTML = '<option value="">— 从地址簿调用 —</option>' + addrCache.map((a) =>
+    `<option value="${a.id}">${escapeHtml(a.name)}${a.phone ? " · " + escapeHtml(a.phone) : ""}</option>`).join("");
+}
+
+async function saveOrder() {
+  const customer = $("#oe-customer").value.trim();
+  const phone = $("#oe-phone").value.trim();
+  const address = $("#oe-address").value.trim();
+  const onCredit = $("#oe-on-credit").checked;
+  if (!customer) return toast("请填写客户姓名");
+  const validLines = editingLines.filter((l) => l.itemId && l.qty >= 1);
+  if (!validLines.length) return toast("请至少添加一件商品");
+  for (const l of validLines) {
+    const it = itemsCache.find((x) => x.id === l.itemId);
+    if (!it) continue;
+    const color = (it.colors || []).find((c) => c.name === l.color);
+    if (color && color.stock < l.qty) {
+      return toast(`「${it.name}」${l.color ? "(" + l.color + ")" : ""} 库存不足（当前 ${color.stock} 件）`);
+    }
+  }
+  for (const l of validLines) {
+    const it = itemsCache.find((x) => x.id === l.itemId);
+    if (!it) continue;
+    const color = (it.colors || []).find((c) => c.name === l.color);
+    if (color) {
+      color.stock -= l.qty;
+      color.sold = (color.sold || 0) + l.qty;
+      await Store.saveItem(it);
+    }
+  }
+  const order = {
+    customer,
+    phone,
+    address,
+    lines: validLines.map((l) => ({ ...l })),
+    status: "pending",
+    type: orderType,
+    due: orderType === "custom" ? $("#oe-due").value || null : null,
+    craft: orderType === "custom" ? $("#oe-craft").value.trim() : "",
+    payStatus: onCredit ? "unpaid" : "paid",
+    paidAmount: onCredit ? 0 : validLines.reduce((s, l) => s + l.qty * l.price, 0)
+  };
+  await Store.saveOrder(order);
+  toast("订单已保存，库存已扣减" + (onCredit ? "（赊账）" : ""));
+  await reloadAll();
+  renderOrders();
+  renderItems();
+  renderToday();
+  showView("orders");
+}
+
+/* ================= 盘点 ================= */
+
+function openStocktake() {
+  stocktakeDraft = {};
+  renderStocktakeList();
+  showView("stocktake");
+}
+
+function renderStocktakeList() {
+  let list = itemsCache;
+  if (stocktakeOnlyStocked) {
+    list = list.filter((it) => (it.colors || []).some((c) => c.stock > 0));
+  }
+  const el = $("#stocktake-list");
+  if (!list.length) {
+    el.innerHTML = '<div class="empty"><span class="empty-icon">📋</span>没有可盘点的款式</div>';
+    return;
+  }
+  el.innerHTML = list.map((it) => {
+    const colors = (it.colors || []).map((c) => {
+      const key = it.id + "::" + c.name;
+      const val = stocktakeDraft[key] !== undefined ? stocktakeDraft[key] : "";
+      return `<div class="st-row">
+        <span class="st-name">${escapeHtml(c.name)}</span>
+        <span class="st-book">账面 ${c.stock}</span>
+        <input class="input st-input" data-key="${key}" type="number" inputmode="numeric" placeholder="实际数" value="${val}">
+      </div>`;
+    }).join("");
+    return `<div class="card st-card">
+      <h3>${escapeHtml(it.name)}</h3>
+      ${colors}
+    </div>`;
+  }).join("");
+  $$(".st-input").forEach((inp) => {
+    inp.oninput = () => {
+      const k = inp.dataset.key;
+      const v = inp.value.trim();
+      if (v === "") delete stocktakeDraft[k];
+      else stocktakeDraft[k] = Number(v);
+    };
+  });
+}
+
+async function finishStocktake() {
+  const lines = [];
+  let count = 0;
+  for (const [key, actual] of Object.entries(stocktakeDraft)) {
+    const [itemId, colorName] = key.split("::");
+    const it = itemsCache.find((x) => x.id === itemId);
+    if (!it) continue;
+    const color = (it.colors || []).find((c) => c.name === colorName);
+    if (!color) continue;
+    const book = color.stock;
+    const diff = actual - book;
+    lines.push({ itemId, itemName: it.name, color: colorName, book, actual, diff });
+    color.stock = actual;
+    await Store.saveItem(it);
+    count++;
+  }
+  if (!count) return toast("还没有输入任何实际数量");
+  const st = { lines };
+  await Store.saveStocktake(st);
+  toast(`盘点完成，共修正 ${count} 项`);
+  stocktakeDraft = {};
+  await reloadAll();
+  renderItems();
+  renderToday();
+  showView("stocktake-history");
+  renderStocktakeHistory();
+}
+
+function renderStocktakeHistory() {
+  const el = $("#stocktake-history-list");
+  if (!stocktakeCache.length) {
+    el.innerHTML = '<div class="empty"><span class="empty-icon">📋</span>还没有盘点记录</div>';
+    return;
+  }
+  el.innerHTML = stocktakeCache.map((st) => {
+    const diffs = (st.lines || []).filter((l) => l.diff !== 0);
+    const totalDiff = diffs.reduce((s, l) => s + l.diff, 0);
+    return `<div class="card">
+      <div class="order-head">
+        <span class="order-customer">盘点 · ${timeStr(st.time)}</span>
+        <span class="order-status ${totalDiff === 0 ? "done" : "pending"}">差异 ${totalDiff > 0 ? "+" : ""}${totalDiff}</span>
+      </div>
+      ${diffs.length ? diffs.map((l) =>
+        `<div class="detail-color-row"><span>${escapeHtml(l.itemName)} · ${escapeHtml(l.color)}</span><span class="v">账面 ${l.book} → 实际 ${l.actual}（${l.diff > 0 ? "+" : ""}${l.diff}）</span></div>`).join("")
+        : '<div class="hint">本次盘点无差异</div>'}
+    </div>`;
+  }).join("");
+}
+
+/* ================= 进货 ================= */
+
+async function renderPurchaseSelects(selectedItemId) {
+  const selItem = $("#pu-item");
+  selItem.innerHTML = itemsCache.map((it) => {
+    const totalStock = (it.colors || []).reduce((s, c) => s + (c.stock || 0), 0);
+    return `<option value="${it.id}">${escapeHtml(it.name)}（库存 ${totalStock}）</option>`;
+  }).join("");
+  if (selectedItemId) selItem.value = selectedItemId;
+  updatePurchaseColor();
+}
+
+function updatePurchaseColor() {
+  const it = itemsCache.find((x) => x.id === $("#pu-item").value);
+  const selColor = $("#pu-color");
+  selColor.innerHTML = (it && it.colors ? it.colors : []).map((c) =>
+    `<option value="${escapeHtml(c.name)}">${escapeHtml(c.name)}（库存 ${c.stock}）</option>`).join("");
+}
+
+function openPurchaseForItem(id) {
+  showView("purchase");
+  renderPurchaseSelects(id);
+  renderPurchaseList();
+}
+
+function renderPurchaseList() {
+  const el = $("#purchase-list");
+  if (!purchaseCache.length) {
+    el.innerHTML = '<div class="hint">还没有进货记录</div>';
+    return;
+  }
+  el.innerHTML = purchaseCache.slice(0, 10).map((p) => {
+    const it = itemsCache.find((x) => x.id === p.itemId);
+    const name = it ? it.name : p.itemName;
+    return `<div class="detail-color-row">
+      <span>${escapeHtml(name)}${p.color ? " · " + escapeHtml(p.color) : ""} × ${p.qty}${p.supplier ? " · " + escapeHtml(p.supplier) : ""}</span>
+      <span class="v">${p.unitPrice ? money(p.unitPrice) + "/件" : ""} ${timeStr(p.time)}</span>
+    </div>`;
+  }).join("");
+}
+
+async function confirmPurchase() {
+  const it = itemsCache.find((x) => x.id === $("#pu-item").value);
+  if (!it) return toast("请选择款式");
+  const colorName = $("#pu-color").value;
+  const qty = Number($("#pu-qty").value);
+  const unitPriceRaw = $("#pu-price").value.trim();
+  const supplier = $("#pu-supplier").value.trim();
+  if (!colorName) return toast("该款式还没有颜色，请先编辑添加");
+  if (!(qty >= 1)) return toast("请填写正确的进货数量");
+  const unitPrice = unitPriceRaw === "" ? null : Number(unitPriceRaw);
+  const color = (it.colors || []).find((c) => c.name === colorName);
+  if (!color) return toast("颜色不存在");
+  color.stock += qty;
+  await Store.saveItem(it);
+  await Store.savePurchase({ itemId: it.id, itemName: it.name, color: colorName, qty, unitPrice, supplier });
+  toast(`已入库 ${qty} 件`);
+  $("#pu-qty").value = "1";
+  $("#pu-price").value = "";
+  $("#pu-supplier").value = "";
+  await reloadAll();
+  renderItems();
+  renderPurchaseSelects();
+  renderPurchaseList();
+  renderToday();
+}
+
+/* ================= 批量改价 ================= */
+
+function openBatchPrice() {
+  batchSelected = new Set();
+  renderBatchList();
+  showView("batch-price");
+}
+
+function renderBatchList() {
+  const el = $("#batch-item-list");
+  if (!itemsCache.length) {
+    el.innerHTML = '<div class="hint">还没有款式</div>';
+    return;
+  }
+  el.innerHTML = itemsCache.map((it) => {
+    const checked = batchSelected.has(it.id);
+    return `<label class="batch-item">
+      <input type="checkbox" data-id="${it.id}" ${checked ? "checked" : ""}>
+      <span class="batch-name">${escapeHtml(it.name)}</span>
+      <span class="batch-price">${money(it.price)}</span>
+    </label>`;
+  }).join("");
+  $$("#batch-item-list input[type=checkbox]").forEach((cb) => {
+    cb.onchange = () => {
+      if (cb.checked) batchSelected.add(cb.dataset.id);
+      else batchSelected.delete(cb.dataset.id);
+      updateBatchCount();
+    };
+  });
+  updateBatchCount();
+}
+
+function updateBatchCount() {
+  const hint = $("#bp-hint");
+  hint.textContent = batchSelected.size ? `已选 ${batchSelected.size} 个款式` : "请先选择款式";
+}
+
+async function applyBatchPrice() {
+  if (!batchSelected.size) return toast("请先选择款式");
+  const mode = $("#bp-mode").value;
+  const val = Number($("#bp-value").value);
+  if (!(val >= 0)) return toast("请输入有效的数值");
+  let changed = 0;
+  await Store.batchUpdateItems((it) => {
+    if (!batchSelected.has(it.id)) return null;
+    let newPrice;
+    if (mode === "set") newPrice = val;
+    else if (mode === "percent") newPrice = Math.round((it.price || 0) * val / 100 * 100) / 100;
+    else newPrice = Math.max(0, (it.price || 0) + val);
+    if (newPrice === it.price) return null;
+    it.price = newPrice;
+    changed++;
+    return it;
+  });
+  toast(`已调整 ${changed} 个款式的售价`);
+  await reloadAll();
+  renderItems();
+  openBatchPrice();
+}
+
+/* ================= 客户欠款 ================= */
+
+function renderDebt() {
+  const el = $("#debt-list");
+  // 汇总：按客户名聚合订单欠款 + 赊账销售
+  const debts = new Map();
+  for (const o of ordersCache) {
+    if (o.status === "cancelled") continue;
+    const d = orderDebt(o);
+    if (d <= 0) continue;
+    const key = o.customer || "未知名客户";
+    if (!debts.has(key)) debts.set(key, { name: key, amount: 0, count: 0 });
+    const rec = debts.get(key);
+    rec.amount += d;
+    rec.count++;
+  }
+  for (const s of salesCache) {
+    if (!s.onCredit) continue;
+    const key = s.customer || "未知名客户";
+    if (!debts.has(key)) debts.set(key, { name: key, amount: 0, count: 0 });
+    const rec = debts.get(key);
+    rec.amount += s.qty * s.price;
+    rec.count++;
+  }
+  const list = [...debts.values()].sort((a, b) => b.amount - a.amount);
+  if (!list.length) {
+    el.innerHTML = '<div class="empty"><span class="empty-icon">✅</span>暂无欠款记录</div>';
+    return;
+  }
+  el.innerHTML = list.map((d) => `
+    <div class="list-card">
+      <div class="list-main">
+        <div class="list-title">${escapeHtml(d.name)}</div>
+        <div class="list-sub">${d.count} 笔未结清</div>
+      </div>
+      <div class="list-side">
+        <div class="num" style="color:var(--danger)">${money(d.amount)}</div>
+        <div class="lbl">欠款</div>
+      </div>
+    </div>`).join("");
+}
+
+/* ================= 统计 ================= */
+
+function renderStats() {
+  const sort = $("#stats-sort").value;
+  const rows = itemsCache.map((it) => {
+    const totalStock = (it.colors || []).reduce((s, c) => s + (c.stock || 0), 0);
+    const totalSold = (it.colors || []).reduce((s, c) => s + (c.sold || 0), 0);
+    const profit = ((it.price || 0) - (it.cost || 0)) * totalSold;
+    return { it, totalStock, totalSold, profit };
+  });
+  rows.sort((a, b) => {
+    if (sort === "sold") return b.totalSold - a.totalSold;
+    if (sort === "profit") return b.profit - a.profit;
+    return b.totalStock - a.totalStock;
+  });
+  $("#stat-items").textContent = itemsCache.length;
+  $("#stat-total-stock").textContent = rows.reduce((s, r) => s + r.totalStock, 0);
+  $("#stat-total-sold").textContent = rows.reduce((s, r) => s + r.totalSold, 0);
+  $("#stat-profit").textContent = fmt(rows.reduce((s, r) => s + r.profit, 0));
+  const el = $("#stats-list");
+  if (!rows.length) { el.innerHTML = '<div class="empty"><span class="empty-icon">📊</span>暂无数据<br>添加款式并产生销售后这里会展示统计</div>'; return; }
+  el.innerHTML = rows.slice(0, 50).map((r) => `
+    <div class="list-card">
+      <div class="list-main">
+        <div class="list-title">${escapeHtml(r.it.name)}</div>
+        <div class="list-sub">库存 ${r.totalStock} · 已售 ${r.totalSold} · 单件利 ${money((r.it.price||0)-(r.it.cost||0))}</div>
+      </div>
+      <div class="list-side">
+        <div class="num">${money(r.profit)}</div>
+        <div class="lbl">利润</div>
+      </div>
+    </div>`).join("");
+}
+
+/* ================= 设置 ================= */
+
+async function initSettings() {
+  const g = await Store.getGlobalLowStock();
+  $("#set-lowstock").value = g || "";
+  $("#account-info").textContent = `当前账号：${currentAccount.username}`;
+  const sync = await Sync.config();
+  $("#set-sync-url").value = sync.url || "";
+  $("#set-sync-key").value = sync.key || "";
+  $("#set-sync-auto").checked = !!sync.autoPull;
+  const st = $("#sync-status");
+  if (await Sync.isConfigured()) {
+    st.textContent = "云同步已就绪 ✅（内置配置，换网址自动生效）";
+    st.style.color = "var(--ok)";
+  } else {
+    st.textContent = "云同步未配置（可选）";
+    st.style.color = "var(--text3)";
+  }
+  // 授权信息
+  const licEl = $("#license-info-setting");
+  const active = await License.checkActive();
+  if (active.ok) {
+    licEl.textContent = "已激活" + (active.name && active.name !== "本地模式" ? " · " + active.name : "") + " · 版本 " + APP_VERSION;
+    licEl.style.color = "var(--ok)";
+  } else {
+    licEl.textContent = "未激活";
+    licEl.style.color = "var(--danger)";
+  }
+  const about = $("#about-text");
+  if (about) about.textContent = "羊毛衫管家 " + APP_VERSION + " · 数据保存在本机浏览器 · 支持云同步";
+}
+
+async function exportData() {
+  const data = await Store.exportAll();
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `knit-stock-backup-${todayStr()}.json`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+  toast("已导出备份文件");
+}
+
+async function importData(file) {
+  try {
+    const text = await file.text();
+    const data = JSON.parse(text);
+    await Store.importAll(data);
+    toast("导入成功");
+    await reloadAll();
+    renderItems();
+  } catch (e) {
+    toast("导入失败：" + (e.message || "文件格式错误"));
+  }
+}
+
+/* ================= 登录 ================= */
+
+function initAuth() {
+  $("#auth-tab-login").onclick = () => setAuthTab("login");
+  $("#auth-tab-register").onclick = () => setAuthTab("register");
+  $("#auth-submit").onclick = () => submitAuth();
+  $("#auth-password").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") submitAuth();
+  });
+}
+
+let authMode = "login";
+
+function setAuthTab(mode) {
+  authMode = mode;
+  $("#auth-tab-login").classList.toggle("active", mode === "login");
+  $("#auth-tab-register").classList.toggle("active", mode === "register");
+  $("#auth-submit").textContent = mode === "login" ? "登录" : "注册";
+  $("#auth-error").classList.add("hidden");
+}
+
+async function submitAuth() {
+  const username = $("#auth-username").value.trim();
+  const password = $("#auth-password").value;
+  const errEl = $("#auth-error");
+  errEl.classList.add("hidden");
+  const res = authMode === "login"
+    ? await Auth.login(username, password)
+    : await Auth.register(username, password);
+  if (!res.ok) {
+    errEl.textContent = res.error;
+    errEl.classList.remove("hidden");
+    return;
+  }
+  currentAccount = res.account;
+  setCurrentAccount(res.account.id);
+  await Auth.remember(res.account.id);
+  await enterApp();
+}
+
+async function enterApp() {
+  // 授权检查：先确认是否已激活
+  const active = await License.checkActive();
+  if (!active.ok) {
+    showLicenseScreen(active.error);
+    return;
+  }
+  showMain();
+  window.__initialLoad = true;
+  await reloadAll();
+  // 多设备同步：登录后自动从云端拉取该用户数据
+  // （同一用户名在任何手机登录，都能拿到云端数据）
+  try {
+    if (await Sync.isConfigured()) {
+      await Sync.pullIfExists();
+      await reloadAll();
+    }
+  } catch (e) {
+    // 同步失败不阻塞
+  }
+  window.__initialLoad = false;
+  renderToday();
+  renderItems();
+  renderOrders();
+  initSettings();
+  showView("today");
+  // 检查更新（不阻塞）
+  checkUpdateSilently();
+}
+
+/* ============ 授权激活界面 ============ */
+
+function showLicenseScreen(error) {
+  $("#view-auth").classList.add("hidden");
+  $("#view-main").classList.add("hidden");
+  $("#view-license").classList.remove("hidden");
+  $("#license-code").value = "";
+  $("#license-tagline").textContent = error ? "授权状态：" + error : "请向软件管理方索取授权码";
+  $("#license-info").textContent = "";
+}
+
+function hideLicenseScreen() {
+  $("#view-license").classList.add("hidden");
+}
+
+async function submitLicense() {
+  const code = $("#license-code").value.trim();
+  const info = $("#license-info");
+  info.textContent = "正在验证…";
+  info.style.color = "var(--text2)";
+  const res = await License.verify(code);
+  if (!res.ok) {
+    info.textContent = res.error;
+    info.style.color = "var(--danger)";
+    return;
+  }
+  await License.saveLocalCode(res.code || code.toUpperCase());
+  info.textContent = "激活成功！欢迎 " + (res.name || "您");
+  info.style.color = "var(--ok)";
+  setTimeout(() => {
+    hideLicenseScreen();
+    enterApp();
+  }, 800);
+}
+
+async function checkUpdateSilently() {
+  try {
+    const up = await License.checkUpdate();
+    if (up.hasNew && up.url) {
+      const go = await confirmModal("发现新版本 " + up.version, (up.notes || "有新版本可用") + "\n\n是否立即更新？");
+      if (go && up.url) {
+        window.open(up.url, "_blank");
+      }
+    }
+  } catch (e) {}
+}
+
+async function logout() {
+  await Auth.logout();
+  currentAccount = null;
+  itemsCache = [];
+  ordersCache = [];
+  addrCache = [];
+  stocktakeCache = [];
+  purchaseCache = [];
+  salesCache = [];
+  customersCache = [];
+  factoriesCache = [];
+  outsourcesCache = [];
+  $("#view-main").classList.add("hidden");
+  $("#view-license").classList.add("hidden");
+  $("#view-auth").classList.remove("hidden");
+  $("#auth-username").value = "";
+  $("#auth-password").value = "";
+  setAuthTab("login");
+}
+
+/* ================= 事件绑定 ================= */
+
+function bindEvents() {
+  // Tab 导航
+  $$(".tab").forEach((t) => {
+    t.onclick = () => {
+      const v = t.dataset.view;
+      if (v === "today") renderToday();
+      if (v === "items") renderItems();
+      if (v === "customers") renderCustomers();
+      if (v === "orders") renderOrders();
+      if (v === "settings") initSettings();
+      showView(v);
+    };
+  });
+
+  // 今日快捷入口
+  $$(".quick-btn").forEach((b) => {
+    b.onclick = () => {
+      const go = b.dataset.go;
+      if (go === "stocktake") openStocktake();
+      else if (go === "purchase") openPurchaseForItem();
+      else if (go === "stats") { renderStats(); showView("stats"); }
+      else if (go === "quick-order") openQuickOrder();
+      else if (go === "outsource") { renderOutsources(); showView("outsource"); }
+      else { const tab = $(`.tab[data-view=${go}]`); if (tab) tab.click(); }
+    };
+  });
+
+  // 主题
+  $("#theme-toggle").onclick = () => applyTheme(!isDark);
+
+  // 新增款式 / 新订单 / 新客户
+  $("#header-btn").onclick = () => {
+    const v = $(".tab.active") ? $(".tab.active").dataset.view : "items";
+    if (v === "orders") openOrderEdit();
+    else if (v === "customers") openCustomerEdit();
+    else openItemEdit();
+  };
+  $("#user-btn").onclick = () => { showView("settings"); initSettings(); };
+
+  // 搜索与筛选
+  $("#item-search").oninput = debounce((e) => { itemSearch = e.target.value; renderItems(); }, 200);
+  $("#filter-all").onclick = () => { itemFilter = "all"; setChips("all"); renderItems(); };
+  $("#filter-low").onclick = () => { itemFilter = "low"; setChips("low"); renderItems(); };
+  $("#filter-out").onclick = () => { itemFilter = "out"; setChips("out"); renderItems(); };
+
+  // 款式编辑
+  $("#ie-save").onclick = saveItemEdit;
+  $("#ie-cancel").onclick = () => showView("items");
+  $("#ie-add-img").onclick = () => {
+    const inp = document.createElement("input");
+    inp.type = "file";
+    inp.accept = "image/*";
+    inp.multiple = true;
+    inp.onchange = () => {
+      Array.from(inp.files).forEach((f) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          if (editingImages.length >= 6) return toast("最多 6 张图片");
+          editingImages.push(reader.result);
+          renderImageThumbs();
+        };
+        reader.readAsDataURL(f);
+      });
+    };
+    inp.click();
+  };
+  $("#ie-add-color").onclick = () => {
+    if (editingColors.length >= 8) return toast("最多 8 个颜色");
+    editingColors.push({ name: "", stock: 0 });
+    renderColorEditor();
+  };
+
+  // 销售
+  $("#sale-item").onchange = updateSaleColor;
+  $("#sale-confirm").onclick = confirmSale;
+
+  // 订单筛选
+  $("#order-filter-all").onclick = () => { orderFilter = "all"; setOrderChips("all"); renderOrders(); };
+  $("#order-filter-pending").onclick = () => { orderFilter = "pending"; setOrderChips("pending"); renderOrders(); };
+  $("#order-filter-done").onclick = () => { orderFilter = "done"; setOrderChips("done"); renderOrders(); };
+  $("#order-filter-debt").onclick = () => { orderFilter = "debt"; setOrderChips("debt"); renderOrders(); };
+  $("#order-filter-custom").onclick = () => { orderFilter = "custom"; setOrderChips("custom"); renderOrders(); };
+  // 订单类型
+  $("#oe-type-stock").onclick = () => setOrderType("stock");
+  $("#oe-type-custom").onclick = () => setOrderType("custom");
+
+  // 订单批量操作
+  $("#order-import-btn").onclick = openImport;
+  $("#order-batch-done").onclick = batchMarkDone;
+  $("#order-batch-cancel").onclick = exitOrderBatchMode;
+
+  // 客户
+  $("#customer-search").oninput = debounce((e) => { customerSearch = e.target.value; renderCustomers(); }, 200);
+  $("#ce-save").onclick = saveCustomerEdit;
+  $("#ce-cancel").onclick = () => { showView("customers"); renderCustomers(); };
+
+  // 快速开单
+  $("#qo-customer").onchange = updateQuickCustomerInfo;
+  $("#qo-new-customer").onclick = () => openCustomerEdit();
+  $("#qo-add-line").onclick = addQuickLine;
+  $("#qo-save").onclick = () => saveQuickOrder(false);
+  $("#qo-save-continue").onclick = () => saveQuickOrder(true);
+
+  // 批量导入
+  $("#import-preview").onclick = previewImport;
+  $("#import-do").onclick = doImport;
+
+  // 外发加工
+  $("#os-new").onclick = openOutsourceEdit;
+  $("#os-factories").onclick = () => { renderFactories(); showView("factories"); };
+  $("#os-save").onclick = saveOutsource;
+  $("#os-cancel").onclick = () => { renderOutsources(); showView("outsource"); };
+  $("#os-filter-all").onclick = () => { osFilter = "all"; setOsChips("all"); renderOutsources(); };
+  $("#os-filter-active").onclick = () => { osFilter = "active"; setOsChips("active"); renderOutsources(); };
+  $("#os-filter-overdue").onclick = () => { osFilter = "overdue"; setOsChips("overdue"); renderOutsources(); };
+  $("#os-filter-settled").onclick = () => { osFilter = "settled"; setOsChips("settled"); renderOutsources(); };
+  $("#os-factory").onchange = () => {
+    const f = factoriesCache.find((x) => x.id === $("#os-factory").value);
+    if (f && f.price && !$("#os-price").value) $("#os-price").value = f.price;
+  };
+  // 加工厂
+  $("#fa-new").onclick = () => openFactoryEdit();
+  $("#fa-save").onclick = saveFactoryEdit;
+  $("#fa-cancel").onclick = () => { renderFactories(); showView("factories"); };
+
+  // 订单编辑
+  $("#oe-save").onclick = saveOrder;
+  $("#oe-cancel").onclick = () => { showView("orders"); renderOrders(); };
+  $("#oe-add-line").onclick = addOrderLine;
+  $("#oe-addr-pick").onclick = async () => {
+    const id = $("#oe-addr-book").value;
+    if (!id) return toast("请先选择地址");
+    const a = addrCache.find((x) => x.id === id);
+    if (!a) return;
+    $("#oe-address").value = a.address || "";
+    if (a.phone && !$("#oe-phone").value) $("#oe-phone").value = a.phone;
+    toast(`已调用「${a.name}」的地址`);
+  };
+  $("#oe-save-addr").onclick = async () => {
+    const name = $("#oe-customer").value.trim();
+    const phone = $("#oe-phone").value.trim();
+    const address = $("#oe-address").value.trim();
+    if (!name || !address) return toast("请先填写客户姓名和地址");
+    await Store.saveAddr({ name, phone, address });
+    await reloadAll();
+    await renderAddrBook();
+    toast("已保存到地址簿");
+  };
+
+  // 盘点
+  $("#st-filter-all").onclick = () => { stocktakeOnlyStocked = false; setStocktakeChips("all"); renderStocktakeList(); };
+  $("#st-filter-stocked").onclick = () => { stocktakeOnlyStocked = true; setStocktakeChips("stocked"); renderStocktakeList(); };
+  $("#st-finish").onclick = finishStocktake;
+  $("#st-history").onclick = () => { renderStocktakeHistory(); showView("stocktake-history"); };
+
+  // 进货
+  $("#pu-item").onchange = updatePurchaseColor;
+  $("#pu-confirm").onclick = confirmPurchase;
+
+  // 批量改价
+  $("#bp-mode").onchange = () => {
+    const lbl = $("#bp-value-lbl");
+    const m = $("#bp-mode").value;
+    lbl.textContent = m === "set" ? "新售价（元）" : m === "percent" ? "调整百分比（如 90 = 打九折，110 = 加价10%）" : "加/减金额（元，负数减价）";
+  };
+  $("#bp-apply").onclick = applyBatchPrice;
+
+  // 统计排序
+  $("#stats-sort").onchange = renderStats;
+
+  // 设置
+  $("#set-lowstock-save").onclick = async () => {
+    const v = Number($("#set-lowstock").value);
+    if (!(v >= 0)) return toast("请输入正确的数值");
+    await Store.setGlobalLowStock(v);
+    toast("已保存，警告线为 " + v + " 件");
+    await reloadAll();
+    renderItems();
+  };
+  $("#set-sync-save").onclick = async () => {
+    const url = $("#set-sync-url").value.trim();
+    const key = $("#set-sync-key").value.trim();
+    const auto = $("#set-sync-auto").checked;
+    if (url && !key) return toast("填了 URL 也需要填 key");
+    await Sync.saveConfig({ url, key, autoPull: auto });
+    toast("同步配置已保存");
+    initSettings();
+  };
+  $("#set-sync-test").onclick = async () => {
+    const st = $("#sync-status");
+    st.textContent = "正在测试连接…";
+    st.style.color = "var(--text2)";
+    try {
+      await Sync.testConnection();
+      st.textContent = "连接成功 ✅ 配置有效";
+      st.style.color = "var(--ok)";
+      toast("连接成功");
+    } catch (e) {
+      st.textContent = "连接失败：" + e.message;
+      st.style.color = "var(--danger)";
+      toast("连接失败");
+    }
+  };
+  $("#set-sync-upload").onclick = async () => {
+    try {
+      await Sync.upload();
+      toast("已上传到云端");
+    } catch (e) {
+      toast("上传失败：" + e.message);
+    }
+  };
+  $("#set-sync-pull").onclick = async () => {
+    try {
+      await Sync.pull();
+      await reloadAll();
+      toast("已从云端拉取");
+      renderItems();
+    } catch (e) {
+      toast("拉取失败：" + e.message);
+    }
+  };
+  $("#set-export").onclick = exportData;
+  $("#set-import").onclick = () => $("#set-import-file").click();
+  $("#set-import-file").onchange = (e) => {
+    if (e.target.files[0]) importData(e.target.files[0]);
+    e.target.value = "";
+  };
+  $("#set-logout").onclick = async () => {
+    if (await confirmModal("退出登录", "确定退出当前账号吗？")) logout();
+  };
+  // 授权
+  $("#license-submit").onclick = submitLicense;
+  $("#license-code").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") submitLicense();
+  });
+  $("#set-reactivate").onclick = () => {
+    showLicenseScreen();
+  };
+  $("#set-check-update").onclick = async () => {
+    const res = $("#update-result");
+    res.textContent = "正在检查…";
+    const up = await License.checkUpdate();
+    if (up.hasNew) {
+      res.textContent = "发现新版本 " + up.version + (up.notes ? "：" + up.notes : "");
+      res.style.color = "var(--warn)";
+      if (up.url) {
+        const go = await confirmModal("更新到 " + up.version, "立即打开新版本页面？");
+        if (go) window.open(up.url, "_blank");
+      }
+    } else {
+      res.textContent = "已是最新版本（" + APP_VERSION + "）";
+      res.style.color = "var(--ok)";
+    }
+  };
+}
+
+function setChips(which) {
+  $("#filter-all").classList.toggle("active", which === "all");
+  $("#filter-low").classList.toggle("active", which === "low");
+  $("#filter-out").classList.toggle("active", which === "out");
+}
+
+function setOrderChips(which) {
+  $("#order-filter-all").classList.toggle("active", which === "all");
+  $("#order-filter-pending").classList.toggle("active", which === "pending");
+  $("#order-filter-done").classList.toggle("active", which === "done");
+  $("#order-filter-debt").classList.toggle("active", which === "debt");
+  $("#order-filter-custom").classList.toggle("active", which === "custom");
+}
+
+function setStocktakeChips(which) {
+  $("#st-filter-all").classList.toggle("active", which === "all");
+  $("#st-filter-stocked").classList.toggle("active", which === "stocked");
+}
+
+function setOsChips(which) {
+  $("#os-filter-all").classList.toggle("active", which === "all");
+  $("#os-filter-active").classList.toggle("active", which === "active");
+  $("#os-filter-overdue").classList.toggle("active", which === "overdue");
+  $("#os-filter-settled").classList.toggle("active", which === "settled");
+}
+
+/* ================= 启动 ================= */
+
+(async function init() {
+  bindEvents();
+  initAuth();
+  // 主题恢复
+  let theme = "light";
+  try { theme = localStorage.getItem("knit-theme") || "light"; } catch {}
+  applyTheme(theme === "dark");
+  // 字体大小恢复
+  initFontSize();
+  // 恢复上次登录
+  const saved = await Auth.restore();
+  if (saved) {
+    currentAccount = saved;
+    setCurrentAccount(saved.id);
+    await enterApp();
+  } else {
+    setAuthTab("login");
+  }
+  // 注册 service worker + 自动更新机制
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("./sw.js").then((reg) => {
+      // 检测到新 sw 就绪时自动刷新，确保用户拿到最新版
+      reg.addEventListener("updatefound", () => {
+        const newWorker = reg.installing;
+        if (!newWorker) return;
+        newWorker.addEventListener("statechange", () => {
+          if (newWorker.state === "activated" && navigator.serviceWorker.controller) {
+            // 新 sw 已接管，刷新页面加载最新版
+            setTimeout(() => window.location.reload(), 300);
+          }
+        });
+      });
+    }).catch(() => {});
+  }
+})();
+</script>
+</body>
+</html>
