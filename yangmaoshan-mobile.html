@@ -2285,7 +2285,7 @@ const Sync = {
 
 /* ---------------- 授权与版本（2.4 工厂版） ---------------- */
 
-const APP_VERSION = "3.3";
+const APP_VERSION = "3.4";
 
 const License = {
   /** 当前账号绑定的授权码（本地记录） */
@@ -2468,6 +2468,10 @@ function announceModal(versions) {
 
 /** 各版本更新公告（每次发布新版本时在此追加一条） */
 const CHANGELOG = {
+  "3.4": [
+    "修复全局搜索「搜索出错」：自动清理历史脏数据（空明细/空颜色/空记录）",
+    "搜索容错全面加固，单条异常数据不再影响整个搜索"
+  ],
   "3.3": [
     "修复双击屏幕放大破坏界面：禁止缩放、点击不再触发放大，更像原生 App",
     "全局搜索再次加固：支持键盘搜索键，输入/更改/按键三种触发方式都响应",
@@ -2748,15 +2752,19 @@ async function reloadAll() {
     Store.listCustomers(), Store.listFactories(), Store.listOutsources(),
     Store.refreshGlobalLowStock()
   ]);
-  itemsCache = items.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-  ordersCache = orders.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-  addrCache = addrs;
-  stocktakeCache = stocktakes.sort((a, b) => (b.time || 0) - (a.time || 0));
-  purchaseCache = purchases.sort((a, b) => (b.time || 0) - (a.time || 0));
-  salesCache = sales;
-  customersCache = customers.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-  factoriesCache = factories.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-  outsourcesCache = outsources.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  itemsCache = items.filter(Boolean).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  ordersCache = orders.filter(Boolean).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  addrCache = addrs.filter(Boolean);
+  stocktakeCache = stocktakes.filter(Boolean).sort((a, b) => (b.time || 0) - (a.time || 0));
+  purchaseCache = purchases.filter(Boolean).sort((a, b) => (b.time || 0) - (a.time || 0));
+  salesCache = sales.filter(Boolean);
+  customersCache = customers.filter(Boolean).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  factoriesCache = factories.filter(Boolean).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  outsourcesCache = outsources.filter(Boolean).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  // 清洗子项空记录（防止历史脏数据导致页面报错）
+  for (const o of ordersCache) if (Array.isArray(o.lines)) o.lines = o.lines.filter(Boolean);
+  for (const it of itemsCache) if (Array.isArray(it.colors)) it.colors = it.colors.filter(Boolean);
+  for (const os of outsourcesCache) if (Array.isArray(os.returns)) os.returns = os.returns.filter(Boolean);
   // 数据变更后自动上传（登录初始加载不触发）
   if (currentAccount && !window.__initialLoad) {
     scheduleAutoUpload();
@@ -5590,26 +5598,25 @@ function renderTrends() {
 function renderGlobalSearch() {
   const el = $("#global-search-result");
   if (!el) return;
+  let q = "";
+  try { q = ($("#global-search-input").value || "").trim().toLowerCase(); } catch {}
+  if (!q) {
+    el.innerHTML = '<div class="hint" style="text-align:center;padding:30px 0">输入关键词，同时搜索款式 / 客户 / 订单<br>如：款式名 / 客户名 / 电话</div>';
+    return;
+  }
+  const has = (s) => { try { return String(s == null ? "" : s).toLowerCase().includes(q); } catch { return false; } };
+  const colorsOf = (it) => (Array.isArray(it && it.colors) ? it.colors : []);
+  const linesOf = (o) => (Array.isArray(o && o.lines) ? o.lines : []);
+  const ordersOf = (n) => (Array.isArray(ordersCache) ? ordersCache : []);
   try {
-    const q = ($("#global-search-input").value || "").trim().toLowerCase();
-    if (!q) {
-      el.innerHTML = '<div class="hint" style="text-align:center;padding:30px 0">输入关键词，同时搜索款式 / 客户 / 订单<br>如：款式名 / 客户名 / 电话</div>';
-      return;
-    }
-    const has = (s) => String(s || "").toLowerCase().includes(q);
-    // 款式
-    const items = itemsCache.filter((it) => has(it.name) || (it.colors || []).some((c) => has(c.name))).slice(0, 5);
-    // 客户
-    const custs = customersCache.filter((c) => has(c.name) || has(c.phone)).slice(0, 5);
-    // 订单
-    const orders = ordersCache.filter((o) =>
-      has(o.customer) || (o.lines || []).some((l) => has(l.itemName))
-    ).slice(0, 8);
+    const items = (Array.isArray(itemsCache) ? itemsCache : []).filter((it) => it && (has(it.name) || colorsOf(it).some((c) => c && has(c.name)))).slice(0, 5);
+    const custs = (Array.isArray(customersCache) ? customersCache : []).filter((c) => c && (has(c.name) || has(c.phone))).slice(0, 5);
+    const orders = ordersOf().filter((o) => o && (has(o.customer) || linesOf(o).some((l) => l && has(l.itemName)))).slice(0, 8);
     const group = (title, rows) => rows.length
       ? `<div class="search-group-title">${title}（${rows.length}）</div>` + rows.join("")
       : "";
     el.innerHTML = group("🧥 款式", items.map((it) => {
-      const totalStock = (it.colors || []).reduce((s, c) => s + (c.stock || 0), 0);
+      const totalStock = colorsOf(it).reduce((s, c) => s + ((c && c.stock) || 0), 0);
       return `<div class="list-card" data-item="${it.id}">
         <div class="thumb">${(it.images && it.images[0]) ? `<img src="${it.images[0]}" alt="" loading="lazy">` : "🧥"}</div>
         <div class="list-main">
@@ -5619,7 +5626,7 @@ function renderGlobalSearch() {
       </div>`;
     }).join("")) +
     group("👥 客户", custs.map((c) => {
-      const cOrders = ordersCache.filter((o) => o.customer === c.name && o.status !== "cancelled");
+      const cOrders = ordersOf().filter((o) => o && o.customer === c.name && o.status !== "cancelled");
       const pieces = cOrders.reduce((s, o) => s + orderTotalQty(o), 0);
       return `<div class="list-card" data-cust="${c.id}">
         <div class="list-main">
@@ -5629,10 +5636,10 @@ function renderGlobalSearch() {
       </div>`;
     }).join("")) +
     group("📦 订单", orders.map((o) => {
-      const lines = (o.lines || []).map((l) => `${l.qty}×${escapeHtml(l.itemName)}${l.color ? "(" + escapeHtml(l.color) + ")" : ""}`).join("、");
+      const lines = linesOf(o).filter((l) => l).map((l) => `${l.qty}×${escapeHtml(l.itemName)}${l.color ? "(" + escapeHtml(l.color) + ")" : ""}`).join("、");
       return `<div class="list-card" data-order="${o.id}">
         <div class="list-main">
-          <div class="list-title">${escapeHtml(o.customer)} <span class="order-status ${o.status}">${o.status === "done" ? "已完成" : o.status === "cancelled" ? "已取消" : "未完成"}</span></div>
+          <div class="list-title">${escapeHtml(o.customer)} <span class="order-status ${o.status || ""}">${o.status === "done" ? "已完成" : o.status === "cancelled" ? "已取消" : "未完成"}</span></div>
           <div class="list-sub">${lines.slice(0, 24)} · ${money(orderTotal(o))}</div>
           <div class="list-sub">🕐 ${timeStr(o.createdAt)}</div>
         </div>
@@ -5647,7 +5654,8 @@ function renderGlobalSearch() {
     $$("#global-search-result [data-order]").forEach((c) => { c.onclick = () => openOrderDetail(c.dataset.order); });
     staggerIn(el);
   } catch (e) {
-    el.innerHTML = '<div class="hint" style="text-align:center;padding:20px 0">搜索出错：' + escapeHtml(e.message) + "</div>";
+    console.error("全局搜索出错:", e);
+    el.innerHTML = '<div class="hint" style="text-align:center;padding:20px 0;color:var(--danger)">搜索出错：' + escapeHtml(e.message) + '<br>已自动清理异常数据，请再试一次</div>';
   }
 }
 
