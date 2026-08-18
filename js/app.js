@@ -100,6 +100,10 @@ function announceModal(versions) {
 
 /** 各版本更新公告（每次发布新版本时在此追加一条） */
 const CHANGELOG = {
+  "3.5": [
+    "彻底修复全局搜索：去掉重复拼接导致的报错，搜索现在真正可用",
+    "首页统计卡片可点击：点「今日新订单」只看今天的订单，点「未收款合计」直达欠款列表"
+  ],
   "3.4": [
     "修复全局搜索「搜索出错」：自动清理历史脏数据（空明细/空颜色/空记录）",
     "搜索容错全面加固，单条异常数据不再影响整个搜索"
@@ -3256,7 +3260,7 @@ function renderGlobalSearch() {
           <div class="list-sub">库存 ${totalStock} 件 · ${money(it.price)}</div>
         </div>
       </div>`;
-    }).join("")) +
+    })) +
     group("👥 客户", custs.map((c) => {
       const cOrders = ordersOf().filter((o) => o && o.customer === c.name && o.status !== "cancelled");
       const pieces = cOrders.reduce((s, o) => s + orderTotalQty(o), 0);
@@ -3266,7 +3270,7 @@ function renderGlobalSearch() {
           <div class="list-sub">${escapeHtml(c.phone || "无电话")} · 共买 ${pieces} 件</div>
         </div>
       </div>`;
-    }).join("")) +
+    })) +
     group("📦 订单", orders.map((o) => {
       const lines = linesOf(o).filter((l) => l).map((l) => `${l.qty}×${escapeHtml(l.itemName)}${l.color ? "(" + escapeHtml(l.color) + ")" : ""}`).join("、");
       return `<div class="list-card" data-order="${o.id}">
@@ -3276,7 +3280,7 @@ function renderGlobalSearch() {
           <div class="list-sub">🕐 ${timeStr(o.createdAt)}</div>
         </div>
       </div>`;
-    }).join(""));
+    }));
     if (!items.length && !custs.length && !orders.length) {
       el.innerHTML = '<div class="empty"><span class="empty-icon">🔍</span>没有找到「' + escapeHtml(q) + '」<br>换个关键词试试</div>';
       return;
@@ -3590,6 +3594,25 @@ function bindEvents() {
       if (v === "orders") renderOrders();
       if (v === "settings") initSettings();
       showView(v);
+    };
+  });
+
+  // 今日统计卡片点击（今日新订单→只看今日订单；营业额/利润→统计；未收款→欠款）
+  $$(".stat-card").forEach((card) => {
+    card.onclick = () => {
+      const go = card.dataset.go;
+      if (go === "orders-today") {
+        orderFilter = "today";
+        setOrderChips("today");
+        renderOrders();
+        showView("orders");
+      } else if (go === "debt") {
+        renderDebt();
+        showView("debt");
+      } else if (go === "stats") {
+        renderStats();
+        showView("stats");
+      }
     };
   });
 
