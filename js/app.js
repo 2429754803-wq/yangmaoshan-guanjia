@@ -100,6 +100,9 @@ function announceModal(versions) {
 
 /** 各版本更新公告（每次发布新版本时在此追加一条） */
 const CHANGELOG = {
+  "3.10": [
+    "新增「工厂/店铺名称」设置：设置里填你的名称，分享卡底部显示「你的名称 · 厂家直供」，客户知道是哪家的货"
+  ],
   "3.9": [
     "分享卡格式重排：三段式干净布局（整幅大图 / 白底信息区 / 红色品牌条），不再杂乱",
     "信息区只留三样：款式名、红色大价格、颜色数量标签"
@@ -1017,12 +1020,14 @@ async function shareItemCard(it) {
         cx += widths[i] + 46;
       }
     }
-    // —— 第三段：底部品牌条 ——
+    // —— 第三段：底部品牌条（显示工厂/店铺名称）——
+    const factoryName = await getFactoryName();
+    const brandName = (factoryName || "洪合羊毛衫") + " · 厂家直供";
     ctx.fillStyle = "#b91c2e";
     ctx.fillRect(0, H - 88, W, 88);
     ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 26px sans-serif";
-    ctx.fillText("洪合羊毛衫 · 厂家直供", W / 2, H - 34);
+    ctx.font = "bold 28px sans-serif";
+    ctx.fillText(brandName, W / 2, H - 34);
     // 预览分享（长按保存 / 系统分享，iOS 微信内通用）
     await finishShareImage(canvas, it.name + ".png", it.name, "👆 长按图片保存，转发给微信好友");
   } catch (e) {
@@ -3438,6 +3443,8 @@ async function initSettings() {
   }
   const about = $("#about-text");
   if (about) about.textContent = "羊毛衫管家 " + APP_VERSION + " · 数据保存在本机浏览器 · 支持云同步";
+  // 工厂/店铺名称
+  $("#set-factory-name").value = await getFactoryName();
   // 微信收款码（按账号存储）
   renderPayQrSetting();
 }
@@ -3454,6 +3461,16 @@ async function getPayQrImage() {
     return v || null;
   } catch {
     return null;
+  }
+}
+
+/** 工厂/店铺名称（按账号存储），未设置返回空 */
+async function getFactoryName() {
+  try {
+    const v = await getSetting("factoryName:" + (currentAccountId() || ""), "");
+    return v || "";
+  } catch {
+    return "";
   }
 }
 
@@ -3985,6 +4002,12 @@ function bindEvents() {
   $("#set-import-file").onchange = (e) => {
     if (e.target.files[0]) importData(e.target.files[0]);
     e.target.value = "";
+  };
+  // 工厂/店铺名称保存
+  $("#set-factory-name-save").onclick = async () => {
+    const name = $("#set-factory-name").value.trim();
+    await setSetting("factoryName:" + (currentAccountId() || ""), name);
+    toast(name ? "已保存：「" + name + "」" : "已清除名称，分享卡显示默认名称");
   };
   // 微信收款码：选择图片上传
   $("#set-payqr-pick").onclick = () => $("#set-payqr-file").click();
