@@ -730,6 +730,19 @@ select.input { appearance: auto; }
 .stat-card { cursor: pointer; transition: transform .15s var(--ease-spring); }
 .stat-card:active { transform: scale(.94); }
 
+/* 微信收款码 */
+.payqr-preview {
+  display: flex; justify-content: center;
+  background: #fff; border-radius: 14px;
+  padding: 12px; margin-bottom: 10px;
+}
+.payqr-preview img { width: 180px; height: 180px; object-fit: contain; border-radius: 8px; }
+.payqr-info { text-align: center; margin-bottom: 8px; }
+.payqr-cust { font-size: var(--fs-sm); color: var(--text2); font-weight: 600; }
+.payqr-amount { font-size: var(--fs-md); color: var(--text); margin-top: 2px; }
+.payqr-amount b { color: var(--danger); font-size: 26px; }
+.payqr-sub { font-size: var(--fs-xxs); color: var(--text3); margin-left: 6px; }
+
 /* 快捷操作 */
 .quick-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 .quick-btn {
@@ -1632,6 +1645,16 @@ button, .list-card, .chip, .quick-btn, .os-board-cell, .tab { user-select: none;
           <div id="sync-status" class="hint"></div>
         </div>
         <div class="card">
+          <label class="lbl">💰 微信收款码</label>
+          <div id="payqr-preview" class="payqr-preview hidden"><img id="payqr-img" alt="收款码"></div>
+          <div class="btn-row">
+            <button id="set-payqr-pick" class="btn">📷 选择收款码图片</button>
+            <button id="set-payqr-clear" class="btn danger hidden">清除</button>
+          </div>
+          <input id="set-payqr-file" type="file" accept="image/*" class="hidden">
+          <div class="hint">在微信「收付款 → 二维码收款」里把收款码截图存到相册，再在这里选图上传。<br>上传后，订单详情的「收款二维码」就显示你的微信收款码，客户扫码直接付款。</div>
+        </div>
+        <div class="card">
           <label class="lbl">数据备份</label>
           <div class="btn-row">
             <button id="set-export" class="btn primary">导出数据</button>
@@ -2287,7 +2310,7 @@ const Sync = {
 
 /* ---------------- 授权与版本（2.4 工厂版） ---------------- */
 
-const APP_VERSION = "3.6";
+const APP_VERSION = "3.7";
 
 const License = {
   /** 当前账号绑定的授权码（本地记录） */
@@ -2470,6 +2493,10 @@ function announceModal(versions) {
 
 /** 各版本更新公告（每次发布新版本时在此追加一条） */
 const CHANGELOG = {
+  "3.7": [
+    "分享卡去掉「微信下单」字样",
+    "微信收款码打通：设置里上传你的微信收款码截图，订单详情的「收款二维码」就显示你的收款码，客户扫码直接付款到你的微信"
+  ],
   "3.6": [
     "款式分享卡不再显示成本，只展示售价、库存、已售",
     "分享界面全新设计：白底圆角图、价格大字、颜色小标签、品牌感更强",
@@ -3388,7 +3415,7 @@ async function shareItemCard(it) {
     // 底部
     ctx.fillStyle = "rgba(255,255,255,.55)";
     ctx.font = "22px sans-serif";
-    ctx.fillText("— 羊毛衫管家 · 微信下单 · 现货速发 —", W / 2, H - 44);
+    ctx.fillText("— 羊毛衫管家 · 现货速发 —", W / 2, H - 44);
     // 预览分享（长按保存 / 系统分享，iOS 微信内通用）
     await finishShareImage(canvas, it.name + ".png", it.name, "👆 长按图片保存，转发给微信好友");
   } catch (e) {
@@ -5021,31 +5048,52 @@ async function restoreOrderStock(order) {
 }
 
 /** 订单收款二维码：客户扫码看到应收金额，用于催款/对账确认 */
-function showOrderPayQr(o) {
+async function showOrderPayQr(o) {
   const total = orderTotal(o);
   const debt = orderDebt(o);
-  const text = "羊毛衫管家 收款单\n客户：" + (o.customer || "") + "\n订单金额：" + money(total) +
-    "\n已收：" + money(o.paidAmount || 0) + "\n待收：" + money(debt) +
-    "\n单号：" + String(o.id || "").slice(-6) + "\n下单：" + timeStr(o.createdAt);
+  const payQr = await getPayQrImage(); // 用户上传的微信收款码
   const mask = document.createElement("div");
   mask.className = "img-share-mask";
-  mask.innerHTML = `
-    <div class="img-share-box qr-box">
-      <h3>🧾 收款二维码</h3>
-      <div id="pay-qr-canvas"></div>
-      <div class="img-share-hint">客户扫一扫即可看到应收金额，用于催款/对账确认</div>
-      <div class="btn-row"><button class="btn primary img-share-close">完成</button></div>
-    </div>`;
+  const info = `<div class="payqr-info">
+    <div class="payqr-cust">${escapeHtml(o.customer || "")}</div>
+    <div class="payqr-amount">应收 <b>${money(debt)}</b><span class="payqr-sub">（订单 ${money(total)} · 已收 ${money(o.paidAmount || 0)}）</span></div>
+  </div>`;
+  if (payQr) {
+    // 有微信收款码：显示收款码图片，客户扫码直接付款
+    mask.innerHTML = `
+      <div class="img-share-box qr-box">
+        <h3>🧾 微信收款码</h3>
+        ${info}
+        <img src="${payQr}" alt="微信收款码" style="width:76%;border-radius:12px;margin:8px auto;display:block">
+        <div class="img-share-hint">客户扫这个码 → 直接转 ${money(debt)} 到你的微信</div>
+        <div class="btn-row"><button class="btn primary img-share-close">完成</button></div>
+      </div>`;
+  } else {
+    // 未上传：显示收款单文字二维码 + 引导上传
+    const text = "羊毛衫管家 收款单\n客户：" + (o.customer || "") + "\n订单金额：" + money(total) +
+      "\n已收：" + money(o.paidAmount || 0) + "\n待收：" + money(debt) +
+      "\n单号：" + String(o.id || "").slice(-6) + "\n下单：" + timeStr(o.createdAt);
+    mask.innerHTML = `
+      <div class="img-share-box qr-box">
+        <h3>🧾 收款二维码</h3>
+        ${info}
+        <div id="pay-qr-canvas"></div>
+        <div class="img-share-hint">客户扫一扫核对应收金额。<br>想要客户扫码直接付款？去「设置 → 微信收款码」上传你的收款码截图</div>
+        <div class="btn-row"><button class="btn primary img-share-close">完成</button></div>
+      </div>`;
+  }
   document.body.appendChild(mask);
   const qrBox = mask.querySelector("#pay-qr-canvas");
-  try {
-    if (typeof QRCode !== "undefined") {
-      new QRCode(qrBox, { text, width: 210, height: 210, correctLevel: QRCode.CorrectLevel.M });
-    } else {
-      qrBox.textContent = "二维码组件加载失败";
+  if (qrBox) {
+    try {
+      if (typeof QRCode !== "undefined") {
+        new QRCode(qrBox, { text: "羊毛衫管家 收款单 客户：" + (o.customer || "") + " 待收：" + money(debt), width: 200, height: 200, correctLevel: QRCode.CorrectLevel.M });
+      } else {
+        qrBox.textContent = "二维码组件加载失败";
+      }
+    } catch (e) {
+      qrBox.textContent = "二维码生成失败：" + (e.message || "");
     }
-  } catch (e) {
-    qrBox.textContent = "二维码生成失败：" + (e.message || "");
   }
   const close = () => mask.remove();
   mask.querySelector(".img-share-close").onclick = close;
@@ -5783,6 +5831,38 @@ async function initSettings() {
   }
   const about = $("#about-text");
   if (about) about.textContent = "羊毛衫管家 " + APP_VERSION + " · 数据保存在本机浏览器 · 支持云同步";
+  // 微信收款码（按账号存储）
+  renderPayQrSetting();
+}
+
+/** 收款码存储键（按账号隔离） */
+function payQrKey() {
+  return "wechatPayQr:" + (currentAccountId() || "");
+}
+
+/** 读取当前账号的微信收款码图片（dataURL），没有返回 null */
+async function getPayQrImage() {
+  try {
+    const v = await getSetting(payQrKey(), null);
+    return v || null;
+  } catch {
+    return null;
+  }
+}
+
+/** 设置页：显示/隐藏收款码 */
+async function renderPayQrSetting() {
+  const img = await getPayQrImage();
+  const pre = $("#payqr-preview");
+  const clear = $("#set-payqr-clear");
+  if (img) {
+    pre.classList.remove("hidden");
+    $("#payqr-img").src = img;
+    clear.classList.remove("hidden");
+  } else {
+    pre.classList.add("hidden");
+    clear.classList.add("hidden");
+  }
 }
 
 async function exportData() {
@@ -6298,6 +6378,28 @@ function bindEvents() {
   $("#set-import-file").onchange = (e) => {
     if (e.target.files[0]) importData(e.target.files[0]);
     e.target.value = "";
+  };
+  // 微信收款码：选择图片上传
+  $("#set-payqr-pick").onclick = () => $("#set-payqr-file").click();
+  $("#set-payqr-file").onchange = (e) => {
+    const f = e.target.files && e.target.files[0];
+    e.target.value = "";
+    if (!f) return;
+    if (f.size > 1024 * 1024 * 2) return toast("图片太大，请选择 2MB 以内的收款码截图");
+    const reader = new FileReader();
+    reader.onload = async () => {
+      await setSetting(payQrKey(), reader.result);
+      toast("收款码已保存，客户扫码可直接付款");
+      renderPayQrSetting();
+    };
+    reader.onerror = () => toast("读取图片失败");
+    reader.readAsDataURL(f);
+  };
+  $("#set-payqr-clear").onclick = async () => {
+    if (!await confirmModal("清除收款码", "确定删除已保存的微信收款码吗？")) return;
+    await setSetting(payQrKey(), null);
+    toast("已清除");
+    renderPayQrSetting();
   };
   $("#set-logout").onclick = async () => {
     if (await confirmModal("退出登录", "确定退出当前账号吗？")) logout();

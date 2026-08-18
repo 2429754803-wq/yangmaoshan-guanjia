@@ -717,6 +717,19 @@ select.input { appearance: auto; }
 .stat-card { cursor: pointer; transition: transform .15s var(--ease-spring); }
 .stat-card:active { transform: scale(.94); }
 
+/* 微信收款码 */
+.payqr-preview {
+  display: flex; justify-content: center;
+  background: #fff; border-radius: 14px;
+  padding: 12px; margin-bottom: 10px;
+}
+.payqr-preview img { width: 180px; height: 180px; object-fit: contain; border-radius: 8px; }
+.payqr-info { text-align: center; margin-bottom: 8px; }
+.payqr-cust { font-size: var(--fs-sm); color: var(--text2); font-weight: 600; }
+.payqr-amount { font-size: var(--fs-md); color: var(--text); margin-top: 2px; }
+.payqr-amount b { color: var(--danger); font-size: 26px; }
+.payqr-sub { font-size: var(--fs-xxs); color: var(--text3); margin-left: 6px; }
+
 /* 快捷操作 */
 .quick-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 .quick-btn {
