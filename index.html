@@ -76,6 +76,10 @@
           <div class="stat-card"><div class="stat-num" id="today-orders">0</div><div class="stat-lbl">今日新订单</div></div>
           <div class="stat-card"><div class="stat-num" id="today-debt">0</div><div class="stat-lbl">未收款合计</div></div>
         </div>
+        <div class="card" id="today-reminders-card">
+          <h3>📢 今日提醒</h3>
+          <div id="today-reminders"></div>
+        </div>
         <div class="card">
           <h3>快捷操作</h3>
           <div class="quick-grid">
@@ -86,6 +90,7 @@
             <button class="quick-btn" data-go="stocktake">📋 盘点</button>
             <button class="quick-btn" data-go="purchase">📥 进货</button>
             <button class="quick-btn" data-go="stats">📊 统计</button>
+            <button class="quick-btn" data-go="trends">🔥 爆款</button>
           </div>
         </div>
       </section>
@@ -420,6 +425,20 @@
           <div class="btn-row">
             <button id="bp-apply" class="btn primary">应用调整</button>
           </div>
+        </div>
+      </section>
+
+      <!-- ============ 爆款推荐 ============ -->
+      <section id="view-trends" class="view">
+        <div class="card">
+          <h3>🔥 我的畅销款</h3>
+          <div class="hint">根据你的销售记录自动分析（按销量排序）。</div>
+          <div id="trends-mine" class="list"></div>
+        </div>
+        <div class="card">
+          <h3>📈 行业风向参考</h3>
+          <div class="hint">羊毛衫市场常见热门款型/颜色趋势（供参考）。</div>
+          <div id="trends-industry" class="list"></div>
         </div>
       </section>
 
