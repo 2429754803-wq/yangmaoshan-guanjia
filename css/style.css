@@ -375,6 +375,37 @@ body {
 }
 .tip-line:last-child { border-bottom: none; }
 
+/* 生产看板 */
+.os-board { padding: 14px 14px 12px; }
+.os-board-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.os-board-cell {
+  background: var(--bg2); border-radius: 14px; padding: 12px 4px;
+  text-align: center; cursor: pointer;
+  transition: transform .15s var(--ease);
+}
+.os-board-cell:active { transform: scale(.94); }
+.os-board-num { font-size: 26px; font-weight: 800; color: var(--text); line-height: 1.2; }
+.os-board-lbl { font-size: var(--fs-tiny); color: var(--text2); margin-top: 3px; white-space: nowrap; }
+.os-board-settle { margin-top: 10px; font-size: var(--fs-sm); color: var(--text2); text-align: right; }
+
+/* 订单快捷收款 */
+.quick-pay-btn {
+  flex: none; align-self: center;
+  border: none; border-radius: 10px;
+  background: linear-gradient(135deg, #a4162a, #c2253a);
+  color: #fff; font-size: var(--fs-xs); font-weight: 700;
+  padding: 8px 12px; margin-left: 8px;
+  box-shadow: 0 2px 8px rgba(185,28,46,.35);
+}
+.quick-pay-btn:active { transform: scale(.94); }
+
+/* 全局搜索分组 */
+.search-group-title {
+  font-size: var(--fs-xs); font-weight: 700; color: var(--text2);
+  padding: 14px 4px 6px;
+}
+.search-group-title:first-child { padding-top: 4px; }
+
 /* 图片分享/预览弹层 */
 .img-share-mask {
   position: fixed; inset: 0; z-index: 999;
