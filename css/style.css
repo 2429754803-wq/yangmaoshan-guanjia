@@ -395,6 +395,15 @@ body {
 .img-share-hint { font-size: var(--fs-sm); color: var(--text2); margin: 10px 0 4px; line-height: 1.6; }
 .img-share-box .btn-row { margin-top: 10px; }
 .qr-box #pay-qr-canvas { display: flex; justify-content: center; background: #fff; border-radius: 12px; padding: 12px; }
+
+/* 语音按住说话录音态 */
+.voice-btn { transition: all .15s var(--ease); }
+.voice-btn.recording {
+  background: var(--danger); color: #fff; border-color: transparent;
+  box-shadow: 0 0 0 5px rgba(220,38,38,.18);
+  animation: voicePulse 1s ease-in-out infinite;
+}
+@keyframes voicePulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.06); } }
 .list-side { text-align: right; flex: none; display: flex; flex-direction: column; justify-content: center; gap: 3px; padding-left: 6px; }
 .list-side .num { font-size: var(--fs-num); font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.3px; }
 .list-side .lbl { font-size: var(--fs-tiny); color: var(--text3); }
