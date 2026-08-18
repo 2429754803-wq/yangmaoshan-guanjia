@@ -79,6 +79,39 @@ function confirmModal(title, text) {
   });
 }
 
+/** 图片分享预览弹层：长按保存 / 系统分享（iOS、微信内都可用） */
+function showImagePreview(url, filename, title, tip, blob) {
+  const mask = document.createElement("div");
+  mask.className = "img-share-mask";
+  const file = blob ? new File([blob], filename, { type: "image/png" }) : null;
+  const shareBtn = (file && navigator.canShare && navigator.canShare({ files: [file] }))
+    ? `<button class="btn primary" id="img-share-sys">📤 系统分享</button>` : "";
+  mask.innerHTML = `
+    <div class="img-share-box">
+      <h3>${escapeHtml(title)}</h3>
+      <img src="${url}" alt="分享图">
+      <div class="img-share-hint">${tip || "👆 长按图片保存，到微信里发送"}</div>
+      <div class="btn-row">
+        ${shareBtn}
+        <button class="btn img-share-close">完成</button>
+      </div>
+    </div>`;
+  document.body.appendChild(mask);
+  const sys = mask.querySelector("#img-share-sys");
+  if (sys) sys.onclick = async () => { try { await navigator.share({ files: [file], title }); mask.remove(); } catch {} };
+  const close = () => { mask.remove(); URL.revokeObjectURL(url); };
+  mask.querySelector(".img-share-close").onclick = close;
+  mask.addEventListener("click", (e) => { if (e.target === mask) close(); });
+}
+
+/** 生成图片后统一处理：转 blob → 预览弹层（长按保存/系统分享） */
+async function finishShareImage(canvas, filename, title, tip) {
+  const blob = await new Promise((r) => canvas.toBlob(r, "image/png"));
+  if (!blob) return toast("图片生成失败");
+  const url = URL.createObjectURL(blob);
+  showImagePreview(url, filename, title, tip, blob);
+}
+
 /* ================= 状态 ================= */
 
 let currentAccount = null;
@@ -1105,19 +1138,8 @@ async function generateCustomerStatement(c) {
     ctx.font = "14px sans-serif";
     ctx.textAlign = "center";
     ctx.fillText(`共计 ${monthOrders.length} 单 · 请核对后与我确认，谢谢！`, W / 2, H - 30);
-    // 转图片分享
-    const blob = await new Promise((r) => canvas.toBlob(r, "image/png"));
-    const file = new File([blob], `对账单-${c.name}-${monthKey}.png`, { type: "image/png" });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], title: `对账单-${c.name}` });
-    } else {
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = `对账单-${c.name}-${monthKey}.png`;
-      a.click();
-      setTimeout(() => URL.revokeObjectURL(a.href), 3000);
-      toast("对账单已生成并保存");
-    }
+    // 预览分享（长按保存/系统分享，iOS 与微信内通用）
+    await finishShareImage(canvas, `对账单-${c.name}-${monthKey}.png`, `对账单 ${monthKey}`, "👆 长按图片保存，发微信给客户核对");
   } catch (e) {
     toast("生成失败：" + (e.message || "未知错误"));
   }
@@ -1510,18 +1532,8 @@ async function generateFactoryStatement(f) {
     ctx.font = "14px sans-serif";
     ctx.textAlign = "center";
     ctx.fillText(`共计 ${monthOuts.length} 单 · 请核对工费，确认后安排结算，谢谢！`, W / 2, H - 30);
-    const blob = await new Promise((r) => canvas.toBlob(r, "image/png"));
-    const file = new File([blob], `外发对账-${f.name}-${monthKey}.png`, { type: "image/png" });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], title: `外发对账-${f.name}` });
-    } else {
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = `外发对账-${f.name}-${monthKey}.png`;
-      a.click();
-      setTimeout(() => URL.revokeObjectURL(a.href), 3000);
-      toast("对账单已生成并保存");
-    }
+    // 预览分享（长按保存/系统分享，iOS 与微信内通用）
+    await finishShareImage(canvas, `外发对账-${f.name}-${monthKey}.png`, `外发对账 ${monthKey}`, "👆 长按图片保存，发微信给加工厂核对工费");
   } catch (e) {
     toast("生成失败：" + (e.message || "未知错误"));
   }
@@ -1644,6 +1656,61 @@ function addQuickLine() {
     price: first ? first.price || 0 : 0
   });
   renderQuickLines();
+}
+
+/** 解析「颜色 + 数量件 + 单价元」文本，自动匹配款式并加入清单 */
+function parseQuickText(raw) {
+  const text = (raw || "").trim();
+  if (!text) return toast("请输入或说出内容");
+  let qty = 1;
+  const qm = text.match(/(\d+(?:\.\d+)?)\s*件/);
+  if (qm) qty = Math.max(1, Math.round(Number(qm[1])));
+  let price = 0;
+  const pm = text.match(/(\d+(?:\.\d+)?)\s*(?:元|块)/);
+  if (pm) price = Number(pm[1]);
+  // 剩余文字作颜色/款式关键词
+  const rest = text
+    .replace(/(\d+(?:\.\d+)?)\s*件/g, "")
+    .replace(/(\d+(?:\.\d+)?)\s*(?:元|块)/g, "")
+    .replace(/[，。！？,\.!?\s]+/g, "").trim();
+  if (!rest) return toast("没听清款式/颜色，请带上颜色名再说一次");
+  // 匹配：颜色优先，其次款式名
+  let hit = null;
+  for (const it of itemsCache) {
+    for (const c of it.colors || []) {
+      if (rest.includes(c.name)) { hit = { it, color: c.name }; break; }
+    }
+    if (hit) break;
+    if (it.name && (it.name.includes(rest) || rest.includes(it.name))) { hit = { it, color: "" }; break; }
+  }
+  if (!hit) return toast(`没匹配到「${rest}」，请手动添加或改用已有颜色名`);
+  const finalPrice = price || hit.it.price || 0;
+  quickLines.push({ itemId: hit.it.id, itemName: hit.it.name, color: hit.color, qty, price: finalPrice });
+  renderQuickLines();
+  toast(`已加入：${hit.it.name}${hit.color ? "(" + hit.color + ")" : ""} ${qty}件 ${money(finalPrice)}`);
+  $("#qo-voice-text").value = "";
+}
+
+/** 语音识别（Chrome/Edge 可用；不支持的手机用输入法麦克风键说话） */
+function startVoiceQuickOrder() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return toast("此浏览器不支持语音识别，可点输入框长按麦克风键说话");
+  try {
+    const rec = new SR();
+    rec.lang = "zh-CN";
+    rec.interimResults = false;
+    rec.maxAlternatives = 1;
+    rec.onresult = (e) => {
+      const t = e.results[0][0].transcript;
+      $("#qo-voice-text").value = t;
+      parseQuickText(t);
+    };
+    rec.onerror = (e) => toast("语音识别失败：" + (e.error || ""));
+    toast("🎤 请说话…（颜色 + 数量件 + 单价元）");
+    rec.start();
+  } catch (e) {
+    toast("语音启动失败");
+  }
 }
 
 async function saveQuickOrder(continueNext) {
@@ -1949,37 +2016,35 @@ async function openOrderDetail(id) {
           ? `<button class="btn danger" id="od-pay-reset">↩️ 撤销收款（设为欠款）</button>`
           : `<button class="btn" id="od-pay-full">标记全部收款</button>`}
         ${o.paidAmount > 0 ? "" : `<button class="btn" id="od-pay-partial">部分收款</button>`}
+        <button class="btn" id="od-pay-qr">🧾 收款二维码</button>
       </div>
       ${o.paidAmount > 0 && o.paidAmount < total ? `<button class="btn" id="od-pay-more">继续收款</button>` : ""}
     </div>`;
   const typeRow = o.type === "custom"
     ? `<div class="detail-color-row"><span>订单类型</span><span class="v">🎨 定制单${o.due ? " · 交期 " + o.due : ""}</span></div>${o.craft ? `<div class="detail-color-row"><span>定制要求</span><span class="v">${escapeHtml(o.craft)}</span></div>` : ""}`
     : `<div class="detail-color-row"><span>订单类型</span><span class="v">现货单</span></div>`;
-  // 发货状态 + 部分发货
+  // 发货状态 + 部分发货（可直接输入已发件数）
   const totalQty = orderTotalQty(o);
   const shippedQty = orderShippedQty(o);
   const lineShipRows = (o.lines || []).map((l, i) => {
     const sh = l.shipped || 0;
     return `<div class="ship-line">
       <span class="ship-name">${escapeHtml(l.itemName)}${l.color ? "(" + escapeHtml(l.color) + ")" : ""}</span>
-      <span class="ship-qty">已发 <b>${sh}</b>/${l.qty || 0} 件</span>
-      <span class="ship-ops">
-        <button class="mini-btn" data-ship-dec="${i}">−</button>
-        <button class="mini-btn" data-ship-inc="${i}">＋</button>
-      </span>
+      <div class="unit-wrap ship-input"><input class="input ship-qty-input" data-i="${i}" type="number" inputmode="numeric" min="0" max="${l.qty || 0}" value="${sh}"><span class="unit">件</span></div>
+      <span class="ship-qty">/ ${l.qty || 0}</span>
     </div>`;
   }).join("");
   const shipHtml = o.status === "cancelled" ? "" : `
     <div class="card">
       <h3>发货状态 ${o.shippedAt ? `<span class="tag green">已发货</span>` : `<span class="tag warn">未发货</span>`}</h3>
       ${o.shippedAt ? `<div class="detail-color-row"><span>发货时间</span><span class="v">${timeStr(o.shippedAt)}</span></div>` : ""}
-      <div style="margin:6px 0 8px">已发 <b>${shippedQty}</b> / ${totalQty} 件${!o.shippedAt && shippedQty < totalQty ? `，还欠发 <b class="danger-text">${totalQty - shippedQty}</b> 件` : ""}</div>
+      <div id="ship-summary" style="margin:6px 0 8px">已发 <b>${shippedQty}</b> / ${totalQty} 件${!o.shippedAt && shippedQty < totalQty ? `，还欠发 <b class="danger-text">${totalQty - shippedQty}</b> 件` : ""}</div>
       <div class="ship-lines">${lineShipRows}</div>
       <div class="btn-row">
         ${o.shippedAt
           ? `<button class="btn danger" id="od-ship-undo">↩️ 撤销发货</button>`
           : shippedQty > 0
-            ? `<button class="btn primary" id="od-ship-confirm">📦 确认发货（已发 ${shippedQty} 件）</button><button class="btn" id="od-ship-all">全部发货</button>`
+            ? `<button class="btn primary" id="od-ship-confirm">📤 确认发货（已发 ${shippedQty} 件）</button><button class="btn" id="od-ship-all">全部发货</button>`
             : `<button class="btn primary" id="od-ship-all">📦 全部发货</button>`}
       </div>
     </div>`;
@@ -2003,6 +2068,7 @@ async function openOrderDetail(id) {
     ${shipHtml}
     <div class="card detail-actions">
       <button class="btn" id="od-back">← 返回订单列表</button>
+      <button class="btn" id="od-delivery-note">📦 发货单图片</button>
       ${o.status === "pending"
         ? `<button class="btn primary" id="od-done">标记为已完成配送</button>
            <button class="btn" id="od-cancel-order">取消订单（库存退回）</button>`
@@ -2090,19 +2156,29 @@ async function openOrderDetail(id) {
     await reloadAll();
     openOrderDetail(id);
   };
-  // 发货：单行 ±1 件（部分发货）
-  $$("#detail-body .mini-btn").forEach((b) => {
-    b.onclick = async () => {
-      const i = Number(b.dataset.shipDec !== undefined ? b.dataset.shipDec : b.dataset.shipInc);
+  // 收款二维码（客户扫码确认应收金额）
+  const payQr = $("#od-pay-qr");
+  if (payQr) payQr.onclick = () => showOrderPayQr(o);
+  // 发货单图片
+  const delNote = $("#od-delivery-note");
+  if (delNote) delNote.onclick = () => generateDeliveryNote(o);
+  // 发货数量：直接输入已发件数，输入即自动保存（防抖，不打断输入）
+  $$("#detail-body .ship-qty-input").forEach((inp) => {
+    inp.oninput = () => {
+      const i = Number(inp.dataset.i);
       const l = (o.lines || [])[i];
       if (!l) return;
-      const delta = b.dataset.shipDec !== undefined ? -1 : 1;
-      l.shipped = Math.min(l.qty || 0, Math.max(0, (l.shipped || 0) + delta));
-      if ((l.shipped || 0) === (l.qty || 0) && (o.lines || []).every((x) => (x.shipped || 0) >= (x.qty || 0))) o.shippedAt = Date.now();
-      else o.shippedAt = null;
-      await Store.saveOrder(o);
-      await reloadAll();
-      openOrderDetail(id);
+      const v = Math.max(0, Math.min(l.qty || 0, Math.round(Number(inp.value) || 0)));
+      l.shipped = v;
+      const sq = orderShippedQty(o), tq = orderTotalQty(o);
+      if (sq >= tq && tq > 0) o.shippedAt = Date.now(); else o.shippedAt = null;
+      const sum = $("#ship-summary");
+      if (sum) sum.innerHTML = `已发 <b>${sq}</b> / ${tq} 件${!o.shippedAt && sq < tq ? `，还欠发 <b class="danger-text">${tq - sq}</b> 件` : ""}`;
+      clearTimeout(inp._saveT);
+      inp._saveT = setTimeout(async () => {
+        await Store.saveOrder(o);
+        await reloadAll();
+      }, 600);
     };
   });
   // 全部发货
@@ -2149,6 +2225,104 @@ async function restoreOrderStock(order) {
       if (color.sold !== undefined) color.sold = Math.max(0, (color.sold || 0) - l.qty);
       await Store.saveItem(it);
     }
+  }
+}
+
+/** 订单收款二维码：客户扫码看到应收金额，用于催款/对账确认 */
+function showOrderPayQr(o) {
+  const total = orderTotal(o);
+  const debt = orderDebt(o);
+  const text = "羊毛衫管家 收款单\n客户：" + (o.customer || "") + "\n订单金额：" + money(total) +
+    "\n已收：" + money(o.paidAmount || 0) + "\n待收：" + money(debt) +
+    "\n单号：" + String(o.id || "").slice(-6) + "\n下单：" + timeStr(o.createdAt);
+  const mask = document.createElement("div");
+  mask.className = "img-share-mask";
+  mask.innerHTML = `
+    <div class="img-share-box qr-box">
+      <h3>🧾 收款二维码</h3>
+      <div id="pay-qr-canvas"></div>
+      <div class="img-share-hint">客户扫一扫即可看到应收金额，用于催款/对账确认</div>
+      <div class="btn-row"><button class="btn primary img-share-close">完成</button></div>
+    </div>`;
+  document.body.appendChild(mask);
+  const qrBox = mask.querySelector("#pay-qr-canvas");
+  try {
+    if (typeof QRCode !== "undefined") {
+      new QRCode(qrBox, { text, width: 210, height: 210, correctLevel: QRCode.CorrectLevel.M });
+    } else {
+      qrBox.textContent = "二维码组件加载失败";
+    }
+  } catch (e) {
+    qrBox.textContent = "二维码生成失败：" + (e.message || "");
+  }
+  const close = () => mask.remove();
+  mask.querySelector(".img-share-close").onclick = close;
+  mask.addEventListener("click", (e) => { if (e.target === mask) close(); });
+}
+
+/** 生成发货单图片（客户/明细/金额/发货状态），可长按保存发客户 */
+async function generateDeliveryNote(o) {
+  try {
+    const total = orderTotal(o);
+    const shippedQty = orderShippedQty(o);
+    const totalQty = orderTotalQty(o);
+    const rows = o.lines || [];
+    const W = 750;
+    const H = 380 + rows.length * 44 + 140;
+    const canvas = document.createElement("canvas");
+    canvas.width = W; canvas.height = H;
+    const ctx = canvas.getContext("2d");
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, "#ffffff"); g.addColorStop(1, "#faf7f3");
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    // 顶部品牌条
+    ctx.fillStyle = "#b91c2e"; ctx.fillRect(0, 0, W, 90);
+    ctx.fillStyle = "#ffffff"; ctx.textAlign = "center";
+    ctx.font = "bold 30px sans-serif";
+    ctx.fillText("羊毛衫管家 · 发货单", W / 2, 42);
+    ctx.font = "18px sans-serif"; ctx.fillStyle = "#fde8b0";
+    ctx.fillText("Delivery Note", W / 2, 70);
+    ctx.textAlign = "left";
+    // 客户信息
+    ctx.fillStyle = "#1c1917"; ctx.font = "bold 22px sans-serif";
+    ctx.fillText("客户：" + (o.customer || ""), 40, 128);
+    ctx.font = "16px sans-serif"; ctx.fillStyle = "#57534e";
+    ctx.fillText("电话：" + (o.phone || "—"), 40, 156);
+    ctx.fillText("地址：" + (o.address || "—"), 40, 182);
+    ctx.fillText("日期：" + timeStr(o.createdAt) + "　单号：" + String(o.id || "").slice(-6), 40, 208);
+    // 表头
+    ctx.fillStyle = "#f5f2ee"; ctx.fillRect(40, 228, W - 80, 34);
+    ctx.fillStyle = "#78716c"; ctx.font = "bold 15px sans-serif";
+    ctx.fillText("商品", 50, 251);
+    ctx.fillText("颜色", 330, 251);
+    ctx.fillText("数量", 460, 251);
+    ctx.fillText("单价", 545, 251);
+    ctx.fillText("金额", W - 130, 251);
+    // 明细
+    ctx.font = "15px sans-serif";
+    let y = 278;
+    for (const l of rows) {
+      ctx.fillStyle = "#1c1917";
+      ctx.fillText(String(l.itemName || "").slice(0, 10), 50, y);
+      ctx.fillText(String(l.color || "—"), 330, y);
+      ctx.fillText(String(l.qty || 0), 465, y);
+      ctx.fillText("¥" + fmt(l.price || 0), 540, y);
+      ctx.fillText("¥" + fmt((l.qty || 0) * (l.price || 0)), W - 145, y);
+      y += 44;
+      if (y > H - 100) break;
+    }
+    // 合计
+    ctx.fillStyle = "#f5f2ee"; ctx.fillRect(40, y + 6, W - 80, 40);
+    ctx.fillStyle = "#1c1917"; ctx.font = "bold 18px sans-serif";
+    ctx.fillText(`合计 ${totalQty} 件　金额 ¥${fmt(total)}`, 50, y + 33);
+    ctx.fillStyle = "#b45309"; ctx.font = "bold 16px sans-serif";
+    ctx.fillText(o.shippedAt ? `已发 ${shippedQty} 件` + (shippedQty < totalQty ? `，欠发 ${totalQty - shippedQty} 件` : "") : "未发货", W - 300, y + 33);
+    // 底部
+    ctx.fillStyle = "#a8a29e"; ctx.font = "14px sans-serif"; ctx.textAlign = "center";
+    ctx.fillText("请核对商品数量与金额，如有问题请及时联系！", W / 2, H - 36);
+    await finishShareImage(canvas, `发货单-${o.customer}-${String(o.id || "").slice(-6)}.png`, "发货单", "👆 长按图片保存，发微信给客户确认");
+  } catch (e) {
+    toast("生成失败：" + (e.message || "未知错误"));
   }
 }
 
@@ -3032,6 +3206,12 @@ function bindEvents() {
   $("#qo-add-line").onclick = addQuickLine;
   $("#qo-save").onclick = () => saveQuickOrder(false);
   $("#qo-save-continue").onclick = () => saveQuickOrder(true);
+  // 语音/文字快速加商品
+  $("#qo-voice-btn").onclick = startVoiceQuickOrder;
+  $("#qo-text-btn").onclick = () => parseQuickText($("#qo-voice-text").value);
+  $("#qo-voice-text").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") { e.preventDefault(); parseQuickText($("#qo-voice-text").value); }
+  });
 
   // 批量导入
   $("#import-preview").onclick = previewImport;
