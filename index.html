@@ -60,6 +60,7 @@
           <h1 id="page-title">款式库存</h1>
           <div class="header-sub" id="header-sub">羊毛衫 · 库存订单管理</div>        </div>
         <div class="header-right">
+          <button id="search-btn" class="header-btn ghost" title="搜索">🔍</button>
           <button id="theme-toggle" class="header-btn ghost" title="切换主题">🌙</button>
           <button id="header-btn" class="header-btn hidden">＋ 新增</button>
           <button id="user-btn" class="header-btn ghost" title="账号">👤</button>
@@ -68,6 +69,14 @@
     </header>
 
     <main id="content">
+      <!-- ============ 全局搜索 ============ -->
+      <section id="view-search" class="view">
+        <div class="search-bar">
+          <input id="global-search-input" class="input" placeholder="搜款式 / 客户 / 订单…" autocomplete="off">
+        </div>
+        <div id="global-search-result" class="list"></div>
+      </section>
+
       <!-- ============ 今日概览 ============ -->
       <section id="view-today" class="view">
         <div class="today-date-card" id="today-date-card">
@@ -114,10 +123,13 @@
       <section id="view-outsource" class="view">
         <div class="filter-row">
           <button id="os-filter-all" class="chip active">全部</button>
+          <button id="os-filter-duetoday" class="chip">📥 今日回货</button>
+          <button id="os-filter-owe" class="chip">📦 欠货</button>
           <button id="os-filter-active" class="chip">生产中</button>
           <button id="os-filter-overdue" class="chip">已逾期</button>
           <button id="os-filter-settled" class="chip">未结算</button>
         </div>
+        <div class="card os-board" id="os-board"></div>
         <div id="outsource-list" class="list"></div>
         <div class="btn-row">
           <button id="os-new" class="btn primary">＋ 下生产单</button>
@@ -353,6 +365,7 @@
         </div>
         <div id="order-list" class="list"></div>
         <div class="btn-row">
+          <button id="order-ship-list-btn" class="btn">📦 发货清单（拣货）</button>
           <button id="order-import-btn" class="btn">📥 批量导入订单</button>
         </div>
       </section>
