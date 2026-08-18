@@ -2090,7 +2090,7 @@ const Sync = {
 
 /* ---------------- 授权与版本（2.4 工厂版） ---------------- */
 
-const APP_VERSION = "2.5";
+const APP_VERSION = "2.6";
 
 const License = {
   /** 当前账号绑定的授权码（本地记录） */
@@ -2434,7 +2434,7 @@ let _autoUploadTimer = null;
 
 /** 数据变更后自动上传到云端（防抖 2 秒），实现多设备实时同步 */
 function scheduleAutoUpload() {
-  if (!currentAccount) return;
+  if (!currentAccount || window.__suppressUpload) return;
   clearTimeout(_autoUploadTimer);
   _autoUploadTimer = setTimeout(async () => {
     try {
@@ -2502,6 +2502,34 @@ function startClock() {
   if (_clockTimer) clearInterval(_clockTimer);
   updateClock();
   _clockTimer = setInterval(updateClock, 1000);
+}
+
+/* 今日概览定时刷新：
+ * - 每 10 秒本地重算销售额/利润/订单/提醒（不依赖操作触发）
+ * - 今日页可见时每 60 秒从云端拉取一次（多设备同一账号实时同步）
+ */
+let _todayRefreshTimer = null;
+let _lastCloudPullMin = -1;
+function startTodayAutoRefresh() {
+  if (_todayRefreshTimer) clearInterval(_todayRefreshTimer);
+  _todayRefreshTimer = setInterval(async () => {
+    renderToday();
+    const minute = Math.floor(Date.now() / 60000);
+    if (currentAccount && document.visibilityState === "visible" && currentView === "today" && minute !== _lastCloudPullMin) {
+      _lastCloudPullMin = minute;
+      try {
+        if (await Sync.isConfigured()) {
+          window.__suppressUpload = true; // 拉取后的重载不触发上传回环
+          const changed = await Sync.pullIfExists();
+          await reloadAll();
+          window.__suppressUpload = false;
+          if (changed) renderToday();
+        }
+      } catch (e) {
+        window.__suppressUpload = false;
+      }
+    }
+  }, 10000);
 }
 
 function renderToday() {
@@ -4216,9 +4244,7 @@ async function openOrderDetail(id) {
       <div class="btn-row">
         ${o.shippedAt
           ? `<button class="btn danger" id="od-ship-undo">↩️ 撤销发货</button>`
-          : shippedQty > 0
-            ? `<button class="btn primary" id="od-ship-confirm">📤 确认发货（已发 ${shippedQty} 件）</button><button class="btn" id="od-ship-all">全部发货</button>`
-            : `<button class="btn primary" id="od-ship-all">📦 全部发货</button>`}
+          : `<button class="btn primary" id="od-ship-all">📦 全部发货</button>`}
       </div>
     </div>`;
   $("#detail-body").innerHTML = `
@@ -4255,8 +4281,13 @@ async function openOrderDetail(id) {
   if (backBtn) backBtn.onclick = back;
   const doneBtn = $("#od-done");
   if (doneBtn) doneBtn.onclick = async () => {
-    await Store.setOrderStatus(id, "done");
-    toast("订单已完成配送");
+    // 配送完成 = 全部发货
+    for (const l of o.lines || []) l.shipped = l.qty || 0;
+    o.shippedAt = Date.now();
+    o.status = "done";
+    o.doneAt = Date.now();
+    await Store.saveOrder(o);
+    toast("订单已完成配送（已按全部发货记录）");
     await reloadAll();
     openOrderDetail(id);
   };
@@ -4336,6 +4367,7 @@ async function openOrderDetail(id) {
   const delNote = $("#od-delivery-note");
   if (delNote) delNote.onclick = () => generateDeliveryNote(o);
   // 发货数量：直接输入已发件数，输入即自动保存（防抖，不打断输入）
+  // 规则：全部发完 = 配送完成（订单自动变"已完成"），未发完则保持"未完成"
   $$("#detail-body .ship-qty-input").forEach((inp) => {
     inp.oninput = () => {
       const i = Number(inp.dataset.i);
@@ -4344,9 +4376,19 @@ async function openOrderDetail(id) {
       const v = Math.max(0, Math.min(l.qty || 0, Math.round(Number(inp.value) || 0)));
       l.shipped = v;
       const sq = orderShippedQty(o), tq = orderTotalQty(o);
-      if (sq >= tq && tq > 0) o.shippedAt = Date.now(); else o.shippedAt = null;
+      const doneNow = tq > 0 && sq >= tq;
+      if (doneNow) {
+        o.shippedAt = Date.now();
+        if (o.status !== "done") { o.status = "done"; o.doneAt = Date.now(); }
+      } else {
+        o.shippedAt = null;
+        if (o.status === "done") { o.status = "pending"; o.doneAt = null; }
+      }
+      // 实时更新头部状态徽章与汇总（不重渲染，避免打断输入）
+      const stEl = $("#detail-body .order-head .order-status");
+      if (stEl) { stEl.className = "order-status " + (doneNow ? "done" : "pending"); stEl.textContent = doneNow ? "已完成" : "未完成"; }
       const sum = $("#ship-summary");
-      if (sum) sum.innerHTML = `已发 <b>${sq}</b> / ${tq} 件${!o.shippedAt && sq < tq ? `，还欠发 <b class="danger-text">${tq - sq}</b> 件` : ""}`;
+      if (sum) sum.innerHTML = `已发 <b>${sq}</b> / ${tq} 件${doneNow ? "，已全部发货" : `，还欠发 <b class="danger-text">${tq - sq}</b> 件`}`;
       clearTimeout(inp._saveT);
       inp._saveT = setTimeout(async () => {
         await Store.saveOrder(o);
@@ -4354,31 +4396,25 @@ async function openOrderDetail(id) {
       }, 600);
     };
   });
-  // 全部发货
+  // 全部发货（= 配送完成）
   const shipAll = $("#od-ship-all");
   if (shipAll) shipAll.onclick = async () => {
     for (const l of o.lines || []) l.shipped = l.qty || 0;
     o.shippedAt = Date.now();
+    o.status = "done";
+    o.doneAt = Date.now();
     await Store.saveOrder(o);
-    toast("已标记全部发货");
+    toast("已全部发货，订单配送完成 ✅");
     await reloadAll();
     openOrderDetail(id);
   };
-  // 确认发货（部分发货后确认）
-  const shipConfirm = $("#od-ship-confirm");
-  if (shipConfirm) shipConfirm.onclick = async () => {
-    o.shippedAt = Date.now();
-    await Store.saveOrder(o);
-    toast(`已确认发货 ${orderShippedQty(o)} 件，剩余 ${orderTotalQty(o) - orderShippedQty(o)} 件欠发`);
-    await reloadAll();
-    openOrderDetail(id);
-  };
-  // 撤销发货
+  // 撤销发货（同时恢复为未完成）
   const shipUndo = $("#od-ship-undo");
   if (shipUndo) shipUndo.onclick = async () => {
-    if (!await confirmModal("撤销发货", "将清空已发数量并恢复为未发货，确定？")) return;
+    if (!await confirmModal("撤销发货", "将清空已发数量，订单恢复为未发货、未完成，确定？")) return;
     for (const l of o.lines || []) l.shipped = 0;
     o.shippedAt = null;
+    if (o.status === "done") { o.status = "pending"; o.doneAt = null; }
     await Store.saveOrder(o);
     toast("已撤销发货");
     await reloadAll();
@@ -5190,6 +5226,7 @@ async function enterApp() {
   renderOrders();
   initSettings();
   startClock();
+  startTodayAutoRefresh();
   showView("today");
   // 检查更新（不阻塞）
   checkUpdateSilently();
