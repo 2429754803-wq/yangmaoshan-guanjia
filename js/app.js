@@ -79,33 +79,60 @@ function confirmModal(title, text) {
   });
 }
 
-/** 公告弹窗（单按钮"知道了"，用于更新公告） */
-function announceModal(title, text) {
-  const mask = $("#modal-mask");
-  const ok = $("#modal-ok");
-  const cancel = $("#modal-cancel");
-  $("#modal-title").textContent = title;
-  $("#modal-text").textContent = text;
-  cancel.classList.add("hidden");
-  ok.textContent = "知道了";
+/** 公告弹窗（分点展示，单按钮"知道了"） */
+function announceModal(versions) {
+  const mask = $("#announce-mask");
+  if (!mask) return;
+  const list = $("#announce-list");
+  list.innerHTML = versions.map((v) => `
+    <div class="announce-ver">
+      <span class="announce-ver-tag">v${escapeHtml(v.version)}</span>
+      <span class="announce-ver-line"></span>
+    </div>
+    ${(v.items || []).map((it) => `
+      <div class="announce-item"><span class="announce-dot"></span><span>${escapeHtml(it)}</span></div>`).join("")}
+  `).join("");
   mask.classList.remove("hidden");
-  const done = () => {
-    mask.classList.add("hidden");
-    cancel.classList.remove("hidden");
-    ok.textContent = "确定";
-    ok.onclick = null;
-    cancel.onclick = null;
-  };
-  ok.onclick = done;
-  cancel.onclick = done;
+  const close = () => mask.classList.add("hidden");
+  $("#announce-ok").onclick = close;
+  mask.addEventListener("click", (e) => { if (e.target === mask) close(); });
 }
 
 /** 各版本更新公告（每次发布新版本时在此追加一条） */
 const CHANGELOG = {
-  "2.8": "🎉 v2.8 更新内容：\n· 首页快捷操作移到中间，进首页就能看到\n· 今日营业额/利润 = 销售 + 今日订单（之前只算销售，现在订单也算，实时刷新）\n· 语音快速开单改为微信式「按住说话」：说款式名+数量即可（如：圆领毛衣 3件）\n· 外发加工改名「生产加工」，加工商列表直接显示每个加工商未结清工费\n· 客户列表显示每个客户共买多少件货，支持按买货件数/欠款排序",
-  "2.7": "🎉 v2.7 更新内容：\n· 更新更省心：打开 App 自动更新到最新版，无需询问、无需操作\n· 每次更新后自动弹出公告，告诉你这次改了什么\n· 发货数量直接输入件数，全部发完自动\"配送完成\"，撤销自动恢复未完成\n· 今日销售额/利润实时刷新（每10秒，多设备每分钟同步）",
-  "2.6": "🎉 v2.6 更新内容：\n· 发货数量可直接输入件数，全部发完自动\"配送完成\"\n· 今日销售额/利润实时刷新（多设备同步）\n· 语音/文字快速开单（说\"黑色3件38元\"直接加单）\n· 订单收款二维码\n· 发货单图片生成\n· 对账单图片分享（长按保存发微信）\n· 本次起更新自动完成，无需手动操作",
-  "2.5": "🎉 v2.5 更新内容：\n· 订单今日/历史视图 + 时间/金额排序\n· 发货状态 + 部分发货\n· 周报/月报 + 整改建议\n· 送货入库（加工商送货）\n· 线上爆款速查（淘宝/小红书）\n· 应用内检查更新"
+  "2.9": [
+    "更新公告全新美化：分点展示、版本标签、卡片式设计",
+    "周报/月报不再第一天就推：数据满一周/满一个月后才会自动出现",
+    "公告优化：多版本合并展示，最新版排最前"
+  ],
+  "2.8": [
+    "首页快捷操作移到中间，进首页就能看到",
+    "今日营业额/利润 = 销售 + 今日订单，实时刷新",
+    "语音快速开单改为微信式「按住说话」，说款式名+数量即可",
+    "外发加工改名「生产加工」，加工商列表直接显示未结清工费",
+    "客户列表显示每个客户共买多少件货，支持按件数/欠款排序"
+  ],
+  "2.7": [
+    "打开 App 自动更新到最新版，无需任何操作",
+    "更新完成后自动弹出公告，告诉你改了什么",
+    "发货数量直接输入件数，全部发完自动「配送完成」",
+    "今日营业额/利润每 10 秒实时刷新，多设备每分钟同步"
+  ],
+  "2.6": [
+    "发货数量可直接输入件数，全部发完自动「配送完成」",
+    "语音/文字快速开单（说「黑色3件38元」直接加单）",
+    "订单收款二维码（客户扫码确认应收金额）",
+    "发货单图片生成",
+    "对账单图片分享（长按保存发微信）"
+  ],
+  "2.5": [
+    "订单今日/历史视图 + 时间/金额排序",
+    "发货状态 + 部分发货",
+    "周报/月报 + 整改建议",
+    "送货入库（加工商送货）",
+    "线上爆款速查（淘宝/小红书）",
+    "应用内检查更新"
+  ]
 };
 
 /** 更新公告：版本变化后首次打开时弹出一次（记录在 localStorage） */
@@ -115,13 +142,14 @@ function showUpdateAnnouncement() {
     const seen = localStorage.getItem("knit-seen-version") || "";
     if (seen === APP_VERSION) return;
     const cur = vNum(APP_VERSION);
-    const entries = Object.keys(CHANGELOG)
+    const keys = Object.keys(CHANGELOG)
       .filter((v) => vNum(v) > vNum(seen) && vNum(v) <= cur)
       .sort((a, b) => vNum(a) - vNum(b));
     localStorage.setItem("knit-seen-version", APP_VERSION);
-    if (!entries.length) return;
-    const text = entries.map((v) => CHANGELOG[v]).join("\n\n");
-    announceModal("📢 更新公告", text + "\n\n（更新已自动完成）");
+    if (!keys.length) return;
+    // 最新版本排最前
+    const versions = keys.slice().reverse().map((v) => ({ version: v, items: CHANGELOG[v] }));
+    announceModal(versions);
   } catch (e) {}
 }
 
@@ -365,6 +393,17 @@ function orderDebt(o) {
   return Math.max(0, total - paid);
 }
 
+/** 最早一笔数据的时间（销售/订单/入库/生产/盘点），用于判断周报月报是否到期 */
+function earliestDataTs() {
+  let ts = Date.now();
+  for (const s of salesCache) if (s.time && s.time < ts) ts = s.time;
+  for (const o of ordersCache) if (o.createdAt && o.createdAt < ts) ts = o.createdAt;
+  for (const p of purchaseCache) if (p.time && p.time < ts) ts = p.time;
+  for (const os of outsourcesCache) if (os.createdAt && os.createdAt < ts) ts = os.createdAt;
+  for (const st of stocktakeCache) if (st.time && st.time < ts) ts = st.time;
+  return ts;
+}
+
 /** 时间显示：今天/明天 + 实时时钟 */
 function updateClock() {
   const el = $("#today-date-text");
@@ -459,9 +498,11 @@ function renderTodayReminders() {
   const now = Date.now();
   const todayStrFull = todayStr();
   const reminders = [];
-  // 0. 周报/月报入口
-  reminders.push({ icon: "📊", text: "查看本周经营周报（含整改建议）", go: "report-week" });
-  reminders.push({ icon: "📅", text: "查看本月经营月报（含整改建议）", go: "report-month" });
+  // 0. 周报/月报：数据满一周/满一个月后才出现（避免第一天就推）
+  const earliest = earliestDataTs();
+  const DAY = 86400000;
+  if (now - earliest >= 7 * DAY) reminders.push({ icon: "📊", text: "查看本周经营周报（含整改建议）", go: "report-week" });
+  if (now - earliest >= 30 * DAY) reminders.push({ icon: "📅", text: "查看本月经营月报（含整改建议）", go: "report-month" });
   // 1. 定制单今天要交货
   const dueOrders = ordersCache.filter((o) =>
     o.type === "custom" && o.status === "pending" && o.due && o.due === todayStrFull
@@ -522,8 +563,20 @@ function renderReport() {
   const days = reportPeriod === "week" ? 7 : 30;
   const from = Date.now() - days * 86400000;
   const label = reportPeriod === "week" ? "本周" : "本月";
+  const reportName = reportPeriod === "week" ? "周报" : "月报";
   const el = $("#report-content");
   if (!el) return;
+  // 数据满一周/满一个月后才出报告（避免第一天就出空报告）
+  const needMs = days * 86400000;
+  if (Date.now() - earliestDataTs() < needMs) {
+    el.innerHTML = `
+      <div class="card" style="text-align:center;padding:36px 20px">
+        <div style="font-size:52px">📅</div>
+        <h3 style="margin:10px 0 6px">${reportName}还没到时间</h3>
+        <div class="hint">使用满 ${days} 天后自动生成报告，现在数据还不够完整。<br>继续记录销售和订单，到期会在今日提醒中自动出现。</div>
+      </div>`;
+    return;
+  }
   // 销售统计
   let salesQty = 0, salesAmt = 0, salesProfit = 0;
   const itemSold = {};
