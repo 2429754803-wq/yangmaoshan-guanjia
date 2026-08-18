@@ -100,6 +100,10 @@ function announceModal(versions) {
 
 /** 各版本更新公告（每次发布新版本时在此追加一条） */
 const CHANGELOG = {
+  "3.1": [
+    "全局搜索修复：数据异常不再报错，输入栏右侧新增「搜索」键，支持回车搜索",
+    "语音快速开单：支持「款式 + 颜色 + 数量」一起说（如：圆领毛衣 红色 3件），自动填颜色"
+  ],
   "3.0": [
     "生产看板：今日回货 / 欠货 / 逾期 / 进行中一目了然，未结算工费合计",
     "今日提醒：今天要回货、欠货未回的生产单自动提醒",
@@ -1876,7 +1880,7 @@ function addQuickLine() {
   renderQuickLines();
 }
 
-/** 解析「款式名 + 数量件」（可带单价），自动匹配款式并加入清单 */
+/** 解析「款式 + 颜色 + 数量」（可带单价），自动匹配款式颜色并加入清单 */
 function parseQuickText(raw) {
   const text = (raw || "").trim();
   if (!text) return toast("请输入或说出内容");
@@ -1886,25 +1890,39 @@ function parseQuickText(raw) {
   let price = 0;
   const pm = text.match(/(\d+(?:\.\d+)?)\s*(?:元|块)/);
   if (pm) price = Number(pm[1]);
-  // 剩余文字作款式/颜色关键词
+  // 剩余文字作款式+颜色关键词
   const rest = text
     .replace(/(\d+(?:\.\d+)?)\s*(?:件|个)/g, "")
     .replace(/(\d+(?:\.\d+)?)\s*(?:元|块)/g, "")
     .replace(/[，。！？,\.!?\s]+/g, "").trim();
-  if (!rest) return toast("没听清款式，请说「款式名 + 数量」（如：圆领毛衣 3件）");
-  // 款式名优先匹配，其次颜色匹配
+  if (!rest) return toast("没听清，请说「款式 + 颜色 + 数量」（如：圆领毛衣 红色 3件）");
+  let color = "";
   let hit = null;
+  // 1) 整串匹配款式名（如"圆领毛衣红色"直接命中"圆领毛衣"），并从中提取该款颜色
   const byName = itemsCache.find((it) => it.name && (it.name.includes(rest) || rest.includes(it.name)));
-  if (byName) hit = { it: byName, color: "" };
+  if (byName) {
+    const c = (byName.colors || []).find((x) => rest.includes(x.name));
+    if (c) color = c.name;
+    hit = { it: byName, color };
+  }
+  // 2) 款式名没整串命中：先提取颜色，再用剩余文字匹配款式；只剩颜色则按颜色找款
   if (!hit) {
+    let restClean = rest;
     for (const it of itemsCache) {
-      for (const c of it.colors || []) {
-        if (rest.includes(c.name)) { hit = { it, color: c.name }; break; }
+      for (const x of it.colors || []) {
+        if (restClean.includes(x.name)) { color = x.name; restClean = restClean.replace(x.name, ""); break; }
       }
-      if (hit) break;
+      if (color) break;
+    }
+    if (restClean) {
+      const it2 = itemsCache.find((it) => it.name && (it.name.includes(restClean) || restClean.includes(it.name)));
+      if (it2) hit = { it: it2, color };
+    } else if (color) {
+      const it3 = itemsCache.find((it) => (it.colors || []).some((x) => x.name === color));
+      if (it3) hit = { it: it3, color };
     }
   }
-  if (!hit) return toast(`没匹配到「${rest}」，请说款式全名或改用已有款式名`);
+  if (!hit) return toast(`没匹配到「${rest}」，请说款式全名（如：圆领毛衣 红色 3件）`);
   const finalPrice = price || hit.it.price || 0;
   quickLines.push({ itemId: hit.it.id, itemName: hit.it.name, color: hit.color, qty, price: finalPrice });
   renderQuickLines();
@@ -3181,61 +3199,65 @@ function renderTrends() {
 function renderGlobalSearch() {
   const el = $("#global-search-result");
   if (!el) return;
-  const q = ($("#global-search-input").value || "").trim().toLowerCase();
-  if (!q) {
-    el.innerHTML = '<div class="hint" style="text-align:center;padding:30px 0">输入关键词，同时搜索款式 / 客户 / 订单</div>';
-    return;
+  try {
+    const q = ($("#global-search-input").value || "").trim().toLowerCase();
+    if (!q) {
+      el.innerHTML = '<div class="hint" style="text-align:center;padding:30px 0">输入关键词，同时搜索款式 / 客户 / 订单<br>如：款式名 / 客户名 / 电话</div>';
+      return;
+    }
+    const has = (s) => String(s || "").toLowerCase().includes(q);
+    // 款式
+    const items = itemsCache.filter((it) => has(it.name) || (it.colors || []).some((c) => has(c.name))).slice(0, 5);
+    // 客户
+    const custs = customersCache.filter((c) => has(c.name) || has(c.phone)).slice(0, 5);
+    // 订单
+    const orders = ordersCache.filter((o) =>
+      has(o.customer) || (o.lines || []).some((l) => has(l.itemName))
+    ).slice(0, 8);
+    const group = (title, rows) => rows.length
+      ? `<div class="search-group-title">${title}（${rows.length}）</div>` + rows.join("")
+      : "";
+    el.innerHTML = group("🧥 款式", items.map((it) => {
+      const totalStock = (it.colors || []).reduce((s, c) => s + (c.stock || 0), 0);
+      return `<div class="list-card" data-item="${it.id}">
+        <div class="thumb">${(it.images && it.images[0]) ? `<img src="${it.images[0]}" alt="" loading="lazy">` : "🧥"}</div>
+        <div class="list-main">
+          <div class="list-title">${escapeHtml(it.name)}</div>
+          <div class="list-sub">库存 ${totalStock} 件 · ${money(it.price)}</div>
+        </div>
+      </div>`;
+    }).join("")) +
+    group("👥 客户", custs.map((c) => {
+      const cOrders = ordersCache.filter((o) => o.customer === c.name && o.status !== "cancelled");
+      const pieces = cOrders.reduce((s, o) => s + orderTotalQty(o), 0);
+      return `<div class="list-card" data-cust="${c.id}">
+        <div class="list-main">
+          <div class="list-title">${escapeHtml(c.name)}</div>
+          <div class="list-sub">${escapeHtml(c.phone || "无电话")} · 共买 ${pieces} 件</div>
+        </div>
+      </div>`;
+    }).join("")) +
+    group("📦 订单", orders.map((o) => {
+      const lines = (o.lines || []).map((l) => `${l.qty}×${escapeHtml(l.itemName)}${l.color ? "(" + escapeHtml(l.color) + ")" : ""}`).join("、");
+      return `<div class="list-card" data-order="${o.id}">
+        <div class="list-main">
+          <div class="list-title">${escapeHtml(o.customer)} <span class="order-status ${o.status}">${o.status === "done" ? "已完成" : o.status === "cancelled" ? "已取消" : "未完成"}</span></div>
+          <div class="list-sub">${lines.slice(0, 24)} · ${money(orderTotal(o))}</div>
+          <div class="list-sub">🕐 ${timeStr(o.createdAt)}</div>
+        </div>
+      </div>`;
+    }).join(""));
+    if (!items.length && !custs.length && !orders.length) {
+      el.innerHTML = '<div class="empty"><span class="empty-icon">🔍</span>没有找到「' + escapeHtml(q) + '」<br>换个关键词试试</div>';
+      return;
+    }
+    $$("#global-search-result [data-item]").forEach((c) => { c.onclick = () => openDetail(c.dataset.item); });
+    $$("#global-search-result [data-cust]").forEach((c) => { c.onclick = () => openCustomerDetail(c.dataset.cust); });
+    $$("#global-search-result [data-order]").forEach((c) => { c.onclick = () => openOrderDetail(c.dataset.order); });
+    staggerIn(el);
+  } catch (e) {
+    el.innerHTML = '<div class="hint" style="text-align:center;padding:20px 0">搜索出错：' + escapeHtml(e.message) + "</div>";
   }
-  // 款式
-  const items = itemsCache.filter((it) => it.name.toLowerCase().includes(q) || (it.colors || []).some((c) => c.name.toLowerCase().includes(q))).slice(0, 5);
-  // 客户
-  const custs = customersCache.filter((c) => c.name.toLowerCase().includes(q) || (c.phone || "").includes(q)).slice(0, 5);
-  // 订单
-  const orders = ordersCache.filter((o) =>
-    (o.customer || "").toLowerCase().includes(q) ||
-    (o.lines || []).some((l) => (l.itemName || "").toLowerCase().includes(q))
-  ).slice(0, 8);
-  const group = (title, rows) => rows.length
-    ? `<div class="search-group-title">${title}（${rows.length}）</div>` + rows.join("")
-    : "";
-  el.innerHTML = group("🧥 款式", items.map((it) => {
-    const totalStock = (it.colors || []).reduce((s, c) => s + (c.stock || 0), 0);
-    return `<div class="list-card" data-item="${it.id}">
-      <div class="thumb">${(it.images && it.images[0]) ? `<img src="${it.images[0]}" alt="" loading="lazy">` : "🧥"}</div>
-      <div class="list-main">
-        <div class="list-title">${escapeHtml(it.name)}</div>
-        <div class="list-sub">库存 ${totalStock} 件 · ${money(it.price)}</div>
-      </div>
-    </div>`;
-  }).join("")) +
-  group("👥 客户", custs.map((c) => {
-    const cOrders = ordersCache.filter((o) => o.customer === c.name && o.status !== "cancelled");
-    const pieces = cOrders.reduce((s, o) => s + orderTotalQty(o), 0);
-    return `<div class="list-card" data-cust="${c.id}">
-      <div class="list-main">
-        <div class="list-title">${escapeHtml(c.name)}</div>
-        <div class="list-sub">${escapeHtml(c.phone || "无电话")} · 共买 ${pieces} 件</div>
-      </div>
-    </div>`;
-  }).join("")) +
-  group("📦 订单", orders.map((o) => {
-    const lines = (o.lines || []).map((l) => `${l.qty}×${escapeHtml(l.itemName)}${l.color ? "(" + escapeHtml(l.color) + ")" : ""}`).join("、");
-    return `<div class="list-card" data-order="${o.id}">
-      <div class="list-main">
-        <div class="list-title">${escapeHtml(o.customer)} <span class="order-status ${o.status}">${o.status === "done" ? "已完成" : o.status === "cancelled" ? "已取消" : "未完成"}</span></div>
-        <div class="list-sub">${lines.slice(0, 24)} · ${money(orderTotal(o))}</div>
-        <div class="list-sub">🕐 ${timeStr(o.createdAt)}</div>
-      </div>
-    </div>`;
-  }).join(""));
-  if (!items.length && !custs.length && !orders.length) {
-    el.innerHTML = '<div class="empty"><span class="empty-icon">🔍</span>没有找到「' + escapeHtml(q) + '」</div>';
-    return;
-  }
-  $$("#global-search-result [data-item]").forEach((c) => { c.onclick = () => openDetail(c.dataset.item); });
-  $$("#global-search-result [data-cust]").forEach((c) => { c.onclick = () => openCustomerDetail(c.dataset.cust); });
-  $$("#global-search-result [data-order]").forEach((c) => { c.onclick = () => openOrderDetail(c.dataset.order); });
-  staggerIn(el);
 }
 
 /* ================= 地址簿 ================= */
@@ -3517,7 +3539,11 @@ function bindEvents() {
     renderGlobalSearch();
     setTimeout(() => { try { $("#global-search-input").focus(); } catch {} }, 120);
   };
+  $("#global-search-btn").onclick = renderGlobalSearch;
   $("#global-search-input").oninput = debounce(renderGlobalSearch, 200);
+  $("#global-search-input").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") { e.preventDefault(); renderGlobalSearch(); }
+  });
 
   // Tab 导航
   $$(".tab").forEach((t) => {
