@@ -70,6 +70,10 @@
     <main id="content">
       <!-- ============ 今日概览 ============ -->
       <section id="view-today" class="view">
+        <div class="today-date-card" id="today-date-card">
+          <div id="today-date-text" class="today-date-text"></div>
+          <div id="today-time-text" class="today-time-text"></div>
+        </div>
         <div class="stats-summary">
           <div class="stat-card"><div class="stat-num" id="today-sales">0</div><div class="stat-lbl">今日销售额</div></div>
           <div class="stat-card"><div class="stat-num" id="today-profit">0</div><div class="stat-lbl">今日利润</div></div>
@@ -88,11 +92,21 @@
             <button class="quick-btn" data-go="orders">📦 订单</button>
             <button class="quick-btn" data-go="outsource">🏭 外发</button>
             <button class="quick-btn" data-go="stocktake">📋 盘点</button>
-            <button class="quick-btn" data-go="purchase">📥 进货</button>
+            <button class="quick-btn" data-go="purchase">📥 送货入库</button>
             <button class="quick-btn" data-go="stats">📊 统计</button>
             <button class="quick-btn" data-go="trends">🔥 爆款</button>
+            <button class="quick-btn" data-go="addrbook">📮 地址簿</button>
           </div>
         </div>
+      </section>
+
+      <!-- ============ 经营报表（周报/月报） ============ -->
+      <section id="view-report" class="view">
+        <div class="filter-row">
+          <button id="rp-week" class="chip active">📊 本周周报</button>
+          <button id="rp-month" class="chip">📅 本月月报</button>
+        </div>
+        <div id="report-content"></div>
       </section>
 
       <!-- ============ 外发加工（工厂） ============ -->
@@ -307,11 +321,16 @@
       <!-- ============ 订单 ============ -->
       <section id="view-orders" class="view">
         <div class="filter-row">
-          <button id="order-filter-all" class="chip active">全部</button>
+          <button id="order-filter-today" class="chip active">今日</button>
+          <button id="order-filter-all" class="chip">全部</button>
           <button id="order-filter-pending" class="chip">未完成</button>
           <button id="order-filter-done" class="chip">已完成</button>
+        </div>
+        <div class="filter-row">
+          <button id="order-filter-unship" class="chip">待发货</button>
           <button id="order-filter-debt" class="chip">有欠款</button>
           <button id="order-filter-custom" class="chip">定制单</button>
+          <button id="order-sort-btn" class="chip sort-chip">⏱ 按时间</button>
         </div>
         <div id="order-batch-bar" class="batch-bar hidden">
           <span id="order-batch-count">已选 0 单</span>
@@ -338,8 +357,13 @@
             <label class="lbl">工艺/定制要求</label>
             <textarea id="oe-craft" class="input ta" placeholder="如：尺寸、颜色、绣字等定制要求"></textarea>
           </div>
+          <label class="lbl">选择已有客户（可选）</label>
+          <div class="addr-row">
+            <select id="oe-customer-select" class="input"><option value="">— 选择已有客户 —</option></select>
+            <button id="oe-customer-pick" class="btn small">选择</button>
+          </div>
           <label class="lbl">客户姓名 *</label>
-          <input id="oe-customer" class="input" placeholder="客户姓名">
+          <input id="oe-customer" class="input" placeholder="客户姓名（选择已有客户自动填充）">
           <label class="lbl">客户电话（可选）</label>
           <input id="oe-phone" class="input" type="tel" placeholder="联系电话">
           <label class="lbl">收货地址</label>
@@ -383,25 +407,25 @@
         <div id="stocktake-history-list" class="list"></div>
       </section>
 
-      <!-- ============ 进货 ============ -->
+      <!-- ============ 送货入库 ============ -->
       <section id="view-purchase" class="view">
         <div class="card">
           <label class="lbl">选择款式</label>
           <select id="pu-item" class="input"></select>
           <label class="lbl">颜色</label>
           <select id="pu-color" class="input"></select>
-          <label class="lbl">进货数量 *</label>
+          <label class="lbl">送货数量（件）*</label>
           <input id="pu-qty" class="input" type="number" inputmode="numeric" min="1" value="1">
-          <label class="lbl">进价（元/件，可选）</label>
-          <input id="pu-price" class="input" type="number" inputmode="decimal" placeholder="留空则不记录进价">
-          <label class="lbl">供应商（可选）</label>
-          <input id="pu-supplier" class="input" placeholder="供应商名称">
+          <label class="lbl">工费（元/件，可选）</label>
+          <input id="pu-price" class="input" type="number" inputmode="decimal" placeholder="留空则不记录工费">
+          <label class="lbl">加工商（可选）</label>
+          <select id="pu-supplier" class="input"><option value="">— 选择加工商 —</option></select>
           <div class="btn-row">
-            <button id="pu-confirm" class="btn primary">确认进货</button>
+            <button id="pu-confirm" class="btn primary">确认入库</button>
           </div>
         </div>
         <div class="card">
-          <h3>最近进货记录</h3>
+          <h3>最近入库记录</h3>
           <div id="purchase-list" class="purchase-list"></div>
         </div>
       </section>
@@ -430,6 +454,15 @@
 
       <!-- ============ 爆款推荐 ============ -->
       <section id="view-trends" class="view">
+        <div class="card">
+          <h3>🛒 线上爆款速查</h3>
+          <div class="hint">一键跳转淘宝/小红书搜索当下爆款，参考热卖款型与颜色（直接打开对应 App/网页，不采集数据）。</div>
+          <input id="trend-keyword" class="input" value="羊毛衫 女 秋冬" placeholder="输入想查的关键词">
+          <div class="btn-row">
+            <button class="btn" id="trend-tb">🛍 去淘宝搜</button>
+            <button class="btn" id="trend-xhs">📕 去小红书搜</button>
+          </div>
+        </div>
         <div class="card">
           <h3>🔥 我的畅销款</h3>
           <div class="hint">根据你的销售记录自动分析（按销量排序）。</div>
@@ -468,6 +501,34 @@
           <div class="hint">统计所有未收款的订单与赊账销售。</div>
         </div>
         <div id="debt-list" class="list"></div>
+      </section>
+
+      <!-- ============ 地址簿 ============ -->
+      <section id="view-addrbook" class="view">
+        <div class="card">
+          <h3>📮 常用地址簿</h3>
+          <div class="hint">管理常用收货地址，下单时可一键调用。支持同一地址多个客户共用。</div>
+        </div>
+        <div id="addrbook-list" class="list"></div>
+        <div class="btn-row">
+          <button id="ab-new" class="btn primary">＋ 新增地址</button>
+        </div>
+      </section>
+
+      <!-- ============ 地址编辑 ============ -->
+      <section id="view-addr-edit" class="view">
+        <div class="card">
+          <label class="lbl">地址名称 *</label>
+          <input id="ab-name" class="input" placeholder="如：张老板（杭州）">
+          <label class="lbl">电话</label>
+          <input id="ab-phone" class="input" type="tel" placeholder="联系电话">
+          <label class="lbl">收货地址 *</label>
+          <textarea id="ab-address" class="input ta" placeholder="详细收货地址"></textarea>
+          <div class="btn-row">
+            <button id="ab-save" class="btn primary">保存地址</button>
+            <button id="ab-cancel" class="btn">取消</button>
+          </div>
+        </div>
       </section>
 
       <!-- ============ 设置 ============ -->
