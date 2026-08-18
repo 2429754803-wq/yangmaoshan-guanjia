@@ -967,9 +967,18 @@ select.input { appearance: auto; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
 /* ============ 质感与 App 化升级（3.2） ============ */
-html, body { overscroll-behavior: none; }
+html, body {
+  overscroll-behavior: none;
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
 #app { min-height: 100vh; min-height: 100dvh; }
-button, .list-card, .chip, .quick-btn, .os-board-cell, .tab { -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
+button, .list-card, .chip, .quick-btn, .os-board-cell, .tab, input, select, textarea {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+button, .list-card, .chip, .quick-btn, .os-board-cell, .tab { user-select: none; -webkit-user-select: none; }
 
 /* 快捷操作：常用按钮高亮 + 更多折叠 */
 .quick-btn.primary {

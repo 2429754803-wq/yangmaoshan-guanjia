@@ -100,6 +100,11 @@ function announceModal(versions) {
 
 /** 各版本更新公告（每次发布新版本时在此追加一条） */
 const CHANGELOG = {
+  "3.3": [
+    "修复双击屏幕放大破坏界面：禁止缩放、点击不再触发放大，更像原生 App",
+    "全局搜索再次加固：支持键盘搜索键，输入/更改/按键三种触发方式都响应",
+    "搜索框用系统搜索键盘，手机上更好输入"
+  ],
   "3.2": [
     "界面质感升级：数字跳动动画、空状态美化、按钮按压反馈",
     "更像 App：禁止下拉刷新回弹、点击无高亮闪烁",
@@ -3550,7 +3555,7 @@ async function logout() {
 /* ================= 事件绑定 ================= */
 
 function bindEvents() {
-  // 全局搜索
+  // 全局搜索（input / change / keyup 三通道触发，适配各种手机键盘）
   $("#search-btn").onclick = () => {
     showView("search");
     $("#global-search-input").value = "";
@@ -3558,10 +3563,14 @@ function bindEvents() {
     setTimeout(() => { try { $("#global-search-input").focus(); } catch {} }, 120);
   };
   $("#global-search-btn").onclick = renderGlobalSearch;
-  $("#global-search-input").oninput = debounce(renderGlobalSearch, 200);
+  const debouncedSearch = debounce(renderGlobalSearch, 180);
+  $("#global-search-input").oninput = debouncedSearch;
+  $("#global-search-input").onchange = debouncedSearch;
+  $("#global-search-input").onkeyup = debouncedSearch;
   $("#global-search-input").addEventListener("keydown", (e) => {
     if (e.key === "Enter") { e.preventDefault(); renderGlobalSearch(); }
   });
+  $("#global-search-input").addEventListener("search", renderGlobalSearch);
 
   // Tab 导航
   $$(".tab").forEach((t) => {

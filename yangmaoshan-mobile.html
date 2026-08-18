@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" id="meta-theme" content="#b91c2e">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -980,9 +980,18 @@ select.input { appearance: auto; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
 /* ============ 质感与 App 化升级（3.2） ============ */
-html, body { overscroll-behavior: none; }
+html, body {
+  overscroll-behavior: none;
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
 #app { min-height: 100vh; min-height: 100dvh; }
-button, .list-card, .chip, .quick-btn, .os-board-cell, .tab { -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
+button, .list-card, .chip, .quick-btn, .os-board-cell, .tab, input, select, textarea {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+button, .list-card, .chip, .quick-btn, .os-board-cell, .tab { user-select: none; -webkit-user-select: none; }
 
 /* 快捷操作：常用按钮高亮 + 更多折叠 */
 .quick-btn.primary {
@@ -1087,7 +1096,7 @@ button, .list-card, .chip, .quick-btn, .os-board-cell, .tab { -webkit-tap-highli
       <section id="view-search" class="view">
         <div class="search-bar">
           <div class="addr-row">
-            <input id="global-search-input" class="input" placeholder="搜款式 / 客户 / 订单…" autocomplete="off" enterkeyhint="search">
+            <input id="global-search-input" class="input" type="search" placeholder="搜款式 / 客户 / 订单…" autocomplete="off" enterkeyhint="search">
             <button id="global-search-btn" class="btn small">🔍 搜索</button>
           </div>
         </div>
@@ -2276,7 +2285,7 @@ const Sync = {
 
 /* ---------------- 授权与版本（2.4 工厂版） ---------------- */
 
-const APP_VERSION = "3.2";
+const APP_VERSION = "3.3";
 
 const License = {
   /** 当前账号绑定的授权码（本地记录） */
@@ -2459,6 +2468,11 @@ function announceModal(versions) {
 
 /** 各版本更新公告（每次发布新版本时在此追加一条） */
 const CHANGELOG = {
+  "3.3": [
+    "修复双击屏幕放大破坏界面：禁止缩放、点击不再触发放大，更像原生 App",
+    "全局搜索再次加固：支持键盘搜索键，输入/更改/按键三种触发方式都响应",
+    "搜索框用系统搜索键盘，手机上更好输入"
+  ],
   "3.2": [
     "界面质感升级：数字跳动动画、空状态美化、按钮按压反馈",
     "更像 App：禁止下拉刷新回弹、点击无高亮闪烁",
@@ -5909,7 +5923,7 @@ async function logout() {
 /* ================= 事件绑定 ================= */
 
 function bindEvents() {
-  // 全局搜索
+  // 全局搜索（input / change / keyup 三通道触发，适配各种手机键盘）
   $("#search-btn").onclick = () => {
     showView("search");
     $("#global-search-input").value = "";
@@ -5917,10 +5931,14 @@ function bindEvents() {
     setTimeout(() => { try { $("#global-search-input").focus(); } catch {} }, 120);
   };
   $("#global-search-btn").onclick = renderGlobalSearch;
-  $("#global-search-input").oninput = debounce(renderGlobalSearch, 200);
+  const debouncedSearch = debounce(renderGlobalSearch, 180);
+  $("#global-search-input").oninput = debouncedSearch;
+  $("#global-search-input").onchange = debouncedSearch;
+  $("#global-search-input").onkeyup = debouncedSearch;
   $("#global-search-input").addEventListener("keydown", (e) => {
     if (e.key === "Enter") { e.preventDefault(); renderGlobalSearch(); }
   });
+  $("#global-search-input").addEventListener("search", renderGlobalSearch);
 
   // Tab 导航
   $$(".tab").forEach((t) => {
