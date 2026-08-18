@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>羊毛衫管家 · 电脑管理后台</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: #f6f4f1; color: #1c1917; min-height: 100vh;
+}
+.wrap { max-width: 960px; margin: 0 auto; padding: 24px 16px 60px; }
+header {
+  background: linear-gradient(135deg, #8f1122, #b91c2e 50%, #c2253a);
+  color: #fff; border-radius: 16px; padding: 24px; margin-bottom: 20px;
+  box-shadow: 0 6px 20px rgba(143,17,34,.25);
+}
+header h1 { font-size: 22px; margin-bottom: 6px; }
+header p { opacity: .85; font-size: 14px; }
+.card {
+  background: #fff; border-radius: 14px; padding: 20px; margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(28,25,23,.08);
+}
+.card h2 { font-size: 16px; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+.card h2::before { content: ""; width: 4px; height: 16px; border-radius: 2px; background: linear-gradient(#e8b04b,#b91c2e); }
+label { display: block; font-size: 13px; color: #78716c; margin: 12px 0 6px; font-weight: 600; }
+input, select, textarea {
+  width: 100%; padding: 10px 12px; border: 1.5px solid #e7e5e4; border-radius: 10px;
+  font-size: 14px; outline: none; font-family: inherit;
+}
+input:focus, textarea:focus { border-color: #b91c2e; box-shadow: 0 0 0 3px rgba(185,28,46,.1); }
+textarea { min-height: 70px; resize: vertical; }
+button {
+  border: none; border-radius: 10px; padding: 11px 18px; font-size: 14px; font-weight: 600;
+  cursor: pointer; font-family: inherit; transition: all .15s;
+}
+button:active { transform: scale(.97); }
+.btn-primary { background: linear-gradient(135deg,#a4162a,#b91c2e); color: #fff; }
+.btn-primary:hover { opacity: .92; }
+.btn-ghost { background: #fff; border: 1.5px solid #e7e5e4; color: #1c1917; }
+.btn-danger { background: #fee2e2; color: #b91c2e; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; }
+.row > * { flex: 1; min-width: 140px; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid #f0eeec; }
+th { color: #78716c; font-size: 12px; font-weight: 600; }
+.badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+.badge.active { background: #dcfce7; color: #15803d; }
+.badge.revoked { background: #fee2e2; color: #b91c2e; }
+.code-cell { font-family: ui-monospace, Consolas, monospace; font-weight: 700; letter-spacing: .5px; }
+.hint { font-size: 12px; color: #a8a29e; margin-top: 6px; line-height: 1.6; }
+.gen-result {
+  background: #f9fafb; border: 1.5px dashed #e7e5e4; border-radius: 10px;
+  padding: 14px; margin-top: 12px; font-family: ui-monospace, Consolas, monospace;
+  font-size: 18px; font-weight: 700; text-align: center; letter-spacing: 2px; color: #b91c2e;
+  word-break: break-all;
+}
+.copy-btn { margin-top: 8px; }
+.msg { padding: 10px 14px; border-radius: 10px; margin-top: 12px; font-size: 13px; display: none; }
+.msg.ok { display: block; background: #dcfce7; color: #15803d; }
+.msg.err { display: block; background: #fee2e2; color: #b91c2e; }
+.status-bar {
+  background: #fff; border: 1px solid #e7e5e4; border-radius: 12px;
+  padding: 12px 16px; margin-bottom: 16px; font-size: 13px; color: #78716c;
+  display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+}
+.config-form { display: none; }
+.config-form.show { display: block; }
+.config-btn { background: #f5f5f4; border: 1.5px solid #e7e5e4; }
+.vers { font-family: ui-monospace, Consolas, monospace; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🖥️ 羊毛衫管家 · 电脑管理后台</h1>
+    <p>生成授权码、吊销授权、发布新版本 —— 管理员专用</p>
+  </header>
+
+  <!-- 状态栏 -->
+  <div class="status-bar">
+    <span id="status-text">未连接云服务</span>
+    <button class="config-btn" id="btn-config">配置云服务</button>
+  </div>
+
+  <!-- 配置表单 -->
+  <div class="card config-form" id="config-form">
+    <h2>连接 Supabase</h2>
+    <label>Supabase URL</label>
+    <input id="cfg-url" placeholder="https://xxxx.supabase.co">
+    <label>Service Role Key（服务端密钥，仅电脑后台使用，切勿发给手机）</label>
+    <input id="cfg-key" type="password" placeholder="eyJhbGciOi...">
+    <div class="hint">在 Supabase 项目 → Settings → API 里找到。service_role key 有完全权限，请妥善保管。</div>
+    <div class="row" style="margin-top:14px">
+      <button class="btn-primary" id="cfg-save">保存并连接</button>
+      <button class="btn-ghost" id="cfg-cancel">取消</button>
+    </div>
+    <div class="msg" id="cfg-msg"></div>
+  </div>
+
+  <!-- 生成授权码 -->
+  <div class="card">
+    <h2>🔑 生成授权码</h2>
+    <div class="grid">
+      <div>
+        <label>授权给（商家/店名）*</label>
+        <input id="lic-name" placeholder="如：老张羊毛衫">
+      </div>
+      <div>
+        <label>备注（可选）</label>
+        <input id="lic-note" placeholder="电话/地址/备注">
+      </div>
+    </div>
+    <button class="btn-primary" id="lic-generate" style="margin-top:14px">生成授权码</button>
+    <div class="gen-result" id="lic-result" style="display:none"></div>
+    <button class="btn-ghost copy-btn" id="lic-copy" style="display:none">复制授权码</button>
+    <div class="msg" id="lic-msg"></div>
+  </div>
+
+  <!-- 授权码列表 -->
+  <div class="card">
+    <h2>📋 授权码管理</h2>
+    <table>
+      <thead>
+        <tr><th>授权码</th><th>授权给</th><th>备注</th><th>激活次数</th><th>创建时间</th><th>状态</th><th>操作</th></tr>
+      </thead>
+      <tbody id="lic-table"><tr><td colspan="7" style="text-align:center;color:#a8a29e">暂无数据</td></tr></tbody>
+    </table>
+  </div>
+
+  <!-- 发布版本 -->
+  <div class="card">
+    <h2>📦 发布新版本</h2>
+    <div class="grid">
+      <div>
+        <label>版本号 *</label>
+        <input id="ver-num" placeholder="如：2.2">
+      </div>
+      <div>
+        <label>新版本文件地址 *</label>
+        <input id="ver-url" placeholder="https://.../knit-stock-single.html">
+      </div>
+    </div>
+    <label>更新说明（手机端会显示）</label>
+    <textarea id="ver-notes" placeholder="如：修复了盘点差异显示问题"></textarea>
+    <div class="hint">把新版 knit-stock-single.html 上传到任意可访问的地址（网盘直链、GitHub、你自己的服务器），把地址填在这里。手机端检测到版本号变化会提示更新。</div>
+    <button class="btn-primary" id="ver-publish" style="margin-top:14px">发布版本</button>
+    <div class="msg" id="ver-msg"></div>
+    <h2 style="margin-top:20px">版本历史</h2>
+    <table>
+      <thead><tr><th>版本号</th><th>说明</th><th>发布时间</th></tr></thead>
+      <tbody id="ver-table"><tr><td colspan="3" style="text-align:center;color:#a8a29e">暂无数据</td></tr></tbody>
+    </table>
+  </div>
+
+  <!-- 使用说明 -->
+  <div class="card">
+    <h2>📖 使用说明</h2>
+    <div class="hint" style="font-size:13px;line-height:2">
+      1. <b>首次使用</b>：点击右上角"配置云服务"，填入 Supabase 项目 URL 和 service_role key（在 supabase.com 项目 Settings → API 中获取）<br>
+      2. <b>生成授权码</b>：填写商家名 → 点"生成授权码" → 复制发给商家<br>
+      3. <b>商家激活</b>：手机端注册登录后输入授权码即可使用；授权码不限制设备数和使用时间<br>
+      4. <b>吊销</b>：点商家行"吊销"，该授权码立即失效，商家手机端下次启动会提示授权被吊销<br>
+      5. <b>发布更新</b>：上传新版单文件到可访问地址 → 填版本号和地址 → 发布；商家手机端启动/点"检查更新"会收到提示<br>
+      6. <b>先执行 supabase-setup.sql</b>：在 Supabase SQL Editor 运行建表脚本（项目附带）
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============ 管理后台逻辑 ============ */
+const $ = (s) => document.querySelector(s);
+
+let cfg = { url: "", key: "" };
+const SKEY = "knit-admin-cfg";
+
+/** 内置默认配置（管理后台专用 service_role key，仅此后台使用） */
+const BUILTIN = {
+  url: "https://qdbwjkwhrftaovqbnxha.supabase.co",
+  key: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkYndqa3docmZ0YW92cWJueGhhIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4Njk1MDc0OSwiZXhwIjoyMTAyNTI2NzQ5fQ._Ajl7V5nZ98vkz7G0U2AmHcoAip3Yq_cN9t9w4nfKX8"
+};
+
+function loadCfg() {
+  try { cfg = JSON.parse(localStorage.getItem(SKEY) || "{}"); } catch {}
+  // 未配置时用内置默认
+  if (!cfg.url || !cfg.key) {
+    cfg = { ...BUILTIN };
+    saveCfg();
+  }
+  updateStatus();
+}
+function saveCfg() {
+  localStorage.setItem(SKEY, JSON.stringify(cfg));
+  updateStatus();
+}
+function updateStatus() {
+  if (cfg.url && cfg.key) {
+    $("#status-text").textContent = "已连接：" + cfg.url.replace("https://", "").replace(".supabase.co", "") + "（内置配置）";
+    $("#status-text").style.color = "#15803d";
+  } else {
+    $("#status-text").textContent = "未连接云服务（点击右侧配置）";
+    $("#status-text").style.color = "#a8a29e";
+  }
+}
+function showMsg(el, text, ok) {
+  el.textContent = text;
+  el.className = "msg " + (ok ? "ok" : "err");
+}
+function esc(s) {
+  return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+async function api(path, opts = {}) {
+  if (!cfg.url || !cfg.key) throw new Error("未配置云服务，请点右上角\"配置云服务\"");
+  const headers = {
+    "Content-Type": "application/json",
+    "apikey": cfg.key,
+    ...(opts.headers || {})
+  };
+  // 新版 key（sb_ 开头）不是 JWT，不能放 Bearer；旧版 JWT 需要放
+  if (!String(cfg.key).startsWith("sb_")) {
+    headers["Authorization"] = "Bearer " + cfg.key;
+  }
+  const res = await fetch(cfg.url + path, { ...opts, headers });
+  if (!res.ok) {
+    const t = await res.text();
+    // 404 常见原因：表未建 / URL 配置错误，给清晰提示
+    if (res.status === 404) {
+      throw new Error("HTTP 404: 云端表不存在或URL配置错误。请确认已执行 supabase-setup.sql 建表脚本，且 URL 正确（" + cfg.url + "）");
+    }
+    throw new Error("HTTP " + res.status + ": " + t.slice(0, 200));
+  }
+  const ct = res.headers.get("content-type") || "";
+  return ct.includes("json") ? res.json() : res.text();
+}
+
+function genCode() {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // 去掉易混的 I/O/0/1
+  const seg = () => Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
+  return seg() + "-" + seg() + "-" + seg();
+}
+
+async function loadLicenses() {
+  if (!cfg.url || !cfg.key) return;
+  try {
+    const rows = await api("/rest/v1/licenses?select=*&order=created_at.desc");
+    const activations = await api("/rest/v1/license_activations?select=license_code");
+    const countMap = {};
+    (activations || []).forEach((a) => { countMap[a.license_code] = (countMap[a.license_code] || 0) + 1; });
+    const tb = $("#lic-table");
+    if (!rows || !rows.length) {
+      tb.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#a8a29e">暂无授权码，点上方生成</td></tr>';
+      return;
+    }
+    tb.innerHTML = rows.map((r) => `
+      <tr>
+        <td class="code-cell">${esc(r.code)}</td>
+        <td>${esc(r.name)}</td>
+        <td>${esc(r.note || "—")}</td>
+        <td>${countMap[r.code] || 0}</td>
+        <td>${new Date(r.created_at).toLocaleDateString("zh-CN")}</td>
+        <td>${r.revoked_at ? '<span class="badge revoked">已吊销</span>' : '<span class="badge active">有效</span>'}</td>
+        <td>${r.revoked_at ? "" : `<button class="btn-danger" data-revoke="${esc(r.code)}">吊销</button>`}</td>
+      </tr>`).join("");
+    $$("[data-revoke]").forEach((b) => {
+      b.onclick = () => revokeLicense(b.dataset.revoke);
+    });
+  } catch (e) {
+    $("#lic-table").innerHTML = `<tr><td colspan="7" style="text-align:center;color:#b91c2e">加载失败：${esc(e.message)}</td></tr>`;
+  }
+}
+
+async function revokeLicense(code) {
+  if (!confirm("确定吊销授权码 " + code + " 吗？该商家的手机将立即失效。")) return;
+  try {
+    await api("/rest/v1/licenses?code=eq." + encodeURIComponent(code), {
+      method: "PATCH",
+      body: JSON.stringify({ revoked_at: new Date().toISOString() })
+    });
+    showMsg($("#lic-msg"), "已吊销 " + code, true);
+    loadLicenses();
+  } catch (e) {
+    showMsg($("#lic-msg"), "操作失败：" + e.message, false);
+  }
+}
+
+async function loadVersions() {
+  if (!cfg.url || !cfg.key) return;
+  try {
+    const rows = await api("/rest/v1/app_versions?select=*&order=created_at.desc");
+    const tb = $("#ver-table");
+    if (!rows || !rows.length) {
+      tb.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#a8a29e">暂无版本</td></tr>';
+      return;
+    }
+    tb.innerHTML = rows.map((r) => `
+      <tr>
+        <td class="vers">v${esc(r.version)}</td>
+        <td>${esc(r.notes || "—")}</td>
+        <td>${new Date(r.created_at).toLocaleString("zh-CN")}</td>
+      </tr>`).join("");
+  } catch (e) {
+    $("#ver-table").innerHTML = `<tr><td colspan="3" style="text-align:center;color:#b91c2e">加载失败：${esc(e.message)}</td></tr>`;
+  }
+}
+
+/* ============ 事件 ============ */
+const $$ = (s) => Array.from(document.querySelectorAll(s));
+
+$("#btn-config").onclick = () => {
+  const f = $("#config-form");
+  f.classList.toggle("show");
+  if (f.classList.contains("show")) {
+    $("#cfg-url").value = cfg.url || BUILTIN.url;
+    $("#cfg-key").value = cfg.key || BUILTIN.key;
+  }
+};
+$("#cfg-save").onclick = () => {
+  const url = $("#cfg-url").value.trim().replace(/\/+$/, "");
+  const key = $("#cfg-key").value.trim();
+  if (!url || !key) return showMsg($("#cfg-msg"), "请填写 URL 和 key", false);
+  cfg = { url, key };
+  saveCfg();
+  $("#config-form").classList.remove("show");
+  showMsg($("#cfg-msg"), "已保存并连接 ✅", true);
+  loadLicenses();
+  loadVersions();
+};
+$("#cfg-cancel").onclick = () => $("#config-form").classList.remove("show");
+
+$("#lic-generate").onclick = async () => {
+  const name = $("#lic-name").value.trim();
+  if (!name) return showMsg($("#lic-msg"), "请填写授权对象", false);
+  if (!cfg.url || !cfg.key) return showMsg($("#lic-msg"), "请先配置云服务", false);
+  const code = genCode();
+  try {
+    await api("/rest/v1/licenses", {
+      method: "POST",
+      headers: { "Prefer": "return=minimal" },
+      body: JSON.stringify({ code, name, note: $("#lic-note").value.trim() })
+    });
+    $("#lic-result").textContent = code;
+    $("#lic-result").style.display = "block";
+    $("#lic-copy").style.display = "block";
+    showMsg($("#lic-msg"), "授权码已生成 ✅", true);
+    $("#lic-name").value = "";
+    $("#lic-note").value = "";
+    loadLicenses();
+  } catch (e) {
+    showMsg($("#lic-msg"), "生成失败：" + e.message, false);
+  }
+};
+$("#lic-copy").onclick = () => {
+  const code = $("#lic-result").textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    $("#lic-copy").textContent = "已复制 ✅";
+    setTimeout(() => { $("#lic-copy").textContent = "复制授权码"; }, 1500);
+  });
+};
+
+$("#ver-publish").onclick = async () => {
+  const version = $("#ver-num").value.trim();
+  const url = $("#ver-url").value.trim();
+  if (!version || !url) return showMsg($("#ver-msg"), "请填写版本号和文件地址", false);
+  if (!cfg.url || !cfg.key) return showMsg($("#ver-msg"), "请先配置云服务", false);
+  try {
+    await api("/rest/v1/app_versions", {
+      method: "POST",
+      headers: { "Prefer": "resolution=merge-duplicates,return=minimal" },
+      body: JSON.stringify({ version, url, notes: $("#ver-notes").value.trim() })
+    });
+    showMsg($("#ver-msg"), "版本 v" + version + " 已发布 ✅ 手机端将检测到更新", true);
+    $("#ver-num").value = "";
+    $("#ver-url").value = "";
+    $("#ver-notes").value = "";
+    loadVersions();
+  } catch (e) {
+    showMsg($("#ver-msg"), "发布失败：" + e.message, false);
+  }
+};
+
+loadCfg();
+</script>
+</body>
+</html>
