@@ -91,6 +91,7 @@
             <button class="quick-btn" data-go="customers">👥 客户</button>
             <button class="quick-btn" data-go="orders">📦 订单</button>
             <button class="quick-btn" data-go="outsource">🏭 外发</button>
+            <button class="quick-btn" data-go="factory-add">➕ 新加工商</button>
             <button class="quick-btn" data-go="stocktake">📋 盘点</button>
             <button class="quick-btn" data-go="purchase">📥 送货入库</button>
             <button class="quick-btn" data-go="stats">📊 统计</button>
@@ -120,14 +121,14 @@
         <div id="outsource-list" class="list"></div>
         <div class="btn-row">
           <button id="os-new" class="btn primary">＋ 下外发单</button>
-          <button id="os-factories" class="btn">🏭 加工厂管理</button>
+          <button id="os-factories" class="btn">🏭 加工商管理</button>
         </div>
       </section>
 
       <!-- ============ 新建外发单 ============ -->
       <section id="view-outsource-edit" class="view">
         <div class="card">
-          <label class="lbl">加工厂 *</label>
+          <label class="lbl">加工商 *</label>
           <select id="os-factory" class="input"></select>
           <label class="lbl">款式 *</label>
           <select id="os-item" class="input"></select>
@@ -155,19 +156,19 @@
         <div id="outsource-detail-body"></div>
       </section>
 
-      <!-- ============ 加工厂管理 ============ -->
+      <!-- ============ 加工商管理 ============ -->
       <section id="view-factories" class="view">
         <div id="factory-list" class="list"></div>
         <div class="btn-row">
-          <button id="fa-new" class="btn primary">＋ 新增加工厂</button>
+          <button id="fa-new" class="btn primary">＋ 新增加工商</button>
         </div>
       </section>
 
-      <!-- ============ 加工厂编辑 ============ -->
+      <!-- ============ 加工商编辑 ============ -->
       <section id="view-factory-edit" class="view">
         <div class="card">
-          <label class="lbl">加工厂名称 *</label>
-          <input id="fa-name" class="input" placeholder="如：张师傅加工厂">
+          <label class="lbl">加工商名称 *</label>
+          <input id="fa-name" class="input" placeholder="如：张师傅加工商">
           <label class="lbl">电话</label>
           <input id="fa-phone" class="input" type="tel" placeholder="联系电话">
           <label class="lbl">擅长工序</label>
@@ -428,7 +429,11 @@
           <label class="lbl">工费（元/件，可选）</label>
           <input id="pu-price" class="input" type="number" inputmode="decimal" placeholder="留空则不记录工费">
           <label class="lbl">加工商（可选）</label>
-          <select id="pu-supplier" class="input"><option value="">— 选择加工商 —</option></select>
+          <div class="addr-row">
+            <select id="pu-supplier" class="input"><option value="">— 选择加工商 —</option></select>
+            <button id="pu-new-supplier" class="btn small">＋ 新加工商</button>
+          </div>
+          <div class="hint">加工商即你的外发加工合作伙伴，在「加工商管理」中可增删改。</div>
           <div class="btn-row">
             <button id="pu-confirm" class="btn primary">确认入库</button>
           </div>
