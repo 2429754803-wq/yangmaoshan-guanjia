@@ -2408,7 +2408,7 @@ const Sync = {
 
 /* ---------------- 授权与版本（2.4 工厂版） ---------------- */
 
-const APP_VERSION = "3.26";
+const APP_VERSION = "3.27";
 
 const License = {
   /** 当前账号绑定的授权码（本地记录） */
@@ -2616,6 +2616,9 @@ function announceModal(versions) {
 
 /** 各版本更新公告（每次发布新版本时在此追加一条） */
 const CHANGELOG = {
+  "3.27": [
+    "分享海报价格重叠彻底修复：价格块改为左对齐精确排布（之前居中对齐导致 ¥ 和数字叠在一起）"
+  ],
   "3.26": [
     "分享海报修复：¥ 和价格数字同一基线不再叠在一起、价格与款式名严格居中对齐、名称下方加细分隔线更美观"
   ],
@@ -3654,17 +3657,18 @@ async function shareItemCard(it) {
     ctx.moveTo(W / 2 - 130, IMG_H + 142);
     ctx.lineTo(W / 2 + 130, IMG_H + 142);
     ctx.stroke();
-    // 价格：¥ 与数字同一垂直中线、整体居中（不重叠，与名称对齐）
+    // 价格：¥ 与数字按左对齐精确排布（textAlign 必须是 left，否则会以各自坐标为中心导致重叠）
     const priceStr = fmt(it.price);
     const numSize = fitFont(ctx, priceStr, W - 220, 92, 40);
     const yuanSize = Math.round(numSize * 0.5);
     const priceY = IMG_H + 230;
+    ctx.textAlign = "left";
     ctx.textBaseline = "middle";
     ctx.font = "bold " + yuanSize + "px sans-serif";
     const yuanW = ctx.measureText("¥").width;
     ctx.font = "bold " + numSize + "px sans-serif";
     const numW = ctx.measureText(priceStr).width;
-    const gap = 6;
+    const gap = 12;
     const startX = (W - (yuanW + gap + numW)) / 2;
     ctx.fillStyle = "#b91c2e";
     ctx.font = "bold " + yuanSize + "px sans-serif";
@@ -3672,6 +3676,7 @@ async function shareItemCard(it) {
     ctx.fillStyle = "#b91c2e";
     ctx.font = "bold " + numSize + "px sans-serif";
     ctx.fillText(priceStr, startX + yuanW + gap, priceY);
+    ctx.textAlign = "center";
     ctx.textBaseline = "alphabetic";
     // 颜色 + 数量（一行文字，最多 4 色 + 等，自动缩放防溢出）
     const colors = (it.colors || []).slice(0, 4);
