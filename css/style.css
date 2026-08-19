@@ -389,15 +389,24 @@ body {
 .os-board-settle { margin-top: 10px; font-size: var(--fs-sm); color: var(--text2); text-align: right; }
 
 /* 订单快捷收款 */
+.quick-actions { flex: none; align-self: center; display: flex; flex-direction: column; gap: 8px; margin-left: 8px; }
 .quick-pay-btn {
-  flex: none; align-self: center;
+  flex: none;
   border: none; border-radius: 10px;
   background: linear-gradient(135deg, #a4162a, #c2253a);
   color: #fff; font-size: var(--fs-xs); font-weight: 700;
-  padding: 8px 12px; margin-left: 8px;
+  padding: 8px 12px;
   box-shadow: 0 2px 8px rgba(185,28,46,.35);
 }
-.quick-pay-btn:active { transform: scale(.94); }
+.quick-ship-btn {
+  flex: none;
+  border: none; border-radius: 10px;
+  background: linear-gradient(135deg, #15803d, #16a34a);
+  color: #fff; font-size: var(--fs-xs); font-weight: 700;
+  padding: 8px 12px;
+  box-shadow: 0 2px 8px rgba(22,163,74,.35);
+}
+.quick-pay-btn:active, .quick-ship-btn:active { transform: scale(.94); }
 
 /* 全局搜索分组 */
 .search-group-title {

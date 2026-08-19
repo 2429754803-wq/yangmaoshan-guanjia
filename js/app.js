@@ -125,6 +125,9 @@ function announceModal(versions) {
 
 /** 各版本更新公告（每次发布新版本时在此追加一条） */
 const CHANGELOG = {
+  "3.18": [
+    "订单列表新增「📦 送货」一键按钮：点一下直接标记全部发货配送完成，不用进详情（和收款按钮并排）"
+  ],
   "3.17": [
     "颜色自动合并：款式里「红」和「红色」等同一颜色的条目自动合并为一种，库存/已售相加，保留标准名（如 红色）"
   ],
@@ -2405,6 +2408,8 @@ function renderOrders() {
       : "";
     const quickPay = (!orderBatchMode && debt > 0 && o.status !== "cancelled")
       ? `<button class="quick-pay-btn" data-id="${o.id}" data-debt="${debt}">💰 收款</button>` : "";
+    const quickShip = (!orderBatchMode && o.status === "pending" && !o.shippedAt)
+      ? `<button class="quick-ship-btn" data-id="${o.id}">📦 送货</button>` : "";
     return `
       <div class="list-card order-card" data-id="${o.id}">
         ${checkBox}
@@ -2418,7 +2423,10 @@ function renderOrders() {
           <div class="order-addr">📮 ${escapeHtml(o.address || "无地址")}</div>
           <div class="order-addr">🕐 ${timeStr(o.createdAt)} · 合计 ${money(total)}${shippedQty && shippedQty < totalQty ? ` · 已发 ${shippedQty}/${totalQty} 件` : ""}</div>
         </div>
-        ${quickPay}
+        <div class="quick-actions">
+          ${quickShip}
+          ${quickPay}
+        </div>
       </div>`;
   }).join("");
   $$("#order-list .order-card").forEach((card) => {
@@ -2444,6 +2452,13 @@ function renderOrders() {
     b.onclick = (e) => {
       e.stopPropagation();
       quickCollect(b.dataset.id);
+    };
+  });
+  // 一键送货（不进入详情，直接标记全部发货=配送完成）
+  $$("#order-list .quick-ship-btn").forEach((b) => {
+    b.onclick = (e) => {
+      e.stopPropagation();
+      quickShip(b.dataset.id);
     };
   });
   $$("#order-list .order-check").forEach((cb) => {
@@ -2490,6 +2505,21 @@ async function quickCollect(id) {
   const status = newPaid >= total ? "paid" : "partial";
   await Store.setOrderPay(id, status, newPaid);
   toast(`已收款 ${money(n)}` + (newPaid >= total ? "，已结清 ✅" : `，还欠 ${money(total - newPaid)}`));
+  await reloadAll();
+  renderOrders();
+  renderToday();
+}
+
+/** 订单列表一键送货：全部发货 = 配送完成 */
+async function quickShip(id) {
+  const o = ordersCache.find((x) => x.id === id);
+  if (!o) return;
+  for (const l of o.lines || []) l.shipped = l.qty || 0;
+  o.shippedAt = Date.now();
+  o.status = "done";
+  o.doneAt = Date.now();
+  await Store.saveOrder(o);
+  toast(`「${o.customer}」已送货（${orderTotalQty(o)} 件），配送完成 ✅`);
   await reloadAll();
   renderOrders();
   renderToday();
