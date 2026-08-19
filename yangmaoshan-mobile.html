@@ -2408,7 +2408,7 @@ const Sync = {
 
 /* ---------------- 授权与版本（2.4 工厂版） ---------------- */
 
-const APP_VERSION = "3.25";
+const APP_VERSION = "3.26";
 
 const License = {
   /** 当前账号绑定的授权码（本地记录） */
@@ -2616,6 +2616,9 @@ function announceModal(versions) {
 
 /** 各版本更新公告（每次发布新版本时在此追加一条） */
 const CHANGELOG = {
+  "3.26": [
+    "分享海报修复：¥ 和价格数字同一基线不再叠在一起、价格与款式名严格居中对齐、名称下方加细分隔线更美观"
+  ],
   "3.25": [
     "升级秒级同步：手机 A 记账后 1.2 秒上传，手机 B 每 5 秒自动检测云端变化并拉取，另一台手机的数据几秒内就显示",
     "同步更省流量：每 5 秒只查几十字节的时间戳，有变化才下载数据"
@@ -3641,31 +3644,43 @@ async function shareItemCard(it) {
     ctx.fillRect(0, IMG_H, W, H - IMG_H);
     ctx.textAlign = "center";
     // 款式名（自动缩放防溢出）
-    const nameSize = fitFont(ctx, it.name, W - 80, 52, 26);
+    const nameSize = fitFont(ctx, it.name, W - 90, 54, 26);
     ctx.fillStyle = "#1c1917";
-    ctx.fillText(it.name, W / 2, IMG_H + 92);
-    // 价格：¥ 红 + 数字（自动缩放防溢出）
+    ctx.fillText(it.name, W / 2, IMG_H + 98);
+    // 名称下方细分隔线
+    ctx.strokeStyle = "#f0eeec";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(W / 2 - 130, IMG_H + 142);
+    ctx.lineTo(W / 2 + 130, IMG_H + 142);
+    ctx.stroke();
+    // 价格：¥ 与数字同一垂直中线、整体居中（不重叠，与名称对齐）
     const priceStr = fmt(it.price);
-    const numSize = fitFont(ctx, priceStr, W - 160, 96, 40);
-    const yuanSize = Math.round(numSize * 0.45);
+    const numSize = fitFont(ctx, priceStr, W - 220, 92, 40);
+    const yuanSize = Math.round(numSize * 0.5);
+    const priceY = IMG_H + 230;
+    ctx.textBaseline = "middle";
     ctx.font = "bold " + yuanSize + "px sans-serif";
     const yuanW = ctx.measureText("¥").width;
     ctx.font = "bold " + numSize + "px sans-serif";
     const numW = ctx.measureText(priceStr).width;
-    const startX = (W - (yuanW + numW + 4)) / 2;
+    const gap = 6;
+    const startX = (W - (yuanW + gap + numW)) / 2;
     ctx.fillStyle = "#b91c2e";
     ctx.font = "bold " + yuanSize + "px sans-serif";
-    ctx.fillText("¥", startX, IMG_H + 206);
+    ctx.fillText("¥", startX, priceY);
+    ctx.fillStyle = "#b91c2e";
     ctx.font = "bold " + numSize + "px sans-serif";
-    ctx.fillText(priceStr, startX + yuanW + 4, IMG_H + 208);
+    ctx.fillText(priceStr, startX + yuanW + gap, priceY);
+    ctx.textBaseline = "alphabetic";
     // 颜色 + 数量（一行文字，最多 4 色 + 等，自动缩放防溢出）
     const colors = (it.colors || []).slice(0, 4);
     if (colors.length) {
-      let colorText = colors.map((c) => `${c.name} ${c.stock}`).join(" · ");
+      let colorText = colors.map((c) => `${c.name} ${c.stock}`).join("  ·  ");
       if ((it.colors || []).length > 4) colorText += " 等";
-      const cSize = fitFont(ctx, colorText, W - 80, 30, 20);
+      const cSize = fitFont(ctx, colorText, W - 90, 30, 20);
       ctx.fillStyle = "#78716c";
-      ctx.fillText(colorText, W / 2, IMG_H + 268);
+      ctx.fillText(colorText, W / 2, IMG_H + 320);
     }
     // —— 底部品牌条（工厂名称，自动缩放防溢出）——
     const factoryName = await getFactoryName();
