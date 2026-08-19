@@ -760,6 +760,13 @@ select.input { appearance: auto; }
 .quick-btn:hover { box-shadow: var(--shadow-md); }
 
 /* 今日日期卡片 */
+.today-clock-strip {
+  text-align: center;
+  font-size: var(--fs-xxs);
+  color: var(--text3);
+  letter-spacing: .3px;
+  padding: 10px 0 4px;
+}
 .today-date-card {
   background: linear-gradient(135deg, var(--primary-deep), var(--primary));
   border-radius: var(--radius-lg);

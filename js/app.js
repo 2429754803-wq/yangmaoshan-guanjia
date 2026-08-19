@@ -125,6 +125,9 @@ function announceModal(versions) {
 
 /** 各版本更新公告（每次发布新版本时在此追加一条） */
 const CHANGELOG = {
+  "3.19": [
+    "首页大时间卡片移除：日期和时钟改成一排小字放在页面底部，重要信息（统计/快捷/提醒）位置更靠上"
+  ],
   "3.18": [
     "订单列表新增「📦 送货」一键按钮：点一下直接标记全部发货配送完成，不用进详情（和收款按钮并排）"
   ],
@@ -520,20 +523,16 @@ function earliestDataTs() {
   return ts;
 }
 
-/** 时间显示：今天/明天 + 实时时钟 */
+/** 时间显示：底部一行小字（日期 + 实时时钟） */
 function updateClock() {
-  const el = $("#today-date-text");
-  const te = $("#today-time-text");
+  const el = $("#today-clock-text");
   if (!el) return;
   const d = new Date();
   const week = ["日", "一", "二", "三", "四", "五", "六"][d.getDay()];
-  el.textContent = `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日 星期${week}`;
-  if (te) {
-    const hh = String(d.getHours()).padStart(2, "0");
-    const mm = String(d.getMinutes()).padStart(2, "0");
-    const ss = String(d.getSeconds()).padStart(2, "0");
-    te.textContent = `${hh}:${mm}:${ss}`;
-  }
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mm = String(d.getMinutes()).padStart(2, "0");
+  const ss = String(d.getSeconds()).padStart(2, "0");
+  el.textContent = `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日 星期${week} · ${hh}:${mm}:${ss}`;
 }
 
 let _clockTimer = null;
