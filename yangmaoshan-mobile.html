@@ -1669,7 +1669,21 @@ body {
             <option value="stock">按库存</option>
           </select>
         </div>
+        <div class="card">
+          <button id="stats-daily-btn" class="btn primary">📅 每日营业额 / 利润明细</button>
+          <div class="hint">按天查看每天卖了多少钱、赚了多少，点某天看当天明细。</div>
+        </div>
         <div id="stats-list" class="list"></div>
+      </section>
+
+      <!-- ============ 每日明细 ============ -->
+      <section id="view-daily" class="view">
+        <div class="card" style="padding:12px 16px">
+          <div class="detail-color-row"><span>累计营业额</span><span class="v" id="daily-total-sales"></span></div>
+          <div class="detail-color-row"><span>累计利润</span><span class="v" id="daily-total-profit"></span></div>
+        </div>
+        <div id="daily-detail"></div>
+        <div id="daily-list" class="list"></div>
       </section>
 
       <!-- ============ 客户欠款 ============ -->
@@ -2408,7 +2422,7 @@ const Sync = {
 
 /* ---------------- 授权与版本（2.4 工厂版） ---------------- */
 
-const APP_VERSION = "3.27";
+const APP_VERSION = "3.28";
 
 const License = {
   /** 当前账号绑定的授权码（本地记录） */
@@ -2616,6 +2630,9 @@ function announceModal(versions) {
 
 /** 各版本更新公告（每次发布新版本时在此追加一条） */
 const CHANGELOG = {
+  "3.28": [
+    "新增「每日明细」：统计页一键进入，按天查看每天的营业额、利润、单数、件数，点某天看当天明细"
+  ],
   "3.27": [
     "分享海报价格重叠彻底修复：价格块改为左对齐精确排布（之前居中对齐导致 ¥ 和数字叠在一起）"
   ],
@@ -2855,7 +2872,8 @@ const VIEW_TITLES = {
   factories: "加工商管理", "factory-edit": "编辑加工商", trends: "爆款推荐",
   addrbook: "地址簿", "addr-edit": "编辑地址",
   report: "经营报表 · 周报/月报",
-  search: "全局搜索"
+  search: "全局搜索",
+  daily: "每日营业额 · 利润"
 };
 
 const TAB_VIEWS = ["today", "items", "customers", "orders", "settings"];
@@ -2896,6 +2914,7 @@ function showView(name) {
       addrbook: "常用地址管理",
       report: "周报/月报 · 经营分析与整改建议",
       search: "一个搜索框找款式 / 客户 / 订单",
+      daily: "每天营业额/利润明细，点日期看当天",
       settings: "警告线 · 同步 · 备份 · 账号"
     };
     sub.textContent = map[name] || "羊毛衫 · 库存订单管理";
@@ -3371,6 +3390,76 @@ function renderReport() {
       <h3>🛠 整改建议</h3>
       ${tips.map((t) => `<div class="tip-line">${t}</div>`).join("")}
     </div>`;
+}
+
+/* ================= 每日营业额/利润明细 ================= */
+
+let dailySelected = null;
+
+function dayKey(ts) {
+  const d = new Date(ts);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function renderDaily() {
+  // 按天聚合：营业额 = 销售 + 订单（与今日统计口径一致）
+  const map = {};
+  const getDay = (k) => (map[k] || (map[k] = { sales: 0, profit: 0, orders: 0, qty: 0 }));
+  for (const s of salesCache) {
+    const d = getDay(dayKey(s.time));
+    d.sales += (s.qty || 0) * (s.price || 0);
+    d.profit += (s.profit || 0);
+    d.qty += (s.qty || 0);
+  }
+  for (const o of ordersCache) {
+    if (o.status === "cancelled") continue;
+    const d = getDay(dayKey(o.createdAt));
+    d.sales += orderTotal(o);
+    d.profit += orderProfit(o);
+    d.orders++;
+    d.qty += orderTotalQty(o);
+  }
+  const days = Object.keys(map).sort().reverse();
+  $("#daily-total-sales").textContent = money(days.reduce((s, k) => s + map[k].sales, 0));
+  $("#daily-total-profit").textContent = money(days.reduce((s, k) => s + map[k].profit, 0));
+  // 选中日的明细
+  const det = $("#daily-detail");
+  if (dailySelected && map[dailySelected]) {
+    const dayOrders = ordersCache.filter((o) => o.status !== "cancelled" && dayKey(o.createdAt) === dailySelected);
+    const daySales = salesCache.filter((s) => dayKey(s.time) === dailySelected);
+    det.innerHTML = `<div class="card">
+      <h3>📅 ${dailySelected} 明细</h3>
+      ${dayOrders.map((o) => `<div class="detail-color-row"><span>${escapeHtml(o.customer)} · ${(o.lines || []).map((l) => l.qty + "×" + escapeHtml(l.itemName)).join("、")}${o.status === "done" ? "" : " · 未完成"}</span><span class="v">${money(orderTotal(o))}</span></div>`).join("")}
+      ${daySales.map((s) => `<div class="detail-color-row"><span>${escapeHtml(s.itemName)}${s.color ? "(" + escapeHtml(s.color) + ")" : ""} ×${s.qty}${s.customer ? " · " + escapeHtml(s.customer) : ""}${s.onCredit ? " · 赊账" : ""}</span><span class="v">${money((s.qty || 0) * (s.price || 0))}</span></div>`).join("")}
+      ${(!dayOrders.length && !daySales.length) ? '<div class="hint">当天没有记录</div>' : ""}
+      <div class="hint" style="text-align:center">当天合计 ${money(map[dailySelected].sales)} · 利润 ${money(map[dailySelected].profit)}</div>
+    </div>`;
+  } else {
+    det.innerHTML = "";
+  }
+  const list = $("#daily-list");
+  if (!days.length) {
+    list.innerHTML = '<div class="empty"><span class="empty-icon">📅</span>还没有任何记录</div>';
+    return;
+  }
+  list.innerHTML = days.map((k) => {
+    const d = map[k];
+    const sel = k === dailySelected ? ' style="border-color:var(--primary)"' : "";
+    return `<div class="list-card" data-day="${k}"${sel}>
+      <div class="list-main">
+        <div class="list-title">${k.slice(5)}</div>
+        <div class="list-sub">${d.orders} 单 · ${d.qty} 件</div>
+      </div>
+      <div class="list-side">
+        <div class="num">${fmt(d.sales)}</div>
+        <div class="lbl">营业额 · 利润 ${fmt(d.profit)}</div>
+      </div>
+    </div>`;
+  }).join("");
+  $$("#daily-list .list-card").forEach((c) => {
+    c.onclick = () => { dailySelected = c.dataset.day; renderDaily(); };
+  });
+  staggerIn(list);
 }
 
 /* ================= 款式列表页 ================= */
@@ -6613,6 +6702,9 @@ function bindEvents() {
   $("#order-ship-list-btn").onclick = generateShipListImage;
   $("#order-batch-done").onclick = batchMarkDone;
   $("#order-batch-cancel").onclick = exitOrderBatchMode;
+
+  // 每日营业额/利润明细入口
+  $("#stats-daily-btn").onclick = () => { dailySelected = null; renderDaily(); showView("daily"); };
 
   // 客户
   $("#customer-search").oninput = debounce((e) => { customerSearch = e.target.value; renderCustomers(); }, 200);
