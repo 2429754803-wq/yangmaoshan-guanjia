@@ -1108,3 +1108,28 @@ body {
   transition: transform .18s var(--ease-spring), box-shadow .25s var(--ease), background .3s var(--ease), border-color .3s var(--ease);
 }
 .card:active { transform: scale(.992); }
+
+/* ============ 库存/加工商优化（3.14） ============ */
+/* 库存列表：总库存大数字突出 */
+.stock-num { font-size: 30px; }
+.list-side .lbl { white-space: nowrap; }
+.list-tags .tag b { font-size: inherit; }
+
+/* 颜色标签：数量加粗更醒目 */
+.list-tags .tag { display: inline-flex; align-items: baseline; gap: 3px; }
+.list-tags .tag b { font-weight: 800; }
+
+/* 加工商一键结清按钮 */
+.settle-all-btn {
+  margin-top: 8px;
+  border: 1.5px solid rgba(185,28,46,.4);
+  background: #fff;
+  color: #b91c2e;
+  font-size: var(--fs-xxs);
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all .15s var(--ease);
+}
+.settle-all-btn:active { background: #fee2e2; transform: scale(.95); }

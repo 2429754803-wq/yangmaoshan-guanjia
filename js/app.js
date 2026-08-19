@@ -33,6 +33,31 @@ function timeStr(ts) {
   return `${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
 }
 
+/* ---- 颜色归一化：红 / 红色 视为同一颜色 ---- */
+function normColor(n) {
+  const s = String(n == null ? "" : n).trim();
+  if (!s) return "";
+  if (s.endsWith("色")) return s;
+  if ("红黑蓝绿黄白灰紫粉棕橙青卡其藏酒米驼咖姜".includes(s)) return s + "色";
+  return s;
+}
+/** 在款式的颜色里找匹配的颜色（先精确，再归一化模糊匹配），找不到返回 null */
+function findColor(it, name) {
+  if (!it || !name) return null;
+  const cs = it.colors || [];
+  const exact = cs.find((c) => c.name === name);
+  if (exact) return exact;
+  const nn = normColor(name);
+  return cs.find((c) => normColor(c.name) === nn) || null;
+}
+/** rest 文字里是否包含该颜色（支持"红"匹配"红色"） */
+function restHasColor(rest, cname) {
+  if (!rest || !cname) return false;
+  if (rest.includes(cname)) return true;
+  const short = cname.replace(/色$/, "");
+  return short !== cname && rest.includes(short);
+}
+
 function toast(msg) {
   const el = document.createElement("div");
   el.className = "toast";
@@ -100,6 +125,11 @@ function announceModal(versions) {
 
 /** 各版本更新公告（每次发布新版本时在此追加一条） */
 const CHANGELOG = {
+  "3.14": [
+    "加工商管理：每个加工商可「一键结清」全部未结工费",
+    "库存界面优化：总库存大数字突出，颜色数量加粗醒目，已售单独显示",
+    "颜色智能识别：红=红色、黑=黑色，语音/输入/下单都会自动对应同一种颜色"
+  ],
   "3.13": [
     "去掉昼夜主题切换：界面固定为亮色，不再忽亮忽暗"
   ],
@@ -752,20 +782,20 @@ function renderItems() {
     const colors = (it.colors || []).map((c) => {
       const isLow = Store.isLowStock(it, c.name);
       const cls = c.stock === 0 ? "red low-blink" : isLow ? "red low-blink" : "green";
-      return `<span class="tag ${cls}">${escapeHtml(c.name)} ${c.stock}</span>`;
+      return `<span class="tag ${cls}">${escapeHtml(c.name)} <b>${c.stock}</b></span>`;
     }).join("");
-    const sideNumCls = low ? "num low-blink" : "num";
+    const sideNumCls = low ? "num stock-num low-blink" : "num stock-num";
     return `
       <div class="list-card" data-id="${it.id}">
         <div class="thumb">${img}</div>
         <div class="list-main">
           <div class="list-title">${escapeHtml(it.name)}</div>
-          <div class="list-sub">售价 ${money(it.price)} · 成本 ${money(it.cost)}</div>
+          <div class="list-sub">售价 ${money(it.price)} · 已售 ${totalSold} 件</div>
           <div class="list-tags">${colors}</div>
         </div>
         <div class="list-side">
           <div class="${sideNumCls}">${totalStock}</div>
-          <div class="lbl">库存 · 已售 ${totalSold}</div>
+          <div class="lbl">总库存（件）</div>
         </div>
       </div>`;
   }).join("");
@@ -1178,7 +1208,7 @@ async function confirmSale() {
   if (!colorName) return toast("该款式还没有颜色，请先编辑添加");
   if (!(qty >= 1)) return toast("请填写正确的销售数量");
   if (!(price >= 0)) return toast("请填写售价");
-  const color = (it.colors || []).find((c) => c.name === colorName);
+  const color = findColor(it, colorName);
   if (!color) return toast("颜色不存在");
   if (color.stock < qty) return toast(`库存不足（当前 ${color.stock} 件）`);
   color.stock -= qty;
@@ -1700,12 +1730,39 @@ function renderFactories() {
         <div class="list-side">
           <div class="num" style="${unsettled ? "color:var(--danger);font-size:15px" : ""}">${unsettled ? money(unsettled) : "✓"}</div>
           <div class="lbl">${unsettled ? "未结清" : "已结清"}</div>
+          ${unsettled > 0 ? `<button class="settle-all-btn" data-fid="${f.id}">一键结清</button>` : ""}
         </div>
       </div>`).join("");
   $$("#factory-list .list-card").forEach((card) => {
     card.onclick = () => openFactoryDetail(card.dataset.id);
   });
+  // 一键结清某加工商全部未结工费
+  $$("#factory-list .settle-all-btn").forEach((b) => {
+    b.onclick = (e) => {
+      e.stopPropagation();
+      settleFactoryAll(b.dataset.fid);
+    };
+  });
   staggerIn($("#factory-list"));
+}
+
+/** 一键结清：把某加工商所有未结清的工费全部标记为已结算 */
+async function settleFactoryAll(fid) {
+  const f = factoriesCache.find((x) => x.id === fid);
+  if (!f) return;
+  const list = outsourcesCache.filter((o) => o.factoryId === fid && o.status !== "cancelled" && !o.settled);
+  const total = list.reduce((s, o) => s + osCost(o), 0);
+  if (!list.length) return toast("该加工商没有未结清工费");
+  if (!await confirmModal("一键结清", `把「${f.name}」的 ${list.length} 笔未结清工费（合计 ${money(total)}）全部标记为已结算？`)) return;
+  for (const o of list) {
+    o.settled = true;
+    o.settledAt = Date.now();
+    await Store.saveOutsource(o);
+  }
+  toast(`已结清 ${list.length} 笔 · ${money(total)}`);
+  await reloadAll();
+  renderFactories();
+  renderOutsources();
 }
 
 /** 加工商详情（含月结对账） */
@@ -1932,6 +1989,13 @@ function renderQuickLines() {
   });
   $$("#qo-lines .ol-color").forEach((inp) => {
     inp.oninput = () => { quickLines[Number(inp.dataset.i)].color = inp.value; };
+    inp.onblur = () => {
+      // 红 -> 红色 自动补全为标准颜色名
+      const l = quickLines[Number(inp.dataset.i)];
+      const it = itemsCache.find((x) => x.id === l.itemId);
+      const c = findColor(it, l.color);
+      if (c && c.name !== l.color) { l.color = c.name; inp.value = c.name; }
+    };
   });
   $$("#qo-lines .ol-qty").forEach((inp) => {
     inp.oninput = () => { quickLines[Number(inp.dataset.i)].qty = Number(inp.value) || 1; };
@@ -1977,7 +2041,7 @@ function parseQuickText(raw) {
   // 1) 整串匹配款式名（如"圆领毛衣红色"直接命中"圆领毛衣"），并从中提取该款颜色
   const byName = itemsCache.find((it) => it.name && (it.name.includes(rest) || rest.includes(it.name)));
   if (byName) {
-    const c = (byName.colors || []).find((x) => rest.includes(x.name));
+    const c = (byName.colors || []).find((x) => restHasColor(rest, x.name));
     if (c) color = c.name;
     hit = { it: byName, color };
   }
@@ -1986,7 +2050,11 @@ function parseQuickText(raw) {
     let restClean = rest;
     for (const it of itemsCache) {
       for (const x of it.colors || []) {
-        if (restClean.includes(x.name)) { color = x.name; restClean = restClean.replace(x.name, ""); break; }
+        if (restHasColor(restClean, x.name)) {
+          color = x.name;
+          restClean = restClean.replace(x.name, "").replace(x.name.replace(/色$/, ""), "");
+          break;
+        }
       }
       if (color) break;
     }
@@ -1994,7 +2062,7 @@ function parseQuickText(raw) {
       const it2 = itemsCache.find((it) => it.name && (it.name.includes(restClean) || restClean.includes(it.name)));
       if (it2) hit = { it: it2, color };
     } else if (color) {
-      const it3 = itemsCache.find((it) => (it.colors || []).some((x) => x.name === color));
+      const it3 = itemsCache.find((it) => findColor(it, color));
       if (it3) hit = { it: it3, color };
     }
   }
@@ -2092,7 +2160,7 @@ async function saveQuickOrder(continueNext) {
   for (const l of validLines) {
     const it = itemsCache.find((x) => x.id === l.itemId);
     if (!it) continue;
-    const color = (it.colors || []).find((c) => c.name === l.color);
+    const color = findColor(it, l.color);
     if (color && color.stock < l.qty) {
       return toast(`「${it.name}」${l.color ? "(" + l.color + ")" : ""} 库存不足（当前 ${color.stock} 件）`);
     }
@@ -2100,7 +2168,7 @@ async function saveQuickOrder(continueNext) {
   for (const l of validLines) {
     const it = itemsCache.find((x) => x.id === l.itemId);
     if (!it) continue;
-    const color = (it.colors || []).find((c) => c.name === l.color);
+    const color = findColor(it, l.color);
     if (color) {
       color.stock -= l.qty;
       color.sold = (color.sold || 0) + l.qty;
@@ -2684,7 +2752,7 @@ async function restoreOrderStock(order) {
   for (const l of order.lines || []) {
     const it = itemsCache.find((x) => x.id === l.itemId);
     if (!it) continue;
-    const color = (it.colors || []).find((c) => c.name === l.color);
+    const color = findColor(it, l.color);
     if (color) {
       color.stock += l.qty;
       if (color.sold !== undefined) color.sold = Math.max(0, (color.sold || 0) - l.qty);
@@ -2919,7 +2987,7 @@ async function saveOrder() {
   for (const l of validLines) {
     const it = itemsCache.find((x) => x.id === l.itemId);
     if (!it) continue;
-    const color = (it.colors || []).find((c) => c.name === l.color);
+    const color = findColor(it, l.color);
     if (color && color.stock < l.qty) {
       return toast(`「${it.name}」${l.color ? "(" + l.color + ")" : ""} 库存不足（当前 ${color.stock} 件）`);
     }
@@ -2927,7 +2995,7 @@ async function saveOrder() {
   for (const l of validLines) {
     const it = itemsCache.find((x) => x.id === l.itemId);
     if (!it) continue;
-    const color = (it.colors || []).find((c) => c.name === l.color);
+    const color = findColor(it, l.color);
     if (color) {
       color.stock -= l.qty;
       color.sold = (color.sold || 0) + l.qty;
@@ -3005,7 +3073,7 @@ async function finishStocktake() {
     const [itemId, colorName] = key.split("::");
     const it = itemsCache.find((x) => x.id === itemId);
     if (!it) continue;
-    const color = (it.colors || []).find((c) => c.name === colorName);
+    const color = findColor(it, colorName);
     if (!color) continue;
     const book = color.stock;
     const diff = actual - book;
@@ -3104,7 +3172,7 @@ async function confirmPurchase() {
   if (!colorName) return toast("该款式还没有颜色，请先编辑添加");
   if (!(qty >= 1)) return toast("请填写正确的送货数量");
   const unitPrice = unitPriceRaw === "" ? null : Number(unitPriceRaw);
-  const color = (it.colors || []).find((c) => c.name === colorName);
+  const color = findColor(it, colorName);
   if (!color) return toast("颜色不存在");
   color.stock += qty;
   await Store.saveItem(it);
