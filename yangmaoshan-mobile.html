@@ -2407,7 +2407,7 @@ const Sync = {
 
 /* ---------------- 授权与版本（2.4 工厂版） ---------------- */
 
-const APP_VERSION = "3.21";
+const APP_VERSION = "3.22";
 
 const License = {
   /** 当前账号绑定的授权码（本地记录） */
@@ -2615,6 +2615,9 @@ function announceModal(versions) {
 
 /** 各版本更新公告（每次发布新版本时在此追加一条） */
 const CHANGELOG = {
+  "3.22": [
+    "今日提醒新增：今日未收款项（今天下的单还没收到钱）和待发货清单（没发的货），点一下直达"
+  ],
   "3.21": [
     "数量输入不再预填数字：送货/销售/生产/开单数量都是空框+提示，直接输入即可，不用再删默认的 1"
   ],
@@ -3158,6 +3161,24 @@ function renderTodayReminders() {
   // 5. 欠款提醒
   const totalDebt = ordersCache.reduce((s, o) => s + (o.status === "cancelled" ? 0 : orderDebt(o)), 0);
   if (totalDebt > 0) reminders.push({ icon: "💰", text: `客户欠款合计 ${money(totalDebt)}`, go: "debt" });
+  // 6. 今日未收款项（今日订单未收 + 今日赊账销售）
+  let todayUnpaid = 0, todayUnpaidCount = 0;
+  for (const o of ordersCache) {
+    if (o.status !== "cancelled" && isToday(o.createdAt)) {
+      const d = orderDebt(o);
+      if (d > 0) { todayUnpaid += d; todayUnpaidCount++; }
+    }
+  }
+  for (const s of salesCache) {
+    if (s.onCredit && isToday(s.time)) todayUnpaid += s.qty * s.price;
+  }
+  if (todayUnpaid > 0) reminders.push({ icon: "🧾", text: `今日还有 ${money(todayUnpaid)} 未收（${todayUnpaidCount} 单）`, go: "today-unpaid" });
+  // 7. 没发的货（待发货订单）
+  const unshipped = ordersCache.filter((o) => o.status === "pending" && !o.shippedAt);
+  if (unshipped.length) {
+    const qty = unshipped.reduce((s, o) => s + orderTotalQty(o), 0);
+    reminders.push({ icon: "📦", text: `${unshipped.length} 单待发货，共 ${qty} 件`, go: "orders-unship" });
+  }
 
   if (!reminders.length) {
     box.innerHTML = `<div class="today-ok">✅ 今日无待办，一切正常</div>`;
@@ -3176,6 +3197,8 @@ function renderTodayReminders() {
       else if (go === "outsource-duetoday") { osFilter = "duetoday"; setOsChips("duetoday"); renderOutsources(); showView("outsource"); }
       else if (go === "outsource-owe") { osFilter = "owe"; setOsChips("owe"); renderOutsources(); showView("outsource"); }
       else if (go === "debt") { renderDebt(); showView("debt"); }
+      else if (go === "today-unpaid") { renderDebt(); showView("debt"); }
+      else if (go === "orders-unship") { orderFilter = "unship"; setOrderChips("unship"); renderOrders(); showView("orders"); }
       else if (go === "report-week") openReport("week");
       else if (go === "report-month") openReport("month");
       else { const tab = $(`.tab[data-view=${go}]`); if (tab) tab.click(); }

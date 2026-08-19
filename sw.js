@@ -1,7 +1,7 @@
 // 羊毛衫管家 Service Worker
 // 策略：网络优先 + 离线回退（确保线上更新后用户立即看到新版）
 // 缓存版本号：每次发布新功能时递增，强制清理旧缓存
-const CACHE = "knit-stock-v3.21";
+const CACHE = "knit-stock-v3.22";
 
 self.addEventListener("install", (e) => {
   // 预缓存核心文件（加速首次加载）
