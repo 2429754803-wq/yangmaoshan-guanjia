@@ -17,45 +17,45 @@
    ============================================================ */
 
 :root {
-  --primary: #b91c2e;
-  --primary-deep: #7f1020;
-  --primary-soft: #fbe9ec;
-  --accent: #e8b04b;
-  --accent-soft: rgba(232,176,75,.14);
-  --bg: #f5f2ee;
-  --bg2: #ece8e3;
-  --card: #ffffff;
-  --text: #1c1917;
-  --text2: #78716c;
-  --text3: #a8a29e;
-  --border: #e7e5e4;
+  --primary: #a3163f;          /* 酒红 */
+  --primary-deep: #6d0f2b;
+  --primary-soft: #fceef3;
+  --accent: #c9a35c;           /* 香槟金 */
+  --accent-soft: rgba(201,163,92,.14);
+  --bg: #f7f4ef;               /* 暖象牙 */
+  --bg2: #efeae3;
+  --card: #fffdfa;
+  --text: #241d1b;
+  --text2: #7a726a;
+  --text3: #a89f95;
+  --border: #ebe5de;
   --ok: #15803d;
   --ok-bg: #dcfce7;
   --warn: #b45309;
   --warn-bg: #fef3c7;
-  --danger: #b91c2e;
-  --danger-bg: #fee2e2;
-  --header-grad: linear-gradient(135deg, #8f1122 0%, #b91c2e 45%, #c2253a 100%);
+  --danger: #b41845;
+  --danger-bg: #fce7ec;
+  --header-grad: linear-gradient(135deg, #6d0f2b 0%, #a3163f 48%, #bd2750 100%);
   --radius-lg: 20px;
   --radius-md: 14px;
   --radius-sm: 10px;
   /* 精致阴影体系：柔和高斯 + 环境光 + 内高光 */
-  --shadow-sm: 0 1px 2px rgba(28,25,23,.04), 0 2px 8px rgba(28,25,23,.04), inset 0 1px 0 rgba(255,255,255,.6);
-  --shadow-md: 0 2px 6px rgba(28,25,23,.05), 0 8px 24px rgba(28,25,23,.08), inset 0 1px 0 rgba(255,255,255,.65);
-  --shadow-lg: 0 4px 12px rgba(28,25,23,.08), 0 20px 48px rgba(28,25,23,.14), inset 0 1px 0 rgba(255,255,255,.7);
-  --shadow-press: 0 1px 2px rgba(28,25,23,.06), inset 0 2px 6px rgba(28,25,23,.06);
+  --shadow-sm: 0 1px 2px rgba(36,29,27,.04), 0 2px 8px rgba(36,29,27,.04), inset 0 1px 0 rgba(255,255,255,.6);
+  --shadow-md: 0 2px 6px rgba(36,29,27,.05), 0 8px 24px rgba(36,29,27,.08), inset 0 1px 0 rgba(255,255,255,.65);
+  --shadow-lg: 0 4px 12px rgba(36,29,27,.08), 0 20px 48px rgba(36,29,27,.14), inset 0 1px 0 rgba(255,255,255,.7);
+  --shadow-press: 0 1px 2px rgba(36,29,27,.06), inset 0 2px 6px rgba(36,29,27,.06);
   /* 动效曲线 */
   --ease: cubic-bezier(.22,.8,.36,1);
   --ease-spring: cubic-bezier(.34,1.4,.5,1);
   /* 玻璃拟态 */
-  --glass-bg: rgba(255,255,255,.78);
+  --glass-bg: rgba(255,253,250,.78);
   --glass-border: rgba(255,255,255,.55);
 }
 
 /* 暗色主题 */
 [data-theme="dark"] {
   --primary: #ef4444;
-  --primary-deep: #b91c2e;
+  --primary-deep: #b41845;
   --primary-soft: #3f1d24;
   --accent: #f0c674;
   --accent-soft: rgba(240,198,116,.12);
@@ -72,7 +72,7 @@
   --warn-bg: rgba(251,191,36,.12);
   --danger: #f87171;
   --danger-bg: rgba(248,113,113,.12);
-  --header-grad: linear-gradient(135deg, #450a0a 0%, #7f1020 50%, #991b1b 100%);
+  --header-grad: linear-gradient(135deg, #450a0a 0%, #6d0f2b 50%, #991b1b 100%);
   --shadow-sm: 0 1px 2px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.03);
   --shadow-md: 0 2px 6px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.04);
   --shadow-lg: 0 4px 12px rgba(0,0,0,.5), 0 20px 48px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.05);
@@ -120,7 +120,8 @@ body {
   position: sticky;
   top: 0;
   z-index: 40;
-  box-shadow: 0 4px 20px rgba(143,17,34,.28);
+  box-shadow: 0 4px 20px rgba(122,17,48,.28);
+  border-bottom: 1px solid rgba(201,163,92,.32);
   position: relative;
   overflow: hidden;
 }
@@ -193,7 +194,7 @@ body {
   background:
     radial-gradient(1200px 500px at 80% -10%, rgba(232,176,75,.25), transparent 60%),
     radial-gradient(800px 400px at -20% 110%, rgba(127,16,32,.55), transparent 55%),
-    linear-gradient(165deg, #6f0e1d 0%, #8f1122 40%, #a4162a 70%, #b91c2e 100%);
+    linear-gradient(165deg, #6f0e1d 0%, #7a1130 40%, #a3163f 70%, #b41845 100%);
   padding: 24px;
 }
 .auth-box {
@@ -216,18 +217,18 @@ body {
   right: -25%;
   width: 80%;
   height: 80%;
-  background: radial-gradient(circle at 70% 30%, rgba(185,28,46,.06), transparent 60%);
+  background: radial-gradient(circle at 70% 30%, rgba(180,24,69,.06), transparent 60%);
   pointer-events: none;
 }
 @keyframes authIn { from { opacity: 0; transform: translateY(24px) scale(.98); } to { opacity: 1; transform: none; } }
-.auth-logo { font-size: 46px; text-align: center; margin-bottom: 6px; filter: drop-shadow(0 4px 8px rgba(143,17,34,.25)); }
+.auth-logo { font-size: 46px; text-align: center; margin-bottom: 6px; filter: drop-shadow(0 4px 8px rgba(122,17,48,.25)); }
 .auth-box h2 {
   text-align: center;
   font-size: 20px;
   font-weight: 700;
   letter-spacing: .3px;
   margin-bottom: 4px;
-  background: linear-gradient(120deg, #7f1020, #b91c2e);
+  background: linear-gradient(120deg, #6d0f2b, #b41845);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -249,13 +250,13 @@ body {
 }
 .auth-tab.active { background: #fff; color: var(--primary); box-shadow: 0 2px 6px rgba(28,25,23,.08); }
 [data-theme="dark"] .auth-tab.active { background: var(--card); }
-.auth-error { background: var(--danger-bg); color: var(--danger); border-radius: 12px; padding: 10px 14px; font-size: var(--fs-xs); margin-top: 12px; border: 1px solid rgba(185,28,46,.15); }
+.auth-error { background: var(--danger-bg); color: var(--danger); border-radius: 12px; padding: 10px 14px; font-size: var(--fs-xs); margin-top: 12px; border: 1px solid rgba(180,24,69,.15); }
 .auth-hint { font-size: var(--fs-xxs); color: var(--text3); margin-top: 18px; line-height: 1.7; text-align: center; }
 
 /* ============ 内容区 ============ */
 body {
   background-image:
-    radial-gradient(circle at 15% 20%, rgba(185,28,46,.03), transparent 40%),
+    radial-gradient(circle at 15% 20%, rgba(180,24,69,.03), transparent 40%),
     radial-gradient(circle at 85% 70%, rgba(232,176,75,.04), transparent 45%);
   background-attachment: fixed;
 }
@@ -281,7 +282,7 @@ body {
   background-position: 14px center;
   background-size: 17px;
 }
-.search-bar .input:focus { border-color: rgba(185,28,46,.35); box-shadow: 0 0 0 4px rgba(185,28,46,.08); }
+.search-bar .input:focus { border-color: rgba(180,24,69,.35); box-shadow: 0 0 0 4px rgba(180,24,69,.08); }
 
 /* ============ 筛选 chips ============ */
 .filter-row { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
@@ -298,10 +299,10 @@ body {
 }
 .chip:active { transform: scale(.95); }
 .chip.active {
-  background: linear-gradient(135deg, #a4162a, #b91c2e);
+  background: linear-gradient(135deg, #a3163f, #b41845);
   border-color: transparent;
   color: #fff;
-  box-shadow: 0 3px 10px rgba(185,28,46,.3);
+  box-shadow: 0 3px 10px rgba(180,24,69,.3);
 }
 .chip.sort-chip { color: var(--text); font-weight: 600; }
 
@@ -406,10 +407,10 @@ body {
 .quick-pay-btn {
   flex: none;
   border: none; border-radius: 10px;
-  background: linear-gradient(135deg, #a4162a, #c2253a);
+  background: linear-gradient(135deg, #a3163f, #bd2750);
   color: #fff; font-size: var(--fs-xs); font-weight: 700;
   padding: 8px 12px;
-  box-shadow: 0 2px 8px rgba(185,28,46,.35);
+  box-shadow: 0 2px 8px rgba(180,24,69,.35);
 }
 .quick-ship-btn {
   flex: none;
@@ -515,7 +516,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
   font-family: inherit;
 }
 .input::placeholder { color: var(--text3); }
-.input:focus { border-color: rgba(185,28,46,.5); box-shadow: 0 0 0 4px rgba(185,28,46,.08); }
+.input:focus { border-color: rgba(180,24,69,.5); box-shadow: 0 0 0 4px rgba(180,24,69,.08); }
 .ta { min-height: 84px; resize: vertical; line-height: 1.6; }
 select.input { appearance: auto; }
 
@@ -537,16 +538,16 @@ select.input { appearance: auto; }
 }
 .btn:active { transform: scale(.97); box-shadow: var(--shadow-press); }
 .btn.primary {
-  background: linear-gradient(135deg, #a4162a, #b91c2e);
+  background: linear-gradient(135deg, #a3163f, #b41845);
   border-color: transparent;
   color: #fff;
-  box-shadow: 0 4px 14px rgba(185,28,46,.28), inset 0 1px 0 rgba(255,255,255,.18);
+  box-shadow: 0 4px 14px rgba(180,24,69,.28), inset 0 1px 0 rgba(255,255,255,.18);
 }
-.btn.primary:active { box-shadow: 0 2px 6px rgba(185,28,46,.3), inset 0 1px 0 rgba(255,255,255,.1); transform: scale(.97); }
+.btn.primary:active { box-shadow: 0 2px 6px rgba(180,24,69,.3), inset 0 1px 0 rgba(255,255,255,.1); transform: scale(.97); }
 .btn.small { width: auto; padding: 8px 16px; font-size: var(--fs-xs); margin-top: 10px; border-radius: 12px; }
 .btn-row { display: flex; gap: 10px; margin-top: 16px; }
 .btn-row .btn { flex: 1; margin-top: 0; }
-.btn.danger { color: var(--danger); border-color: rgba(185,28,46,.25); }
+.btn.danger { color: var(--danger); border-color: rgba(180,24,69,.25); }
 .hint { font-size: var(--fs-xxs); color: var(--text3); margin-top: 8px; line-height: 1.7; }
 
 /* ============ 底部导航 ============ */
@@ -719,14 +720,14 @@ select.input { appearance: auto; }
   top: -30px; right: -30px;
   width: 80px; height: 80px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(185,28,46,.07), transparent 70%);
+  background: radial-gradient(circle, rgba(180,24,69,.07), transparent 70%);
 }
 .stat-num {
   font-size: 24px;
   font-weight: 800;
   letter-spacing: -.5px;
   font-variant-numeric: tabular-nums;
-  background: linear-gradient(120deg, var(--primary-deep), var(--primary));
+  background: linear-gradient(120deg, var(--primary-deep) 10%, #c9a35c 90%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -943,7 +944,7 @@ select.input { appearance: auto; }
   animation: modalIn .32s var(--ease-spring);
 }
 .announce-head {
-  background: linear-gradient(135deg, #a4162a, #cf3148);
+  background: linear-gradient(135deg, #a3163f, #c2254f);
   color: #fff; text-align: center;
   padding: 22px 16px 20px;
   flex: none;
@@ -959,8 +960,8 @@ select.input { appearance: auto; }
 .announce-ver { display: flex; align-items: center; gap: 10px; margin: 8px 0 6px; }
 .announce-ver:first-child { margin-top: 0; }
 .announce-ver-tag {
-  background: rgba(185,28,46,.1);
-  color: #b91c2e;
+  background: rgba(180,24,69,.1);
+  color: #b41845;
   font-size: 12px; font-weight: 800;
   padding: 3px 12px; border-radius: 20px;
   flex: none;
@@ -973,7 +974,7 @@ select.input { appearance: auto; }
 }
 .announce-dot {
   flex: none; width: 6px; height: 6px; border-radius: 50%;
-  background: linear-gradient(135deg, #b91c2e, #e15a6c);
+  background: linear-gradient(135deg, #b41845, #e15a6c);
   margin-top: 9px;
 }
 .announce-ok { flex: none; margin: 12px 20px 18px; border-radius: 14px; }
@@ -1026,10 +1027,10 @@ button, .list-card, .chip, .quick-btn, .os-board-cell, .tab { user-select: none;
 
 /* 快捷操作：常用按钮高亮 + 更多折叠 */
 .quick-btn.primary {
-  background: linear-gradient(135deg, #a4162a, #c2253a);
+  background: linear-gradient(135deg, #a3163f, #bd2750);
   border-color: transparent;
   color: #fff;
-  box-shadow: 0 4px 14px rgba(185,28,46,.3), inset 0 1px 0 rgba(255,255,255,.18);
+  box-shadow: 0 4px 14px rgba(180,24,69,.3), inset 0 1px 0 rgba(255,255,255,.18);
 }
 .quick-more-toggle {
   display: block; width: 100%;
@@ -1060,17 +1061,17 @@ button, .list-card, .chip, .quick-btn, .os-board-cell, .tab { user-select: none;
 .empty .empty-icon {
   width: 68px; height: 68px; margin: 0 auto 14px;
   border-radius: 50%;
-  background: radial-gradient(circle at 32% 28%, rgba(185,28,46,.14), rgba(185,28,46,.06) 65%);
+  background: radial-gradient(circle at 32% 28%, rgba(180,24,69,.14), rgba(180,24,69,.06) 65%);
   display: flex; align-items: center; justify-content: center;
   font-size: 30px;
-  box-shadow: inset 0 2px 8px rgba(185,28,46,.06);
+  box-shadow: inset 0 2px 8px rgba(180,24,69,.06);
 }
 
 /* ============ 质感再优化（3.12） ============ */
 /* 页面顶部一抹品牌色光晕 */
 body {
   background:
-    radial-gradient(900px 300px at 50% -6%, rgba(185,28,46,.05), transparent 60%),
+    radial-gradient(900px 300px at 50% -6%, rgba(180,24,69,.05), transparent 60%),
     var(--bg);
 }
 #content { padding-top: 18px; }
@@ -1094,9 +1095,9 @@ body {
 }
 .quick-btn .qb-txt { font-size: var(--fs-xs); font-weight: 600; letter-spacing: .3px; }
 .quick-btn.primary {
-  background: linear-gradient(135deg, #a4162a, #c2253a);
+  background: linear-gradient(135deg, #a3163f, #bd2750);
   color: #fff;
-  box-shadow: 0 6px 16px rgba(185,28,46,.32), inset 0 1px 0 rgba(255,255,255,.2);
+  box-shadow: 0 6px 16px rgba(180,24,69,.32), inset 0 1px 0 rgba(255,255,255,.2);
 }
 .quick-btn.primary .qb-icon { filter: drop-shadow(0 3px 6px rgba(0,0,0,.25)); }
 
@@ -1114,10 +1115,10 @@ body {
 
 /* 底部 Tab 激活态：红色胶囊 */
 .tab.active {
-  background: linear-gradient(135deg, #a4162a, #c2253a);
+  background: linear-gradient(135deg, #a3163f, #bd2750);
   color: #fff;
   font-weight: 700;
-  box-shadow: 0 4px 12px rgba(185,28,46,.32);
+  box-shadow: 0 4px 12px rgba(180,24,69,.32);
 }
 .tab.active .t-icon { filter: none; opacity: 1; transform: translateY(-1px) scale(1.05); }
 
@@ -1129,7 +1130,7 @@ body {
 }
 .input:focus {
   background: var(--card);
-  box-shadow: 0 0 0 4px rgba(185,28,46,.08), inset 0 1px 2px rgba(28,25,23,.03);
+  box-shadow: 0 0 0 4px rgba(180,24,69,.08), inset 0 1px 2px rgba(28,25,23,.03);
 }
 
 /* 卡片过渡微动 */
@@ -1151,9 +1152,9 @@ body {
 /* 加工商一键结清按钮 */
 .settle-all-btn {
   margin-top: 8px;
-  border: 1.5px solid rgba(185,28,46,.4);
+  border: 1.5px solid rgba(180,24,69,.4);
   background: #fff;
-  color: #b91c2e;
+  color: #b41845;
   font-size: var(--fs-xxs);
   font-weight: 700;
   padding: 6px 12px;
@@ -1162,6 +1163,47 @@ body {
   transition: all .15s var(--ease);
 }
 .settle-all-btn:active { background: #fee2e2; transform: scale(.95); }
+
+/* ============ 质感再打磨（3.29） ============ */
+/* 勾选框品牌化 */
+input[type="checkbox"] {
+  accent-color: #b41845;
+  width: 18px; height: 18px;
+  vertical-align: middle;
+  margin-right: 2px;
+}
+.check { display: flex; align-items: center; gap: 4px; cursor: pointer; font-size: var(--fs-sm); color: var(--text); }
+
+/* 背景暖色光晕（顶部品牌红 + 右上角暖金） */
+body {
+  background:
+    radial-gradient(900px 300px at 50% -6%, rgba(180,24,69,.05), transparent 60%),
+    radial-gradient(680px 400px at 108% 22%, rgba(232,176,75,.06), transparent 62%),
+    var(--bg);
+}
+
+/* 今日统计 ¥ 符号 */
+.stat-cur { font-size: 15px; font-weight: 800; margin-right: 2px; opacity: .85; }
+
+/* 快捷图标按压弹跳 */
+.quick-btn:active .qb-icon { transform: scale(1.18); }
+.quick-btn .qb-icon { transition: transform .18s var(--ease-spring); }
+
+/* 卡片轻悬浮（桌面端） */
+@media (hover: hover) {
+  .list-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+  .btn:hover { box-shadow: var(--shadow-md); }
+}
+
+/* 弹窗按钮统一圆角与质感 */
+.modal .btn-row .btn, .announce-ok, .img-share-close { border-radius: 14px; }
+
+/* 输入框内部更柔和 */
+.input { transition: background .25s var(--ease), box-shadow .25s var(--ease), border-color .25s var(--ease); }
+
+/* 列表卡点击反馈更明显 */
+.list-card { will-change: transform; }
+.list-card:active { transform: scale(.975); }
 </style>
 <script>const m={name:"羊毛衫管家",short_name:"羊毛衫管家",description:"洪合羊毛衫商家专用：库存、销售、订单、盘点、进货、欠款一站管理",start_url:"./",display:"standalone",orientation:"portrait",background_color:"#f6f4f1",theme_color:"#b91c2e",lang:"zh-CN",icons:[{src:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAADWUlEQVR4nO3d0UrjUBRA0Tj0TwL1/z9H8H6LwzwIgxR1Ora5vXutd6Gck53EWNun1/P5bYOoX0e/ADiSAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBEDa6egXMJP95WWrGM/PR7+EKTy9ns9vW1jpoL9kxENI3wLVD/73GZTnkA2gvPRL9ug8kgFUl/2VPTiXXADFJf+LPTafVAC15V5rD80pFQB8JADSMgGULus/YY/MKxMAXCIA0gRAmgBIEwBpp9WeQtTf3XgP+0K7Oa32+O3952cc9qPbF9zNr1WfPVeeY9/LvuhupgngFkOZadCPbF94N1MEcMthzDLoR7UvvpvD/yVyhiFwrCN/J5jiCgDJAJz9Ofo4cAUgTQCkCYA0AZAmANIEQJoASBMAaQIgTQCkCYA0AZAmANIEQJoASBMAaQIgTQCkCYA0AZAmANIEQJoASBMAaQIgTQCkCYA0AZAmANIEQJoASBMAaYcGMNPXZXIcX5EE1Vuge9TvSjPv3MbBdwGHB3DrIRw94Ec3Ft/NFAHcahgzDHgFY+HdTBPATw9llgGvYiy6m9M2mffhXPvVmTMNdzVjwd1MF8DMw2K93Ux1CwT3JgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGmZAFb6JIN7GJF5ZQKArR5A5az2v0ZoTqkAYKsHUDq7XWPE5pMLoLjk7xrBuSQDqC77MyM6j2wA5aV/nMEIz+Hp9Xx+24Ku/YjvlY1gCLkAHPhfG6EQUrdADn5zSgcA2QCc/c0rHQBcIgDSBECaAEgTAGkCIE0ApGUCKP15/yeMyLwyAfB9I3Lw5wIoLfZaIzajVAB/1N///pkRnEvu7dCQvgLA3wRAmgBIEwBpAiBNAKQJgDQBkCYA0gRAmgBIEwBpAiBNAKQJgDQBkCYA0gRAmgBIEwBpAiBNAKQJgDQBkCYAtrLf4PCeHVXsdBEAAAAASUVORK5CYII=",sizes:"192x192",type:"image/png",purpose:"any"},{src:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAYAAAD0eNT6AAALM0lEQVR4nO3dXW7cNhSA0bjITgzM7H85A9hrcdGHvhRFflqJvNJ3zgISccBLftY4yNvH4/H1DQBI+WP3AwAA6wkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABH3f/QBwpPfXywfKqT6fT58wt/D28Xh87X4I+K9c+OwmCLgqAcDluPSZSgxwJQKAy3DxcxVCgCsQAIzn4ueqhACT+VcAjOby58rsXybzBoCRHJzcjbcBTOMNAOO4/Lkj+5ppBACjOCS5M/ubSQQAYzgcKbDPmUIAMIJDkRL7nQkEANs5DCmy79lNALCVQ5Ay+5+dBAAABAkAtvHTD5gD9hEAbOHyB/PAXgIAAIIEAMv56R/MBfsJAAAIEgAs5ad/MB/MIAAAIEgAAECQAGAZr//BnDCHAACAIAEAAEECAACCBABL+P4fzAuzCAAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQd93PwAz/wvdz+dz298NHM95wj8JgEF2DuiPnkUMwPU4T/gZATDApEH9N2IArsN5wq8SABtNH9QfPbO3AjCL84Tf5ZcAN7nisN7p+eFOrj6PV3/+q/IGYLE7bXRvA2DGDN6B82Q9bwAWutOwFtYFk9117u66rokEwCJ339R3Xx9Mcvd5u/v6phAAC1Q2c2WdsFNlzirr3EkAnKy2iWvrhZVq81Vb72oC4ETVzVtdN5ypOlfVda8gAAAgSACcpF6t9fXDkerzVF//WQTACWxWnwM4T5yr0wkAAAgSAAfz07/PA5wn53C+HksAAEDQ28fj8bX7Ie5CnQKcz/9GegxvAAAgSAAAQJAAAIAgAXAQ3/8DrOG8PYYAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAOMjn83nUHwWA8/Z0AgAAggQAAAQJgAP5GsDnAs6TczlnjyMAACBIAABAkAA4mNdTPg9wnpzD+XosAQAAQQLgBCrV5wDOE+fqdALgJPUIqK8fjlSfp/r6zyIAOJxhBZwn8wmAE7kIAecJUwmAk9UioLZeWKk2X7X1riYAFqhs4so6YafKnFXWuZMAWOTum/nu64NJ7j5vd1/fFAJgoTtu6r/WdMd1wXR3nDvnyVoCYLE7bfC7rAOuynnC/yEANrn65Xn154c7ufo8Xv35r+r77gco+3vTv79e367CoMJMzhN+lwAYYPrguvThOpwn/CoBMPii3RkELn24NucJPyMABnMJA84TzuKXAAEgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIAABAkAAAgSAAAQJAAAIAgAQAAQQIAAIIEAAAECQAACBIALPH5fPqkwbwwiAAAgCABAABBAgAAggQAy/g9ADAnzCEAACBIAABAkABgKV8DgPlgBgEAAEECgOW8BQBzwX4CAACCBABbeAsA5oG9BADbiAAwB+wjAAA2EcHsJADYygEIsIcAYDsRQJF9z24CgBEchpTY70wgABjDoUiBfc4UAoBRHI7cmf3NJAKAcRyS3HFP29dMIwAYyYHJXbj4mUoAMJrDkyuzf5ns7ePx+Nr9EPAr3l8vHxSX4OLnCgQAlyMEmMrFz5UIAC5NDLCbS5+rEgCM5GLnboQC0wgAxnDpUyEGmEAAsJ2LnyohwE7+GSBbufwps//ZSQCwjcMPzAH7CAC2cPmDeWAvAcByLn8wF+wnAFjK5Q/mgxkEAAAECQCW8dM/mBPmEAAAECQAACBIALCE1/9gXphFAABAkAAAgCABAABBAgAAggQAAAQJAAAIEgAAECQAACBIAABAkAAAgCABAABBAgAAggQAAAQJAAAIEgAAECQAACBIAABAkABgic/n0ycN5oVBBAAABAkAAAgSACzjawAwJ8whAACGEMmsJABYygEHMIMAYDkRAOaC/QQAW4gAMA/sJQDYRgSAOWAfAcBWIoDy3rf/2UkAsJ2DkBoXPxO8fTweX7sfAv7p/fXyoXArLn2mEQAAEOQrAAAIEgAAECQAACBIAABAkAAAgCABAABBAgAAggQAAAQJAAAIEgAAECQAACBIAABAkAAAgCABAABBAgAAggQAAAQJAAAIEgAAECQAACBIAABAkAAAgCABAABBAgAAggQAAAQJAAAIEgAAECQAACBIAABAkAAAgCABAABBAgAAggQAAAQJAAAIEgAAECQAACBIAABAkAAAgCABAABBAgAAggQAAAQJAAAIEgAAECQAACBIAABAkAAAgCABAABBAgAAggQAAAQJAAAIEgAAECQAACBIAABAkAAAgCABAABBAgAAggQAAAQJAAAIEgAAECQAACBIAABAkAAAgCABAABBAgAAggQAAAQJAAAIEgAAECQAACBIAABAkAAAgCABAADfev4EqvuXup6IGkUAAAAASUVORK5CYII=",sizes:"512x512",type:"image/png",purpose:"any"},{src:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAADWUlEQVR4nO3d0UrjUBRA0Tj0TwL1/z9H8H6LwzwIgxR1Ora5vXutd6Gck53EWNun1/P5bYOoX0e/ADiSAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBEDa6egXMJP95WWrGM/PR7+EKTy9ns9vW1jpoL9kxENI3wLVD/73GZTnkA2gvPRL9ug8kgFUl/2VPTiXXADFJf+LPTafVAC15V5rD80pFQB8JADSMgGULus/YY/MKxMAXCIA0gRAmgBIEwBpp9WeQtTf3XgP+0K7Oa32+O3952cc9qPbF9zNr1WfPVeeY9/LvuhupgngFkOZadCPbF94N1MEcMthzDLoR7UvvpvD/yVyhiFwrCN/J5jiCgDJAJz9Ofo4cAUgTQCkCYA0AZAmANIEQJoASBMAaQIgTQCkCYA0AZAmANIEQJoASBMAaQIgTQCkCYA0AZAmANIEQJoASBMAaQIgTQCkCYA0AZAmANIEQJoASBMAaYcGMNPXZXIcX5EE1Vuge9TvSjPv3MbBdwGHB3DrIRw94Ec3Ft/NFAHcahgzDHgFY+HdTBPATw9llgGvYiy6m9M2mffhXPvVmTMNdzVjwd1MF8DMw2K93Ux1CwT3JgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGkCIE0ApAmANAGQJgDSBECaAEgTAGmZAFb6JIN7GJF5ZQKArR5A5az2v0ZoTqkAYKsHUDq7XWPE5pMLoLjk7xrBuSQDqC77MyM6j2wA5aV/nMEIz+Hp9Xx+24Ku/YjvlY1gCLkAHPhfG6EQUrdADn5zSgcA2QCc/c0rHQBcIgDSBECaAEgTAGkCIE0ApGUCKP15/yeMyLwyAfB9I3Lw5wIoLfZaIzajVAB/1N///pkRnEvu7dCQvgLA3wRAmgBIEwBpAiBNAKQJgDQBkCYA0gRAmgBIEwBpAiBNAKQJgDQBkCYA0gRAmgBIEwBpAiBNAKQJgDQBkCYAtrLf4PCeHVXsdBEAAAAASUVORK5CYII=",sizes:"192x192",type:"image/png",purpose:"maskable"}]};const b=new Blob([JSON.stringify(m)],{type:"application/json"});const l=document.createElement("link");l.rel="manifest";l.href=URL.createObjectURL(b);document.head.appendChild(l);</script></head>
 <body>
@@ -1233,10 +1275,10 @@ body {
       <!-- ============ 今日概览 ============ -->
       <section id="view-today" class="view">
         <div class="stats-summary">
-          <div class="stat-card" data-go="stats"><div class="stat-num" id="today-sales">0</div><div class="stat-lbl">今日营业额</div></div>
-          <div class="stat-card" data-go="stats"><div class="stat-num" id="today-profit">0</div><div class="stat-lbl">今日利润</div></div>
+          <div class="stat-card" data-go="stats"><div class="stat-num"><span class="stat-cur">¥</span><span id="today-sales">0</span></div><div class="stat-lbl">今日营业额</div></div>
+          <div class="stat-card" data-go="stats"><div class="stat-num"><span class="stat-cur">¥</span><span id="today-profit">0</span></div><div class="stat-lbl">今日利润</div></div>
           <div class="stat-card" data-go="orders-today"><div class="stat-num" id="today-orders">0</div><div class="stat-lbl">今日新订单 ›</div></div>
-          <div class="stat-card" data-go="debt"><div class="stat-num" id="today-debt">0</div><div class="stat-lbl">未收款合计 ›</div></div>
+          <div class="stat-card" data-go="debt"><div class="stat-num"><span class="stat-cur">¥</span><span id="today-debt">0</span></div><div class="stat-lbl">未收款合计 ›</div></div>
         </div>
         <div class="card">
           <h3>快捷操作</h3>
@@ -2422,7 +2464,7 @@ const Sync = {
 
 /* ---------------- 授权与版本（2.4 工厂版） ---------------- */
 
-const APP_VERSION = "3.28";
+const APP_VERSION = "3.30";
 
 const License = {
   /** 当前账号绑定的授权码（本地记录） */
@@ -2630,6 +2672,12 @@ function announceModal(versions) {
 
 /** 各版本更新公告（每次发布新版本时在此追加一条） */
 const CHANGELOG = {
+  "3.30": [
+    "高级配色升级：亮红改为酒红+香槟金+暖象牙白，头部金线、统计数字金红渐变，整体更有质感"
+  ],
+  "3.29": [
+    "界面质感再打磨：勾选框品牌红、背景暖光晕、今日统计加¥符号、快捷图标按压弹跳、卡片桌面悬浮感"
+  ],
   "3.28": [
     "新增「每日明细」：统计页一键进入，按天查看每天的营业额、利润、单数、件数，点某天看当天明细"
   ],
