@@ -540,13 +540,14 @@ const Sync = {
     const username = currentAccount ? currentAccount.username : null;
     if (!username) throw new Error("未登录");
     const payload = await Store.exportAll();
-    const row = { username, data: payload, updated_at: new Date().toISOString() };
+    const ts = new Date().toISOString();
+    const row = { username, data: payload, updated_at: ts };
     await this.request("/rest/v1/knit_sync", {
       method: "POST",
       headers: { "Prefer": "resolution=merge-duplicates,return=minimal" },
       body: JSON.stringify(row)
     });
-    return true;
+    return ts; // 返回本次上传的 updated_at，供秒级同步识别"自己上传"避免回环
   },
   async pull() {
     const username = currentAccount ? currentAccount.username : null;
@@ -588,7 +589,7 @@ const Sync = {
 
 /* ---------------- 授权与版本（2.4 工厂版） ---------------- */
 
-const APP_VERSION = "3.24";
+const APP_VERSION = "3.25";
 
 const License = {
   /** 当前账号绑定的授权码（本地记录） */

@@ -2359,13 +2359,14 @@ const Sync = {
     const username = currentAccount ? currentAccount.username : null;
     if (!username) throw new Error("未登录");
     const payload = await Store.exportAll();
-    const row = { username, data: payload, updated_at: new Date().toISOString() };
+    const ts = new Date().toISOString();
+    const row = { username, data: payload, updated_at: ts };
     await this.request("/rest/v1/knit_sync", {
       method: "POST",
       headers: { "Prefer": "resolution=merge-duplicates,return=minimal" },
       body: JSON.stringify(row)
     });
-    return true;
+    return ts; // 返回本次上传的 updated_at，供秒级同步识别"自己上传"避免回环
   },
   async pull() {
     const username = currentAccount ? currentAccount.username : null;
@@ -2407,7 +2408,7 @@ const Sync = {
 
 /* ---------------- 授权与版本（2.4 工厂版） ---------------- */
 
-const APP_VERSION = "3.24";
+const APP_VERSION = "3.25";
 
 const License = {
   /** 当前账号绑定的授权码（本地记录） */
@@ -2615,6 +2616,10 @@ function announceModal(versions) {
 
 /** 各版本更新公告（每次发布新版本时在此追加一条） */
 const CHANGELOG = {
+  "3.25": [
+    "升级秒级同步：手机 A 记账后 1.2 秒上传，手机 B 每 5 秒自动检测云端变化并拉取，另一台手机的数据几秒内就显示",
+    "同步更省流量：每 5 秒只查几十字节的时间戳，有变化才下载数据"
+  ],
   "3.24": [
     "多手机同步加强：任意页面每 60 秒自动从云端拉取并刷新，另一台手机记的账 1 分钟内显示",
     "后台管理修复：新增「恢复内置配置」按钮（旧连接配置会导致授权码显示为空），状态栏区分内置/自定义连接"
@@ -2938,40 +2943,50 @@ function initFontSize() {
 /* ================= 数据刷新 ================= */
 
 let _autoUploadTimer = null;
+/** 本会话自己上传过的时间戳（ms），用于秒级同步识别"自己上传"避免拉回环 */
+const _myUploads = new Set();
+function rememberUpload(ts) {
+  try {
+    const ms = Date.parse(ts);
+    if (!isNaN(ms)) {
+      _myUploads.add(ms);
+      if (_myUploads.size > 10) {
+        const first = _myUploads.values().next().value;
+        _myUploads.delete(first);
+      }
+    }
+  } catch {}
+}
 
-/** 数据变更后自动上传到云端（防抖 2 秒），实现多设备实时同步 */
+/** 数据变更后自动上传到云端（防抖 1.2 秒），实现多设备秒级同步 */
 function scheduleAutoUpload() {
   if (!currentAccount || window.__suppressUpload) return;
   clearTimeout(_autoUploadTimer);
   _autoUploadTimer = setTimeout(async () => {
     try {
       if (await Sync.isConfigured()) {
-        await Sync.upload();
+        const sent = await Sync.upload();
+        rememberUpload(sent);
       }
     } catch (e) {
       // 上传失败静默（下次变更再试）
     }
-  }, 2000);
+  }, 1200);
 }
 
 // 切后台 / 关页面时立即上传一次，避免最后输入的数据没同步
 let _flushSyncing = false;
+function flushUpload() {
+  if (!currentAccount || _flushSyncing) return;
+  _flushSyncing = true;
+  Sync.isConfigured().then((ok) => {
+    if (ok) return Sync.upload().then((sent) => rememberUpload(sent));
+  }).catch(() => {}).finally(() => { _flushSyncing = false; });
+}
 window.addEventListener("visibilitychange", () => {
-  if (document.visibilityState === "hidden" && currentAccount && !_flushSyncing) {
-    _flushSyncing = true;
-    Sync.isConfigured().then((ok) => {
-      if (ok) return Sync.upload();
-    }).catch(() => {}).finally(() => { _flushSyncing = false; });
-  }
+  if (document.visibilityState === "hidden") flushUpload();
 });
-window.addEventListener("pagehide", () => {
-  if (currentAccount && !_flushSyncing) {
-    _flushSyncing = true;
-    Sync.isConfigured().then((ok) => {
-      if (ok) return Sync.upload();
-    }).catch(() => {}).finally(() => { _flushSyncing = false; });
-  }
-});
+window.addEventListener("pagehide", flushUpload);
 
 async function reloadAll() {
   const [items, orders, addrs, stocktakes, purchases, sales, customers, factories, outsources] = await Promise.all([
@@ -3069,42 +3084,47 @@ function startClock() {
   _clockTimer = setInterval(updateClock, 1000);
 }
 
-/* 定时自动同步：
- * - 每 10 秒本地重算今日统计（不依赖操作触发）
- * - 任意页面可见时每 60 秒从云端拉取一次并刷新当前视图（多设备同一账号≈实时同步）
+/* 秒级自动同步：
+ * - 每 5 秒本地重算今日统计
+ * - 每 5 秒查一次云端 updated_at（几十字节，很省流量），变了才拉取全量并刷新当前视图
  */
 let _todayRefreshTimer = null;
-let _lastCloudPullMin = -1;
+let _lastSeenSyncMs = 0; // 最近看到的云端更新时间（ms）
+function refreshCurrentView() {
+  if (currentView === "items") renderItems();
+  else if (currentView === "customers") renderCustomers();
+  else if (currentView === "orders") renderOrders();
+  else if (currentView === "outsource") renderOutsources();
+  else if (currentView === "factories") renderFactories();
+  else if (currentView === "trends") renderTrends();
+  else if (currentView === "addrbook") renderAddrBookList();
+}
 function startTodayAutoRefresh() {
   if (_todayRefreshTimer) clearInterval(_todayRefreshTimer);
   _todayRefreshTimer = setInterval(async () => {
     renderToday();
-    const minute = Math.floor(Date.now() / 60000);
-    if (currentAccount && document.visibilityState === "visible" && minute !== _lastCloudPullMin) {
-      _lastCloudPullMin = minute;
-      try {
-        if (await Sync.isConfigured()) {
-          window.__suppressUpload = true; // 拉取后的重载不触发上传回环
-          const changed = await Sync.pullIfExists();
-          await reloadAll();
-          window.__suppressUpload = false;
-          if (changed) {
-            renderToday();
-            // 刷新当前视图，让另一台手机记的数据尽快显示
-            if (currentView === "items") renderItems();
-            else if (currentView === "customers") renderCustomers();
-            else if (currentView === "orders") renderOrders();
-            else if (currentView === "outsource") renderOutsources();
-            else if (currentView === "factories") renderFactories();
-            else if (currentView === "trends") renderTrends();
-            else if (currentView === "addrbook") renderAddrBookList();
-          }
-        }
-      } catch (e) {
-        window.__suppressUpload = false;
+    if (!currentAccount || document.visibilityState !== "visible") return;
+    try {
+      if (!await Sync.isConfigured()) return;
+      // 1) 轻量查询云端更新时间戳
+      const rows = await Sync.request("/rest/v1/knit_sync?username=eq." + encodeURIComponent(currentAccount.username) + "&select=updated_at");
+      const serverMs = (rows && rows[0] && rows[0].updated_at) ? Date.parse(rows[0].updated_at) : 0;
+      if (!serverMs || serverMs === _lastSeenSyncMs) return;
+      // 2) 自己刚上传的不拉（避免回环），其余情况拉取合并
+      if (_myUploads.has(serverMs)) { _lastSeenSyncMs = serverMs; return; }
+      _lastSeenSyncMs = serverMs;
+      window.__suppressUpload = true;
+      const changed = await Sync.pullIfExists();
+      await reloadAll();
+      window.__suppressUpload = false;
+      if (changed) {
+        renderToday();
+        refreshCurrentView();
       }
+    } catch (e) {
+      window.__suppressUpload = false;
     }
-  }, 10000);
+  }, 5000);
 }
 
 function renderToday() {
@@ -6321,6 +6341,12 @@ async function enterApp() {
     if (await Sync.isConfigured()) {
       await Sync.pullIfExists();
       await reloadAll();
+      // 记录云端当前更新时间，秒级同步从这一刻开始
+      try {
+        const rows = await Sync.request("/rest/v1/knit_sync?username=eq." + encodeURIComponent(currentAccount.username) + "&select=updated_at");
+        const serverMs = (rows && rows[0] && rows[0].updated_at) ? Date.parse(rows[0].updated_at) : Date.now();
+        _lastSeenSyncMs = isNaN(serverMs) ? Date.now() : serverMs;
+      } catch {}
     }
   } catch (e) {
     // 同步失败不阻塞

@@ -267,10 +267,21 @@ async function loadLicenses() {
         <td>${countMap[r.code] || 0}</td>
         <td>${new Date(r.created_at).toLocaleDateString("zh-CN")}</td>
         <td>${r.revoked_at ? '<span class="badge revoked">已吊销</span>' : '<span class="badge active">有效</span>'}</td>
-        <td>${r.revoked_at ? "" : `<button class="btn-danger" data-revoke="${esc(r.code)}">吊销</button>`}</td>
+        <td>
+          ${r.revoked_at
+            ? `<button class="btn-ghost" data-restore="${esc(r.code)}">恢复</button>`
+            : `<button class="btn-danger" data-revoke="${esc(r.code)}">吊销</button>`}
+          <button class="btn-danger" data-del="${esc(r.code)}" style="margin-left:6px">删除</button>
+        </td>
       </tr>`).join("");
     $$("[data-revoke]").forEach((b) => {
       b.onclick = () => revokeLicense(b.dataset.revoke);
+    });
+    $$("[data-restore]").forEach((b) => {
+      b.onclick = () => restoreLicense(b.dataset.restore);
+    });
+    $$("[data-del]").forEach((b) => {
+      b.onclick = () => deleteLicense(b.dataset.del);
     });
   } catch (e) {
     $("#lic-table").innerHTML = `<tr><td colspan="7" style="text-align:center;color:#b91c2e">加载失败：${esc(e.message)}</td></tr>`;
