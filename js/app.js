@@ -125,6 +125,9 @@ function announceModal(versions) {
 
 /** 各版本更新公告（每次发布新版本时在此追加一条） */
 const CHANGELOG = {
+  "3.17": [
+    "颜色自动合并：款式里「红」和「红色」等同一颜色的条目自动合并为一种，库存/已售相加，保留标准名（如 红色）"
+  ],
   "3.16": [
     "去掉「线上爆款速查」入口（保留我的畅销款和行业风向）",
     "开单修复：颜色改为下拉选择现有颜色（显示库存），没选颜色或库存不足会拦截不能保存"
@@ -453,9 +456,28 @@ async function reloadAll() {
   customersCache = customers.filter(Boolean).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
   factoriesCache = factories.filter(Boolean).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
   outsourcesCache = outsources.filter(Boolean).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-  // 清洗子项空记录（防止历史脏数据导致页面报错）
+  // 清洗子项空记录 + 合并同色异名（红/红色 合并为一种，库存已售相加）
+  for (const it of itemsCache) {
+    if (!Array.isArray(it.colors)) continue;
+    const cleaned = it.colors.filter((c) => c && c.name);
+    const byKey = new Map();
+    const merged = [];
+    for (const c of cleaned) {
+      const key = normColor(c.name);
+      if (byKey.has(key)) {
+        const t = byKey.get(key);
+        t.stock = (t.stock || 0) + (c.stock || 0);
+        t.sold = (t.sold || 0) + (c.sold || 0);
+        if (c.name.endsWith("色") && !t.name.endsWith("色")) t.name = c.name;
+      } else {
+        const cp = { name: c.name, stock: c.stock || 0, sold: c.sold || 0 };
+        byKey.set(key, cp);
+        merged.push(cp);
+      }
+    }
+    it.colors = merged;
+  }
   for (const o of ordersCache) if (Array.isArray(o.lines)) o.lines = o.lines.filter(Boolean);
-  for (const it of itemsCache) if (Array.isArray(it.colors)) it.colors = it.colors.filter(Boolean);
   for (const os of outsourcesCache) if (Array.isArray(os.returns)) os.returns = os.returns.filter(Boolean);
   // 数据变更后自动上传（登录初始加载不触发）
   if (currentAccount && !window.__initialLoad) {
