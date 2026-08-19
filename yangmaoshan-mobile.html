@@ -1596,6 +1596,7 @@ body {
           <select id="pu-item" class="input"></select>
           <label class="lbl">颜色</label>
           <select id="pu-color" class="input"></select>
+          <input id="pu-color-new" class="input hidden" placeholder="新颜色名称（如：咖色）">
           <label class="lbl">送货数量（件）*</label>
           <input id="pu-qty" class="input" type="number" inputmode="numeric" min="1" value="1">
           <label class="lbl">工费（元/件，可选）</label>
@@ -2406,7 +2407,7 @@ const Sync = {
 
 /* ---------------- 授权与版本（2.4 工厂版） ---------------- */
 
-const APP_VERSION = "3.19";
+const APP_VERSION = "3.20";
 
 const License = {
   /** 当前账号绑定的授权码（本地记录） */
@@ -2614,6 +2615,9 @@ function announceModal(versions) {
 
 /** 各版本更新公告（每次发布新版本时在此追加一条） */
 const CHANGELOG = {
+  "3.20": [
+    "送货入库：颜色下拉增加「＋ 新增颜色」，加工商送来新颜色可以直接录入并自动加到款式里"
+  ],
   "3.19": [
     "首页大时间卡片移除：日期和时钟改成一排小字放在页面底部，重要信息（统计/快捷/提醒）位置更靠上"
   ],
@@ -5692,7 +5696,8 @@ function updatePurchaseColor() {
   const it = itemsCache.find((x) => x.id === $("#pu-item").value);
   const selColor = $("#pu-color");
   selColor.innerHTML = (it && it.colors ? it.colors : []).map((c) =>
-    `<option value="${escapeHtml(c.name)}">${escapeHtml(c.name)}（库存 ${c.stock}）</option>`).join("");
+    `<option value="${escapeHtml(c.name)}">${escapeHtml(c.name)}（库存 ${c.stock}）</option>`).join("") +
+    `<option value="__new__">＋ 新增颜色…</option>`;
 }
 
 function openPurchaseForItem(id) {
@@ -5720,19 +5725,35 @@ function renderPurchaseList() {
 async function confirmPurchase() {
   const it = itemsCache.find((x) => x.id === $("#pu-item").value);
   if (!it) return toast("请选择款式");
-  const colorName = $("#pu-color").value;
+  // 颜色：可选现有颜色，或选"新增颜色"后输入新颜色名
+  const newInp = $("#pu-color-new");
+  let colorName = "";
+  if (!newInp.classList.contains("hidden")) {
+    colorName = newInp.value.trim();
+    if (!colorName) return toast("请填写新颜色名称");
+  } else {
+    colorName = $("#pu-color").value;
+  }
   const qty = Number($("#pu-qty").value);
   const unitPriceRaw = $("#pu-price").value.trim();
   const supplier = $("#pu-supplier").value.trim();
-  if (!colorName) return toast("该款式还没有颜色，请先编辑添加");
+  if (!colorName) return toast("请选择颜色或新增颜色");
   if (!(qty >= 1)) return toast("请填写正确的送货数量");
   const unitPrice = unitPriceRaw === "" ? null : Number(unitPriceRaw);
-  const color = findColor(it, colorName);
-  if (!color) return toast("颜色不存在");
+  let color = findColor(it, colorName);
+  if (!color) {
+    // 新颜色：自动加入款式
+    color = { name: colorName, stock: 0, sold: 0 };
+    it.colors.push(color);
+  }
   color.stock += qty;
   await Store.saveItem(it);
   await Store.savePurchase({ itemId: it.id, itemName: it.name, color: colorName, qty, unitPrice, supplier });
-  toast(`${supplier ? "加工商「" + supplier + "」" : ""}已入库 ${qty} 件`);
+  toast(`${supplier ? "加工商「" + supplier + "」" : ""}已入库 ${qty} 件${colorName ? "（" + colorName + "）" : ""}`);
+  // 重置控件
+  newInp.classList.add("hidden");
+  newInp.value = "";
+  $("#pu-color").classList.remove("hidden");
   $("#pu-qty").value = "1";
   $("#pu-price").value = "";
   await reloadAll();
@@ -6563,6 +6584,16 @@ function bindEvents() {
   // 送货入库
   $("#pu-item").onchange = updatePurchaseColor;
   $("#pu-confirm").onclick = confirmPurchase;
+  // 选"＋ 新增颜色"时切到输入框
+  $("#pu-color").onchange = () => {
+    if ($("#pu-color").value === "__new__") {
+      $("#pu-color").classList.add("hidden");
+      const inp = $("#pu-color-new");
+      inp.classList.remove("hidden");
+      inp.value = "";
+      setTimeout(() => { try { inp.focus(); } catch {} }, 60);
+    }
+  };
   // 从送货入库内联添加加工商：保存后返回入库页并选中新加工商
   $("#pu-new-supplier").onclick = () => {
     afterFactorySave = (name) => {
