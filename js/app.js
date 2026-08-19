@@ -125,6 +125,11 @@ function announceModal(versions) {
 
 /** 各版本更新公告（每次发布新版本时在此追加一条） */
 const CHANGELOG = {
+  "3.23": [
+    "数据更安全：切后台/关页面自动上传云端，防最后一条没同步",
+    "新增备份提醒：30 天没导出会自动提醒你导出文件保存",
+    "设置页加了数据安全提示"
+  ],
   "3.22": [
     "今日提醒新增：今日未收款项（今天下的单还没收到钱）和待发货清单（没发的货），点一下直达"
   ],
@@ -455,6 +460,25 @@ function scheduleAutoUpload() {
   }, 2000);
 }
 
+// 切后台 / 关页面时立即上传一次，避免最后输入的数据没同步
+let _flushSyncing = false;
+window.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden" && currentAccount && !_flushSyncing) {
+    _flushSyncing = true;
+    Sync.isConfigured().then((ok) => {
+      if (ok) return Sync.upload();
+    }).catch(() => {}).finally(() => { _flushSyncing = false; });
+  }
+});
+window.addEventListener("pagehide", () => {
+  if (currentAccount && !_flushSyncing) {
+    _flushSyncing = true;
+    Sync.isConfigured().then((ok) => {
+      if (ok) return Sync.upload();
+    }).catch(() => {}).finally(() => { _flushSyncing = false; });
+  }
+});
+
 async function reloadAll() {
   const [items, orders, addrs, stocktakes, purchases, sales, customers, factories, outsources] = await Promise.all([
     Store.listItems(), Store.listOrders(), Store.listAddrs(),
@@ -689,6 +713,13 @@ function renderTodayReminders() {
     const qty = unshipped.reduce((s, o) => s + orderTotalQty(o), 0);
     reminders.push({ icon: "📦", text: `${unshipped.length} 单待发货，共 ${qty} 件`, go: "orders-unship" });
   }
+  // 8. 备份提醒（有数据但 30 天没导出时提醒）
+  const hasData = ordersCache.length || salesCache.length || itemsCache.length;
+  let lastBackup = 0;
+  try { lastBackup = Number(localStorage.getItem("knit-last-backup") || 0); } catch {}
+  if (hasData && (!lastBackup || Date.now() - lastBackup > 30 * 86400000)) {
+    reminders.push({ icon: "💾", text: "建议备份数据：导出文件保存，防止手机丢失/清理", go: "backup" });
+  }
 
   if (!reminders.length) {
     box.innerHTML = `<div class="today-ok">✅ 今日无待办，一切正常</div>`;
@@ -709,6 +740,7 @@ function renderTodayReminders() {
       else if (go === "debt") { renderDebt(); showView("debt"); }
       else if (go === "today-unpaid") { renderDebt(); showView("debt"); }
       else if (go === "orders-unship") { orderFilter = "unship"; setOrderChips("unship"); renderOrders(); showView("orders"); }
+      else if (go === "backup") { initSettings(); showView("settings"); }
       else if (go === "report-week") openReport("week");
       else if (go === "report-month") openReport("month");
       else { const tab = $(`.tab[data-view=${go}]`); if (tab) tab.click(); }
@@ -3712,7 +3744,8 @@ async function exportData() {
   a.download = `knit-stock-backup-${todayStr()}.json`;
   a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 3000);
-  toast("已导出备份文件");
+  try { localStorage.setItem("knit-last-backup", String(Date.now())); } catch {}
+  toast("已导出备份文件，建议发微信或存电脑一份");
 }
 
 async function importData(file) {
