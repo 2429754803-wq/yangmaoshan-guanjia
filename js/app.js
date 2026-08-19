@@ -100,6 +100,14 @@ function announceModal(versions) {
 
 /** 各版本更新公告（每次发布新版本时在此追加一条） */
 const CHANGELOG = {
+  "3.12": [
+    "字体固定为最大字号，设置里的字体选项已去掉",
+    "界面质感升级：快捷按钮改成两行式卡片、统计卡/底部Tab/输入框/卡片按压反馈全部打磨"
+  ],
+  "3.11": [
+    "分享卡再简化：颜色从标签改成一排文字，所有内容自动缩放，不再超出卡片",
+    "记一笔销售的记录现在也显示在订单列表（带 🧾 销售标记），点一下直达款式"
+  ],
   "3.10": [
     "新增「工厂/店铺名称」设置：设置里填你的名称，分享卡底部显示「你的名称 · 厂家直供」，客户知道是哪家的货"
   ],
@@ -360,26 +368,17 @@ function applyTheme(dark) {
   try { localStorage.setItem("knit-theme", dark ? "dark" : "light"); } catch {}
 }
 
-/* ================= 字体大小 ================= */
+/* ================= 字体大小（固定最大，界面更清晰） ================= */
 
-const FONT_SIZES = { s: "13px", m: "15px", l: "17px", xl: "19px" };
-
-function applyFontSize(size) {
-  const px = FONT_SIZES[size] || FONT_SIZES.m;
+function applyFontSize(px) {
   // 修改 --fs 变量：CSS 里所有字号都基于它派生，改一处全局生效
   document.documentElement.style.setProperty("--fs", px);
   document.body.style.fontSize = px;
-  try { localStorage.setItem("knit-fontsize", size); } catch {}
-  $$(".fontsize-chip").forEach((c) => c.classList.toggle("active", c.dataset.size === size));
 }
 
 function initFontSize() {
-  let size = "m";
-  try { size = localStorage.getItem("knit-fontsize") || "m"; } catch {}
-  applyFontSize(size);
-  $$(".fontsize-chip").forEach((c) => {
-    c.onclick = () => applyFontSize(c.dataset.size);
-  });
+  // 字体固定为最大，方便仓库里看
+  applyFontSize("19px");
 }
 
 /* ================= 数据刷新 ================= */
@@ -951,14 +950,25 @@ function roundRectPath(ctx, x, y, w, h, r) {
   ctx.closePath();
 }
 
-/** 款式分享卡（发给客户）：三段式干净布局 = 大图 / 白底信息 / 品牌条 */
+/** 自适应字号：保证文字不超过 maxWidth */
+function fitFont(ctx, text, maxWidth, start, min) {
+  let size = start;
+  do {
+    ctx.font = "bold " + size + "px sans-serif";
+    if (ctx.measureText(text).width <= maxWidth || size <= min) break;
+    size -= 2;
+  } while (size > min);
+  return size;
+}
+
+/** 款式分享卡（发给客户）：大图 / 名称 / 价格 / 颜色 / 品牌条，全部自适应防溢出 */
 async function shareItemCard(it) {
   try {
-    const W = 800, H = 1150, IMG_H = 700;
+    const W = 800, H = 1150, IMG_H = 680;
     const canvas = document.createElement("canvas");
     canvas.width = W; canvas.height = H;
     const ctx = canvas.getContext("2d");
-    // —— 第一段：整幅大图（无白边，cover 裁切）——
+    // —— 大图（cover 填满，无白边）——
     const img = new Image();
     await new Promise((resolve) => {
       if (it.images && it.images[0]) {
@@ -980,61 +990,53 @@ async function shareItemCard(it) {
       ctx.textAlign = "center";
       ctx.fillText("🧥", W / 2, IMG_H / 2 + 55);
     }
-    // —— 第二段：白底信息区 ——
+    // —— 白底信息区 ——
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, IMG_H, W, H - IMG_H);
-    // 款式名
     ctx.textAlign = "center";
+    // 款式名（自动缩放防溢出）
+    const nameSize = fitFont(ctx, it.name, W - 80, 52, 26);
     ctx.fillStyle = "#1c1917";
-    ctx.font = "bold 50px sans-serif";
-    ctx.fillText(it.name, W / 2, IMG_H + 88);
-    // 价格：¥ 小号红 + 数字特大
+    ctx.fillText(it.name, W / 2, IMG_H + 92);
+    // 价格：¥ 红 + 数字（自动缩放防溢出）
     const priceStr = fmt(it.price);
-    ctx.font = "bold 44px sans-serif";
+    const numSize = fitFont(ctx, priceStr, W - 160, 96, 40);
+    const yuanSize = Math.round(numSize * 0.45);
+    ctx.font = "bold " + yuanSize + "px sans-serif";
     const yuanW = ctx.measureText("¥").width;
-    ctx.font = "bold 96px sans-serif";
+    ctx.font = "bold " + numSize + "px sans-serif";
     const numW = ctx.measureText(priceStr).width;
-    const startX = (W - (yuanW + numW + 6)) / 2;
+    const startX = (W - (yuanW + numW + 4)) / 2;
     ctx.fillStyle = "#b91c2e";
-    ctx.font = "bold 44px sans-serif";
-    ctx.fillText("¥", startX, IMG_H + 196);
-    ctx.font = "bold 96px sans-serif";
-    ctx.fillText(priceStr, startX + yuanW + 6, IMG_H + 206);
-    // 颜色 + 数量（白底红边标签，一行居中）
-    const colors = (it.colors || []).slice(0, 6);
+    ctx.font = "bold " + yuanSize + "px sans-serif";
+    ctx.fillText("¥", startX, IMG_H + 206);
+    ctx.font = "bold " + numSize + "px sans-serif";
+    ctx.fillText(priceStr, startX + yuanW + 4, IMG_H + 208);
+    // 颜色 + 数量（一行文字，最多 4 色 + 等，自动缩放防溢出）
+    const colors = (it.colors || []).slice(0, 4);
     if (colors.length) {
-      ctx.font = "bold 27px sans-serif";
-      const widths = colors.map((c) => ctx.measureText(c.name + " " + c.stock).width);
-      const totalW2 = widths.reduce((a, b) => a + b, 0) + colors.length * 46 - 12;
-      let cx = (W - totalW2) / 2;
-      const cy = IMG_H + 252;
-      for (let i = 0; i < colors.length; i++) {
-        ctx.fillStyle = "#ffffff";
-        ctx.strokeStyle = "rgba(185,28,46,.35)";
-        ctx.lineWidth = 2;
-        roundRectPath(ctx, cx, cy, widths[i] + 32, 48, 24);
-        ctx.fill();
-        ctx.stroke();
-        ctx.fillStyle = "#57534e";
-        ctx.fillText(colors[i].name + " " + colors[i].stock, cx + 16, cy + 32);
-        cx += widths[i] + 46;
-      }
+      let colorText = colors.map((c) => `${c.name} ${c.stock}`).join(" · ");
+      if ((it.colors || []).length > 4) colorText += " 等";
+      const cSize = fitFont(ctx, colorText, W - 80, 30, 20);
+      ctx.fillStyle = "#78716c";
+      ctx.fillText(colorText, W / 2, IMG_H + 268);
     }
-    // —— 第三段：底部品牌条（显示工厂/店铺名称）——
+    // —— 底部品牌条（工厂名称，自动缩放防溢出）——
     const factoryName = await getFactoryName();
     const brandName = (factoryName || "洪合羊毛衫") + " · 厂家直供";
     ctx.fillStyle = "#b91c2e";
     ctx.fillRect(0, H - 88, W, 88);
+    const bSize = fitFont(ctx, brandName, W - 80, 28, 18);
     ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 28px sans-serif";
-    ctx.fillText(brandName, W / 2, H - 34);
-    // 预览分享（长按保存 / 系统分享，iOS 微信内通用）
+    ctx.fillText(brandName, W / 2, H - 33);
+    // 预览分享
     await finishShareImage(canvas, it.name + ".png", it.name, "👆 长按图片保存，转发给微信好友");
   } catch (e) {
     toast("分享失败：" + (e.message || "未知错误"));
   }
 }
 
+/** 款式分享卡（发给客户）：三段式干净布局 = 大图 / 白底信息 / 品牌条 */
 /** 生成朋友圈九宫格：9 张不同设计的卡片图 */
 async function generateNineGrid(it) {
   try {
@@ -2246,18 +2248,42 @@ function renderOrders() {
     if (orderFilter === "custom") return o.type === "custom";
     return true;
   });
-  // 排序：默认按创建时间倒序，可切换按金额
-  if (orderSort === "amount") {
-    list = [...list].sort((a, b) => orderTotal(b) - orderTotal(a) || (b.createdAt || 0) - (a.createdAt || 0));
-  } else {
-    list = [...list].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-  }
+  // 销售记录也显示在订单列表里（"记一笔销售"的记录）
+  let sales = [];
+  if (orderFilter === "today") sales = salesCache.filter((s) => isToday(s.time));
+  else if (orderFilter === "history") sales = salesCache.filter((s) => !isToday(s.time));
+  else if (orderFilter === "all") sales = salesCache;
+  else if (orderFilter === "debt") sales = salesCache.filter((s) => s.onCredit);
+  const rows = [
+    ...list.map((o) => ({ kind: "order", o, t: o.createdAt || 0, amt: orderTotal(o) })),
+    ...sales.map((s) => ({ kind: "sale", s, t: s.time || 0, amt: (s.qty || 0) * (s.price || 0) }))
+  ];
+  // 排序：默认按时间倒序，可切换按金额
+  if (orderSort === "amount") rows.sort((a, b) => b.amt - a.amt || b.t - a.t);
+  else rows.sort((a, b) => b.t - a.t);
   const el = $("#order-list");
-  if (!list.length) {
-    el.innerHTML = '<div class="empty"><span class="empty-icon">' + (ordersCache.length ? "📋" : "📦") + "</span>" + (ordersCache.length ? "没有匹配的订单" : "还没有订单<br>点右上角 ＋ 新订单创建第一单") + "</div>";
+  if (!rows.length) {
+    el.innerHTML = '<div class="empty"><span class="empty-icon">' + ((ordersCache.length || salesCache.length) ? "📋" : "📦") + "</span>" + ((ordersCache.length || salesCache.length) ? "没有匹配的记录" : "还没有订单<br>点右上角 ＋ 新订单创建第一单") + "</div>";
     return;
   }
-  el.innerHTML = list.map((o) => {
+  el.innerHTML = rows.map((r) => {
+    if (r.kind === "sale") {
+      const s = r.s;
+      const it = itemsCache.find((x) => x.id === s.itemId);
+      const name = it ? it.name : s.itemName;
+      return `
+      <div class="list-card order-card" data-sale="${s.id}">
+        <div style="flex:1;min-width:0">
+          <div class="order-head">
+            <span class="order-customer">${escapeHtml(s.customer || "散客")}</span>
+            <span class="tag blue">🧾 销售</span>
+          </div>
+          <div class="order-lines-preview">${s.qty}× ${escapeHtml(name)}${s.color ? "（" + escapeHtml(s.color) + "）" : ""} · ${money((s.qty || 0) * (s.price || 0))}</div>
+          <div class="order-addr">🕐 ${timeStr(s.time)}${s.onCredit ? " · 赊账未收" : " · 已收款"}</div>
+        </div>
+      </div>`;
+    }
+    const o = r.o;
     const lines = (o.lines || []).map((l) => `${l.qty}×${escapeHtml(l.itemName)}${l.color ? "(" + escapeHtml(l.color) + ")" : ""}`).join("、");
     const total = orderTotal(o);
     const debt = orderDebt(o);
@@ -2301,7 +2327,15 @@ function renderOrders() {
         if (cb && e.target !== cb) { cb.checked = !cb.checked; cb.dispatchEvent(new Event("change", { bubbles: true })); }
       };
     } else {
-      card.onclick = () => openOrderDetail(card.dataset.id);
+      card.onclick = () => {
+        if (card.dataset.sale) {
+          // 销售记录：点进对应款式
+          const s = salesCache.find((x) => x.id === card.dataset.sale);
+          if (s && s.itemId) openDetail(s.itemId);
+        } else {
+          openOrderDetail(card.dataset.id);
+        }
+      };
     }
   });
   // 快捷收款（不进入详情）
