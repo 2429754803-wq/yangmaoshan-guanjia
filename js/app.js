@@ -125,6 +125,9 @@ function announceModal(versions) {
 
 /** 各版本更新公告（每次发布新版本时在此追加一条） */
 const CHANGELOG = {
+  "3.15": [
+    "爆款速查升级：优先直接打开本机已安装的淘宝/小红书 App，没装则自动回退网页版"
+  ],
   "3.14": [
     "加工商管理：每个加工商可「一键结清」全部未结工费",
     "库存界面优化：总库存大数字突出，颜色数量加粗醒目，已售单独显示",
@@ -3325,13 +3328,36 @@ function renderStats() {
 
 /* ================= 爆款推荐 ================= */
 
-/** 跳转到电商/社区搜索页看爆款（不采集数据，仅打开链接） */
+/** 跳转到电商/社区搜索看爆款：优先拉起本机已安装的 App，失败自动回退网页版 */
 function jumpToSearch(platform) {
   const kw = encodeURIComponent(($("#trend-keyword").value.trim() || "羊毛衫"));
-  const url = platform === "tb"
+  const web = platform === "tb"
     ? "https://s.taobao.com/search?q=" + kw
     : "https://www.xiaohongshu.com/search_result?keyword=" + kw;
-  window.open(url, "_blank");
+  // 淘宝 / 小红书的 App URL Scheme（拉起本机 App）
+  const scheme = platform === "tb"
+    ? "taobao://s.taobao.com/search?q=" + kw
+    : "xhsdiscover://search_result?keyword=" + kw;
+  let opened = false;
+  const mark = () => { opened = true; };
+  window.addEventListener("blur", mark, { once: true });
+  document.addEventListener("visibilitychange", () => { if (document.hidden) mark(); }, { once: true });
+  try {
+    // 用隐藏 iframe 触发 Scheme；若页面没有失焦（App 没打开），1.2 秒后网页兜底
+    const iframe = document.createElement("iframe");
+    iframe.style.cssText = "display:none;width:0;height:0;border:0";
+    iframe.src = scheme;
+    document.body.appendChild(iframe);
+    setTimeout(() => {
+      try { iframe.remove(); } catch {}
+      if (!opened) {
+        toast("本机没装对应 App，已打开网页版");
+        window.open(web, "_blank");
+      }
+    }, 1200);
+  } catch (e) {
+    window.open(web, "_blank");
+  }
 }
 
 /** 行业风向参考（羊毛衫市场常见热门，可后续联网更新） */
