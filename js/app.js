@@ -125,6 +125,9 @@ function announceModal(versions) {
 
 /** 各版本更新公告（每次发布新版本时在此追加一条） */
 const CHANGELOG = {
+  "3.21": [
+    "数量输入不再预填数字：送货/销售/生产/开单数量都是空框+提示，直接输入即可，不用再删默认的 1"
+  ],
   "3.20": [
     "送货入库：颜色下拉增加「＋ 新增颜色」，加工商送来新颜色可以直接录入并自动加到款式里"
   ],
@@ -1254,7 +1257,7 @@ async function confirmSale() {
     onCredit: onCredit || false
   });
   toast(`已销售 ${qty} 件${onCredit ? "（赊账）" : ""}`);
-  $("#sale-qty").value = "1";
+  $("#sale-qty").value = "";
   $("#sale-customer").value = "";
   $("#sale-on-credit").checked = false;
   await reloadAll();
@@ -1598,7 +1601,7 @@ function openOutsourceEdit() {
   selI.innerHTML = itemsCache.map((it) =>
     `<option value="${it.id}">${escapeHtml(it.name)}</option>`).join("");
   $("#os-color").value = "";
-  $("#os-qty").value = "100";
+  $("#os-qty").value = "";
   $("#os-price").value = "";
   $("#os-material").value = "";
   $("#os-due").value = "";
@@ -2013,7 +2016,7 @@ function renderQuickLines() {
         <select class="input ol-color" data-i="${i}">${colorOptionsHtml(l.itemId, l.color)}</select>
       </div>
       <div class="ol-row">
-        <div class="unit-wrap"><input class="input ol-qty" data-i="${i}" type="number" inputmode="numeric" min="1" value="${l.qty}"><span class="unit">件</span></div>
+        <div class="unit-wrap"><input class="input ol-qty" data-i="${i}" type="number" inputmode="numeric" min="1" value="${l.qty}" placeholder="数量"><span class="unit">件</span></div>
         <div class="unit-wrap"><input class="input ol-price" data-i="${i}" type="number" inputmode="decimal" value="${l.price}" placeholder="单价"><span class="unit">元</span></div>
         <button class="rm" data-i="${i}">✕</button>
       </div>
@@ -2034,7 +2037,10 @@ function renderQuickLines() {
     sel.onchange = () => { quickLines[Number(sel.dataset.i)].color = sel.value; };
   });
   $$("#qo-lines .ol-qty").forEach((inp) => {
-    inp.oninput = () => { quickLines[Number(inp.dataset.i)].qty = Number(inp.value) || 1; };
+    inp.oninput = () => {
+      const v = inp.value;
+      quickLines[Number(inp.dataset.i)].qty = v === "" ? "" : (Number(v) || 1);
+    };
   });
   $$("#qo-lines .ol-price").forEach((inp) => {
     inp.oninput = () => { quickLines[Number(inp.dataset.i)].price = Number(inp.value) || 0; };
@@ -2050,7 +2056,7 @@ function addQuickLine() {
     itemId: first ? first.id : "",
     itemName: first ? first.name : "",
     color: "",
-    qty: 1,
+    qty: "",
     price: first ? first.price || 0 : 0
   });
   renderQuickLines();
@@ -2190,6 +2196,8 @@ async function saveQuickOrder(continueNext) {
       await Store.saveCustomer({ name: customerName, phone, address, note: "快速开单创建" });
     }
   }
+  const noQty = quickLines.find((l) => l.itemId && !(l.qty >= 1));
+  if (noQty) return toast(`请填写「${noQty.itemName || "该商品"}」的数量`);
   const validLines = quickLines.filter((l) => l.itemId && l.qty >= 1);
   if (!validLines.length) return toast("请至少添加一件商品");
   // 开单前严格校验：必须选颜色 + 库存足够
@@ -3014,7 +3022,10 @@ function renderOrderLines() {
     sel.onchange = () => { editingLines[Number(sel.dataset.i)].color = sel.value; };
   });
   $$("#oe-lines .ol-qty").forEach((inp) => {
-    inp.oninput = () => { editingLines[Number(inp.dataset.i)].qty = Number(inp.value) || 1; };
+    inp.oninput = () => {
+      const v = inp.value;
+      editingLines[Number(inp.dataset.i)].qty = v === "" ? "" : (Number(v) || 1);
+    };
   });
   $$("#oe-lines .ol-price").forEach((inp) => {
     inp.oninput = () => { editingLines[Number(inp.dataset.i)].price = Number(inp.value) || 0; };
@@ -3030,7 +3041,7 @@ function addOrderLine() {
     itemId: first ? first.id : "",
     itemName: first ? first.name : "",
     color: "",
-    qty: 1,
+    qty: "",
     price: first ? first.price || 0 : 0
   });
   renderOrderLines();
@@ -3048,6 +3059,8 @@ async function saveOrder() {
   const address = $("#oe-address").value.trim();
   const onCredit = $("#oe-on-credit").checked;
   if (!customer) return toast("请填写客户姓名");
+  const noQty = editingLines.find((l) => l.itemId && !(l.qty >= 1));
+  if (noQty) return toast(`请填写「${noQty.itemName || "该商品"}」的数量`);
   const validLines = editingLines.filter((l) => l.itemId && l.qty >= 1);
   if (!validLines.length) return toast("请至少添加一件商品");
   // 开单前严格校验：必须选颜色 + 库存足够
@@ -3264,7 +3277,7 @@ async function confirmPurchase() {
   newInp.classList.add("hidden");
   newInp.value = "";
   $("#pu-color").classList.remove("hidden");
-  $("#pu-qty").value = "1";
+  $("#pu-qty").value = "";
   $("#pu-price").value = "";
   await reloadAll();
   renderItems();
