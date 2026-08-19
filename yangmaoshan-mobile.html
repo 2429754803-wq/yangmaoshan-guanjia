@@ -1171,7 +1171,6 @@ body {
           <div class="header-sub" id="header-sub">羊毛衫 · 库存订单管理</div>        </div>
         <div class="header-right">
           <button id="search-btn" class="header-btn ghost" title="搜索">🔍</button>
-          <button id="theme-toggle" class="header-btn ghost" title="切换主题">🌙</button>
           <button id="header-btn" class="header-btn hidden">＋ 新增</button>
           <button id="user-btn" class="header-btn ghost" title="账号">👤</button>
         </div>
@@ -2378,7 +2377,7 @@ const Sync = {
 
 /* ---------------- 授权与版本（2.4 工厂版） ---------------- */
 
-const APP_VERSION = "3.12";
+const APP_VERSION = "3.13";
 
 const License = {
   /** 当前账号绑定的授权码（本地记录） */
@@ -2561,6 +2560,9 @@ function announceModal(versions) {
 
 /** 各版本更新公告（每次发布新版本时在此追加一条） */
 const CHANGELOG = {
+  "3.13": [
+    "去掉昼夜主题切换：界面固定为亮色，不再忽亮忽暗"
+  ],
   "3.12": [
     "字体固定为最大字号，设置里的字体选项已去掉",
     "界面质感升级：快捷按钮改成两行式卡片、统计卡/底部Tab/输入框/卡片按压反馈全部打磨"
@@ -2734,7 +2736,6 @@ let editingLines = [];
 let stocktakeDraft = {};   // {itemId: {colorName: actualQty}}
 let stocktakeOnlyStocked = false;
 let batchSelected = new Set();
-let isDark = false;
 let currentView = "today";
 
 /* ================= 视图导航 ================= */
@@ -2818,15 +2819,13 @@ function showMain() {
   $("#view-main").classList.remove("hidden");
 }
 
-/* ================= 主题 ================= */
+/* ================= 主题（固定亮色，去掉昼夜切换） ================= */
 
-function applyTheme(dark) {
-  isDark = dark;
-  document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
-  $("#theme-toggle").textContent = dark ? "☀️" : "🌙";
+function applyTheme() {
+  // 始终亮色主题，不随系统/手动切换
+  document.documentElement.removeAttribute("data-theme");
   const mt = $("#meta-theme");
-  if (mt) mt.content = dark ? "#1c1917" : "#b91c2e";
-  try { localStorage.setItem("knit-theme", dark ? "dark" : "light"); } catch {}
+  if (mt) mt.content = "#b91c2e";
 }
 
 /* ================= 字体大小（固定最大，界面更清晰） ================= */
@@ -6238,9 +6237,6 @@ function bindEvents() {
     $("#quick-more-toggle").textContent = isHidden ? "收起 ▴" : "更多功能 ▾";
   };
 
-  // 主题
-  $("#theme-toggle").onclick = () => applyTheme(!isDark);
-
   // 新增款式 / 新订单 / 新客户 / 新加工商
   $("#header-btn").onclick = () => {
     const v = currentView || ($(".tab.active") ? $(".tab.active").dataset.view : "items");
@@ -6612,11 +6608,9 @@ function setOsChips(which) {
 (async function init() {
   bindEvents();
   initAuth();
-  // 主题恢复
-  let theme = "light";
-  try { theme = localStorage.getItem("knit-theme") || "light"; } catch {}
-  applyTheme(theme === "dark");
-  // 字体大小恢复
+  // 固定亮色主题（已去掉昼夜切换）
+  applyTheme();
+  // 字体固定最大
   initFontSize();
   // 恢复上次登录
   const saved = await Auth.restore();
