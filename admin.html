@@ -83,7 +83,10 @@ th { color: #78716c; font-size: 12px; font-weight: 600; }
   <!-- 状态栏 -->
   <div class="status-bar">
     <span id="status-text">未连接云服务</span>
-    <button class="config-btn" id="btn-config">配置云服务</button>
+    <div class="row" style="flex:1;min-width:180px;justify-content:flex-end;margin:0">
+      <button class="config-btn" id="btn-reset">恢复内置配置</button>
+      <button class="config-btn" id="btn-config">配置云服务</button>
+    </div>
   </div>
 
   <!-- 配置表单 -->
@@ -198,7 +201,8 @@ function saveCfg() {
 }
 function updateStatus() {
   if (cfg.url && cfg.key) {
-    $("#status-text").textContent = "已连接：" + cfg.url.replace("https://", "").replace(".supabase.co", "") + "（内置配置）";
+    const isBuiltin = cfg.url === BUILTIN.url && cfg.key === BUILTIN.key;
+    $("#status-text").textContent = "已连接：" + cfg.url.replace("https://", "").replace(".supabase.co", "") + (isBuiltin ? "（内置配置）" : "（自定义配置）");
     $("#status-text").style.color = "#15803d";
   } else {
     $("#status-text").textContent = "未连接云服务（点击右侧配置）";
@@ -317,6 +321,16 @@ $("#btn-config").onclick = () => {
     $("#cfg-url").value = cfg.url || BUILTIN.url;
     $("#cfg-key").value = cfg.key || BUILTIN.key;
   }
+};
+// 恢复内置配置：清除浏览器里保存的旧连接（旧配置会导致授权码显示为空）
+$("#btn-reset").onclick = () => {
+  if (!confirm("恢复为内置默认连接？（会清除本机保存的旧配置）")) return;
+  localStorage.removeItem(SKEY);
+  cfg = { ...BUILTIN };
+  saveCfg();
+  loadLicenses();
+  loadVersions();
+  showMsg($("#cfg-msg"), "已恢复内置配置并重新连接 ✅", true);
 };
 $("#cfg-save").onclick = () => {
   const url = $("#cfg-url").value.trim().replace(/\/+$/, "");

@@ -125,6 +125,10 @@ function announceModal(versions) {
 
 /** 各版本更新公告（每次发布新版本时在此追加一条） */
 const CHANGELOG = {
+  "3.24": [
+    "多手机同步加强：任意页面每 60 秒自动从云端拉取并刷新，另一台手机记的账 1 分钟内显示",
+    "后台管理修复：新增「恢复内置配置」按钮（旧连接配置会导致授权码显示为空），状态栏区分内置/自定义连接"
+  ],
   "3.23": [
     "数据更安全：切后台/关页面自动上传云端，防最后一条没同步",
     "新增备份提醒：30 天没导出会自动提醒你导出文件保存",
@@ -575,9 +579,9 @@ function startClock() {
   _clockTimer = setInterval(updateClock, 1000);
 }
 
-/* 今日概览定时刷新：
- * - 每 10 秒本地重算销售额/利润/订单/提醒（不依赖操作触发）
- * - 今日页可见时每 60 秒从云端拉取一次（多设备同一账号实时同步）
+/* 定时自动同步：
+ * - 每 10 秒本地重算今日统计（不依赖操作触发）
+ * - 任意页面可见时每 60 秒从云端拉取一次并刷新当前视图（多设备同一账号≈实时同步）
  */
 let _todayRefreshTimer = null;
 let _lastCloudPullMin = -1;
@@ -586,7 +590,7 @@ function startTodayAutoRefresh() {
   _todayRefreshTimer = setInterval(async () => {
     renderToday();
     const minute = Math.floor(Date.now() / 60000);
-    if (currentAccount && document.visibilityState === "visible" && currentView === "today" && minute !== _lastCloudPullMin) {
+    if (currentAccount && document.visibilityState === "visible" && minute !== _lastCloudPullMin) {
       _lastCloudPullMin = minute;
       try {
         if (await Sync.isConfigured()) {
@@ -594,7 +598,17 @@ function startTodayAutoRefresh() {
           const changed = await Sync.pullIfExists();
           await reloadAll();
           window.__suppressUpload = false;
-          if (changed) renderToday();
+          if (changed) {
+            renderToday();
+            // 刷新当前视图，让另一台手机记的数据尽快显示
+            if (currentView === "items") renderItems();
+            else if (currentView === "customers") renderCustomers();
+            else if (currentView === "orders") renderOrders();
+            else if (currentView === "outsource") renderOutsources();
+            else if (currentView === "factories") renderFactories();
+            else if (currentView === "trends") renderTrends();
+            else if (currentView === "addrbook") renderAddrBookList();
+          }
         }
       } catch (e) {
         window.__suppressUpload = false;
