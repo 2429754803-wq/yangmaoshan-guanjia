@@ -2,185 +2,310 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>羊毛衫管家 · 电脑管理后台</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>羊毛衫管家 · 管理后台</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-  background: #f6f4f1; color: #1c1917; min-height: 100vh;
+  background: #f4f0ea; color: #241d1b; min-height: 100vh;
 }
-.wrap { max-width: 960px; margin: 0 auto; padding: 24px 16px 60px; }
-header {
-  background: linear-gradient(135deg, #8f1122, #b91c2e 50%, #c2253a);
-  color: #fff; border-radius: 16px; padding: 24px; margin-bottom: 20px;
-  box-shadow: 0 6px 20px rgba(143,17,34,.25);
+.hidden { display: none !important; }
+
+/* ============ 登录页 ============ */
+#login-mask {
+  position: fixed; inset: 0; z-index: 999;
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+  background:
+    radial-gradient(900px 400px at 80% -10%, rgba(201,163,92,.25), transparent 60%),
+    radial-gradient(700px 400px at -10% 110%, rgba(109,15,43,.55), transparent 55%),
+    linear-gradient(160deg, #5c0d24 0%, #7a1130 45%, #a3163f 100%);
 }
-header h1 { font-size: 22px; margin-bottom: 6px; }
-header p { opacity: .85; font-size: 14px; }
+.login-card {
+  background: rgba(255,253,250,.97); border-radius: 22px; padding: 34px 28px 26px;
+  width: 100%; max-width: 360px; text-align: center;
+  box-shadow: 0 24px 60px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.7);
+}
+.login-logo { font-size: 44px; margin-bottom: 8px; }
+.login-card h1 { font-size: 21px; color: #6d0f2b; letter-spacing: 1px; }
+.login-card .sub { font-size: 13px; color: #a89f95; margin: 6px 0 22px; }
+.login-card input {
+  width: 100%; padding: 13px 14px; margin-bottom: 12px;
+  border: 1.5px solid #ebe5de; border-radius: 12px; font-size: 15px; outline: none;
+  background: #faf7f2;
+}
+.login-card input:focus { border-color: #c9a35c; box-shadow: 0 0 0 3px rgba(201,163,92,.15); }
+.login-btn {
+  width: 100%; padding: 13px; border: none; border-radius: 12px;
+  background: linear-gradient(135deg, #6d0f2b, #a3163f); color: #fff;
+  font-size: 16px; font-weight: 700; cursor: pointer; letter-spacing: 2px;
+  box-shadow: 0 6px 18px rgba(109,15,43,.35);
+}
+.login-btn:active { transform: scale(.97); }
+.login-err { color: #b41845; font-size: 13px; margin-top: 10px; min-height: 18px; }
+.login-hint { font-size: 12px; color: #a89f95; margin-top: 14px; line-height: 1.7; }
+
+/* ============ 布局 ============ */
+.app { max-width: 1180px; margin: 0 auto; padding: 0 16px 60px; }
+.navbar {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 18px 0 14px; flex-wrap: wrap;
+}
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand .logo {
+  width: 40px; height: 40px; border-radius: 12px; font-size: 20px;
+  background: linear-gradient(135deg, #6d0f2b, #a3163f); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 12px rgba(109,15,43,.3);
+}
+.brand h1 { font-size: 19px; color: #6d0f2b; letter-spacing: .5px; }
+.brand small { display: block; font-size: 12px; color: #a89f95; font-weight: 400; }
+.navbar-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.status-pill {
+  font-size: 12.5px; padding: 7px 14px; border-radius: 20px;
+  background: #fffdfa; border: 1px solid #ebe5de; color: #7a726a;
+  display: flex; align-items: center; gap: 6px;
+}
+.status-pill .dot { width: 8px; height: 8px; border-radius: 50%; background: #c9a35c; }
+.status-pill.on .dot { background: #15803d; }
+.logout-btn {
+  border: 1.5px solid #ebe5de; background: #fffdfa; color: #7a726a;
+  padding: 8px 16px; border-radius: 20px; font-size: 13px; cursor: pointer;
+}
+.logout-btn:hover { border-color: #b41845; color: #b41845; }
+
+/* Tab 导航 */
+.tabs {
+  display: flex; gap: 6px; margin-bottom: 18px; flex-wrap: wrap;
+  background: #fffdfa; border: 1px solid #ebe5de; border-radius: 16px; padding: 6px;
+  box-shadow: 0 2px 10px rgba(36,29,27,.04);
+}
+.tab-btn {
+  flex: 1; min-width: 120px; padding: 11px 8px; border: none; border-radius: 12px;
+  background: transparent; font-size: 14px; font-weight: 600; color: #7a726a;
+  cursor: pointer; transition: all .2s;
+}
+.tab-btn:hover { color: #6d0f2b; }
+.tab-btn.active {
+  background: linear-gradient(135deg, #6d0f2b, #a3163f); color: #fff;
+  box-shadow: 0 4px 12px rgba(109,15,43,.3);
+}
+
+/* 卡片 */
 .card {
-  background: #fff; border-radius: 14px; padding: 20px; margin-bottom: 16px;
-  box-shadow: 0 1px 3px rgba(28,25,23,.08);
+  background: #fffdfa; border: 1px solid #ebe5de; border-radius: 18px; padding: 22px;
+  margin-bottom: 16px; box-shadow: 0 2px 10px rgba(36,29,27,.04), inset 0 1px 0 rgba(255,255,255,.7);
 }
-.card h2 { font-size: 16px; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
-.card h2::before { content: ""; width: 4px; height: 16px; border-radius: 2px; background: linear-gradient(#e8b04b,#b91c2e); }
-label { display: block; font-size: 13px; color: #78716c; margin: 12px 0 6px; font-weight: 600; }
-input, select, textarea {
-  width: 100%; padding: 10px 12px; border: 1.5px solid #e7e5e4; border-radius: 10px;
-  font-size: 14px; outline: none; font-family: inherit;
+.card h2 {
+  font-size: 16px; color: #241d1b; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
 }
-input:focus, textarea:focus { border-color: #b91c2e; box-shadow: 0 0 0 3px rgba(185,28,46,.1); }
-textarea { min-height: 70px; resize: vertical; }
-button {
-  border: none; border-radius: 10px; padding: 11px 18px; font-size: 14px; font-weight: 600;
-  cursor: pointer; font-family: inherit; transition: all .15s;
-}
-button:active { transform: scale(.97); }
-.btn-primary { background: linear-gradient(135deg,#a4162a,#b91c2e); color: #fff; }
-.btn-primary:hover { opacity: .92; }
-.btn-ghost { background: #fff; border: 1.5px solid #e7e5e4; color: #1c1917; }
-.btn-danger { background: #fee2e2; color: #b91c2e; }
-.row { display: flex; gap: 10px; flex-wrap: wrap; }
-.row > * { flex: 1; min-width: 140px; }
+.card h2::before { content: ""; width: 4px; height: 16px; border-radius: 2px; background: linear-gradient(#c9a35c, #a3163f); }
 .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-@media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
+@media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+
+/* 概览统计卡 */
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.stat-box {
+  background: linear-gradient(160deg, #fffdfa, #f6f1ea); border: 1px solid #ebe5de;
+  border-radius: 16px; padding: 18px 16px; text-align: center;
+}
+.stat-box .num { font-size: 26px; font-weight: 800; background: linear-gradient(120deg, #6d0f2b, #c9a35c); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.stat-box .lbl { font-size: 12.5px; color: #a89f95; margin-top: 4px; }
+
+/* 表单 */
+label { display: block; font-size: 13px; color: #7a726a; margin: 12px 0 6px; font-weight: 600; }
+input, select, textarea {
+  width: 100%; padding: 11px 13px; border: 1.5px solid #ebe5de; border-radius: 11px;
+  font-size: 14px; outline: none; font-family: inherit; background: #faf7f2;
+}
+input:focus, textarea:focus { border-color: #c9a35c; box-shadow: 0 0 0 3px rgba(201,163,92,.14); background: #fff; }
+textarea { min-height: 70px; resize: vertical; }
+button { border: none; border-radius: 11px; padding: 11px 18px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all .15s; }
+button:active { transform: scale(.97); }
+.btn-primary { background: linear-gradient(135deg, #6d0f2b, #a3163f); color: #fff; box-shadow: 0 4px 12px rgba(109,15,43,.28); }
+.btn-primary:hover { opacity: .93; }
+.btn-ghost { background: #fff; border: 1.5px solid #ebe5de; color: #241d1b; }
+.btn-danger { background: #fce7ec; color: #b41845; }
+.btn-warn { background: #fef3c7; color: #92600a; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+.row > * { flex: 1; min-width: 130px; }
+
+/* 表格 */
+.table-wrap { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; font-size: 14px; }
-th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid #f0eeec; }
-th { color: #78716c; font-size: 12px; font-weight: 600; }
-.badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+th, td { text-align: left; padding: 12px 10px; border-bottom: 1px solid #f1ece5; white-space: nowrap; }
+th { color: #a89f95; font-size: 12px; font-weight: 600; }
+tr:hover td { background: #faf7f2; }
+.code-cell { font-family: ui-monospace, Consolas, monospace; font-weight: 700; letter-spacing: .5px; color: #6d0f2b; }
+.badge { display: inline-block; padding: 3px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
 .badge.active { background: #dcfce7; color: #15803d; }
-.badge.revoked { background: #fee2e2; color: #b91c2e; }
-.code-cell { font-family: ui-monospace, Consolas, monospace; font-weight: 700; letter-spacing: .5px; }
-.hint { font-size: 12px; color: #a8a29e; margin-top: 6px; line-height: 1.6; }
+.badge.revoked { background: #fce7ec; color: #b41845; }
+.tbl-btn { padding: 6px 12px; font-size: 12.5px; border-radius: 9px; }
+.tbl-btn + .tbl-btn { margin-left: 6px; }
+
+/* 生成结果 */
 .gen-result {
-  background: #f9fafb; border: 1.5px dashed #e7e5e4; border-radius: 10px;
-  padding: 14px; margin-top: 12px; font-family: ui-monospace, Consolas, monospace;
-  font-size: 18px; font-weight: 700; text-align: center; letter-spacing: 2px; color: #b91c2e;
+  background: #faf7f2; border: 1.5px dashed #c9a35c; border-radius: 12px;
+  padding: 16px; margin-top: 14px; font-family: ui-monospace, monospace;
+  font-size: 20px; font-weight: 700; text-align: center; letter-spacing: 3px; color: #6d0f2b;
   word-break: break-all;
 }
-.copy-btn { margin-top: 8px; }
-.msg { padding: 10px 14px; border-radius: 10px; margin-top: 12px; font-size: 13px; display: none; }
+.msg { padding: 11px 14px; border-radius: 10px; margin-top: 12px; font-size: 13px; display: none; }
 .msg.ok { display: block; background: #dcfce7; color: #15803d; }
-.msg.err { display: block; background: #fee2e2; color: #b91c2e; }
-.status-bar {
-  background: #fff; border: 1px solid #e7e5e4; border-radius: 12px;
-  padding: 12px 16px; margin-bottom: 16px; font-size: 13px; color: #78716c;
-  display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
-}
-.config-form { display: none; }
-.config-form.show { display: block; }
-.config-btn { background: #f5f5f4; border: 1.5px solid #e7e5e4; }
-.vers { font-family: ui-monospace, Consolas, monospace; }
+.msg.err { display: block; background: #fce7ec; color: #b41845; }
+.hint { font-size: 12px; color: #a89f95; margin-top: 6px; line-height: 1.7; }
+.fade-in { animation: fadeIn .3s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <h1>🖥️ 羊毛衫管家 · 电脑管理后台</h1>
-    <p>生成授权码、吊销授权、发布新版本 —— 管理员专用</p>
-  </header>
 
-  <!-- 状态栏 -->
-  <div class="status-bar">
-    <span id="status-text">未连接云服务</span>
-    <div class="row" style="flex:1;min-width:180px;justify-content:flex-end;margin:0">
-      <button class="config-btn" id="btn-reset">恢复内置配置</button>
-      <button class="config-btn" id="btn-config">配置云服务</button>
+<!-- 登录 -->
+<div id="login-mask">
+  <div class="login-card">
+    <div class="login-logo">🖥️</div>
+    <h1>羊毛衫管家 · 管理后台</h1>
+    <div class="sub">管理员登录后管理授权码与版本</div>
+    <input id="lg-user" placeholder="管理员账号" autocomplete="username">
+    <input id="lg-pass" type="password" placeholder="密码" autocomplete="current-password">
+    <button class="login-btn" id="lg-btn">登 录</button>
+    <div class="login-err" id="lg-err"></div>
+    <div class="login-hint">首次登录：admin / 123456<br>登录后请在「系统设置」里修改密码</div>
+  </div>
+</div>
+
+<div id="main" class="app hidden">
+  <nav class="navbar">
+    <div class="brand">
+      <div class="logo">🧥</div>
+      <div><h1>羊毛衫管家 · 管理后台</h1><small>生成授权码 · 吊销恢复删除 · 发布版本</small></div>
+    </div>
+    <div class="navbar-right">
+      <span class="status-pill" id="status-text"><span class="dot"></span>未连接云服务</span>
+      <button class="logout-btn" id="btn-logout">退出登录</button>
+    </div>
+  </nav>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="overview">📊 概览</button>
+    <button class="tab-btn" data-tab="licenses">🔑 授权码</button>
+    <button class="tab-btn" data-tab="versions">📦 版本</button>
+    <button class="tab-btn" data-tab="settings">⚙️ 系统设置</button>
+  </div>
+
+  <!-- 概览 -->
+  <div class="tab-page" id="page-overview">
+    <div class="stat-grid" id="overview-stats"></div>
+    <div class="card">
+      <h2>最新授权</h2>
+      <div id="overview-recent"></div>
     </div>
   </div>
 
-  <!-- 配置表单 -->
-  <div class="card config-form" id="config-form">
-    <h2>连接 Supabase</h2>
-    <label>Supabase URL</label>
-    <input id="cfg-url" placeholder="https://xxxx.supabase.co">
-    <label>Service Role Key（服务端密钥，仅电脑后台使用，切勿发给手机）</label>
-    <input id="cfg-key" type="password" placeholder="eyJhbGciOi...">
-    <div class="hint">在 Supabase 项目 → Settings → API 里找到。service_role key 有完全权限，请妥善保管。</div>
-    <div class="row" style="margin-top:14px">
-      <button class="btn-primary" id="cfg-save">保存并连接</button>
-      <button class="btn-ghost" id="cfg-cancel">取消</button>
+  <!-- 授权码 -->
+  <div class="tab-page hidden" id="page-licenses">
+    <div class="card">
+      <h2>生成授权码</h2>
+      <div class="grid">
+        <div>
+          <label>授权给（商家/店名）*</label>
+          <input id="lic-name" placeholder="如：老张羊毛衫">
+        </div>
+        <div>
+          <label>备注（可选）</label>
+          <input id="lic-note" placeholder="电话/地址/备注">
+        </div>
+      </div>
+      <button class="btn-primary" id="lic-generate" style="margin-top:14px">生成授权码</button>
+      <div class="gen-result hidden" id="lic-result"></div>
+      <button class="btn-ghost" id="lic-copy" style="margin-top:10px;display:none">复制授权码</button>
+      <div class="msg" id="lic-msg"></div>
     </div>
-    <div class="msg" id="cfg-msg"></div>
-  </div>
-
-  <!-- 生成授权码 -->
-  <div class="card">
-    <h2>🔑 生成授权码</h2>
-    <div class="grid">
-      <div>
-        <label>授权给（商家/店名）*</label>
-        <input id="lic-name" placeholder="如：老张羊毛衫">
-      </div>
-      <div>
-        <label>备注（可选）</label>
-        <input id="lic-note" placeholder="电话/地址/备注">
-      </div>
-    </div>
-    <button class="btn-primary" id="lic-generate" style="margin-top:14px">生成授权码</button>
-    <div class="gen-result" id="lic-result" style="display:none"></div>
-    <button class="btn-ghost copy-btn" id="lic-copy" style="display:none">复制授权码</button>
-    <div class="msg" id="lic-msg"></div>
-  </div>
-
-  <!-- 授权码列表 -->
-  <div class="card">
-    <h2>📋 授权码管理</h2>
-    <table>
-      <thead>
-        <tr><th>授权码</th><th>授权给</th><th>备注</th><th>激活次数</th><th>创建时间</th><th>状态</th><th>操作</th></tr>
-      </thead>
-      <tbody id="lic-table"><tr><td colspan="7" style="text-align:center;color:#a8a29e">暂无数据</td></tr></tbody>
-    </table>
-  </div>
-
-  <!-- 发布版本 -->
-  <div class="card">
-    <h2>📦 发布新版本</h2>
-    <div class="grid">
-      <div>
-        <label>版本号 *</label>
-        <input id="ver-num" placeholder="如：2.2">
-      </div>
-      <div>
-        <label>新版本文件地址 *</label>
-        <input id="ver-url" placeholder="https://.../knit-stock-single.html">
+    <div class="card">
+      <h2>授权码管理</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>授权码</th><th>授权给</th><th>备注</th><th>激活次数</th><th>创建时间</th><th>状态</th><th>操作</th></tr></thead>
+          <tbody id="lic-table"><tr><td colspan="7" style="text-align:center;color:#a89f95">加载中…</td></tr></tbody>
+        </table>
       </div>
     </div>
-    <label>更新说明（手机端会显示）</label>
-    <textarea id="ver-notes" placeholder="如：修复了盘点差异显示问题"></textarea>
-    <div class="hint">把新版 knit-stock-single.html 上传到任意可访问的地址（网盘直链、GitHub、你自己的服务器），把地址填在这里。手机端检测到版本号变化会提示更新。</div>
-    <button class="btn-primary" id="ver-publish" style="margin-top:14px">发布版本</button>
-    <div class="msg" id="ver-msg"></div>
-    <h2 style="margin-top:20px">版本历史</h2>
-    <table>
-      <thead><tr><th>版本号</th><th>说明</th><th>发布时间</th></tr></thead>
-      <tbody id="ver-table"><tr><td colspan="3" style="text-align:center;color:#a8a29e">暂无数据</td></tr></tbody>
-    </table>
   </div>
 
-  <!-- 使用说明 -->
-  <div class="card">
-    <h2>📖 使用说明</h2>
-    <div class="hint" style="font-size:13px;line-height:2">
-      1. <b>首次使用</b>：点击右上角"配置云服务"，填入 Supabase 项目 URL 和 service_role key（在 supabase.com 项目 Settings → API 中获取）<br>
-      2. <b>生成授权码</b>：填写商家名 → 点"生成授权码" → 复制发给商家<br>
-      3. <b>商家激活</b>：手机端注册登录后输入授权码即可使用；授权码不限制设备数和使用时间<br>
-      4. <b>吊销</b>：点商家行"吊销"，该授权码立即失效，商家手机端下次启动会提示授权被吊销<br>
-      5. <b>发布更新</b>：上传新版单文件到可访问地址 → 填版本号和地址 → 发布；商家手机端启动/点"检查更新"会收到提示<br>
-      6. <b>先执行 supabase-setup.sql</b>：在 Supabase SQL Editor 运行建表脚本（项目附带）
+  <!-- 版本 -->
+  <div class="tab-page hidden" id="page-versions">
+    <div class="card">
+      <h2>发布新版本</h2>
+      <div class="grid">
+        <div>
+          <label>版本号 *</label>
+          <input id="ver-num" placeholder="如：3.31">
+        </div>
+        <div>
+          <label>新版本文件地址 *</label>
+          <input id="ver-url" placeholder="https://.../yangmaoshan-mobile.html">
+        </div>
+      </div>
+      <label>更新说明（手机端公告会显示）</label>
+      <textarea id="ver-notes" placeholder="如：修复了XXX"></textarea>
+      <div class="hint">手机端以线上 version.json 为准自动更新，此处版本表主要作记录。</div>
+      <button class="btn-primary" id="ver-publish" style="margin-top:14px">发布版本</button>
+      <div class="msg" id="ver-msg"></div>
+    </div>
+    <div class="card">
+      <h2>版本历史</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>版本号</th><th>说明</th><th>发布时间</th></tr></thead>
+          <tbody id="ver-table"><tr><td colspan="3" style="text-align:center;color:#a89f95">加载中…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 系统设置 -->
+  <div class="tab-page hidden" id="page-settings">
+    <div class="card">
+      <h2>连接 Supabase</h2>
+      <label>Supabase URL</label>
+      <input id="cfg-url" placeholder="https://xxxx.supabase.co">
+      <label>Service Role Key（服务端密钥，切勿发给手机）</label>
+      <input id="cfg-key" type="password" placeholder="eyJhbGciOi...">
+      <div class="row">
+        <button class="btn-primary" id="cfg-save">保存并连接</button>
+        <button class="btn-ghost" id="cfg-cancel">取消</button>
+        <button class="btn-warn" id="btn-reset">恢复内置配置</button>
+      </div>
+      <div class="msg" id="cfg-msg"></div>
+    </div>
+    <div class="card">
+      <h2>修改管理员密码</h2>
+      <label>当前密码</label>
+      <input id="pw-old" type="password" placeholder="输入当前密码">
+      <label>新密码（至少 6 位）</label>
+      <input id="pw-new" type="password" placeholder="新密码">
+      <button class="btn-primary" id="pw-save" style="margin-top:14px">修改密码</button>
+      <div class="msg" id="pw-msg"></div>
+    </div>
+    <div class="card">
+      <h2>使用说明</h2>
+      <div class="hint" style="font-size:13px;line-height:2">
+        1. 生成授权码 → 发给商家 → 商家在手机端输入激活<br>
+        2. 吊销 = 该授权码立即失效；恢复 = 重新生效；删除 = 永久移除（不可恢复）<br>
+        3. 手机端更新以线上 version.json 为准，自动完成；此处版本表仅作记录<br>
+        4. 首次使用后台请先修改默认密码
+      </div>
     </div>
   </div>
 </div>
 
 <script>
-/* ============ 管理后台逻辑 ============ */
 const $ = (s) => document.querySelector(s);
+const $$ = (s) => Array.from(document.querySelectorAll(s));
 
+/* ============ 配置 ============ */
 let cfg = { url: "", key: "" };
 const SKEY = "knit-admin-cfg";
-
-/** 内置默认配置（管理后台专用 service_role key，仅此后台使用） */
 const BUILTIN = {
   url: "https://qdbwjkwhrftaovqbnxha.supabase.co",
   key: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkYndqa3docmZ0YW92cWJueGhhIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4Njk1MDc0OSwiZXhwIjoyMTAyNTI2NzQ5fQ._Ajl7V5nZ98vkz7G0U2AmHcoAip3Yq_cN9t9w4nfKX8"
@@ -188,53 +313,89 @@ const BUILTIN = {
 
 function loadCfg() {
   try { cfg = JSON.parse(localStorage.getItem(SKEY) || "{}"); } catch {}
-  // 未配置时用内置默认
-  if (!cfg.url || !cfg.key) {
-    cfg = { ...BUILTIN };
-    saveCfg();
-  }
-  updateStatus();
+  if (!cfg.url || !cfg.key) { cfg = { ...BUILTIN }; saveCfg(); }
 }
-function saveCfg() {
-  localStorage.setItem(SKEY, JSON.stringify(cfg));
-  updateStatus();
-}
+function saveCfg() { localStorage.setItem(SKEY, JSON.stringify(cfg)); updateStatus(); }
 function updateStatus() {
+  const el = $("#status-text");
   if (cfg.url && cfg.key) {
     const isBuiltin = cfg.url === BUILTIN.url && cfg.key === BUILTIN.key;
-    $("#status-text").textContent = "已连接：" + cfg.url.replace("https://", "").replace(".supabase.co", "") + (isBuiltin ? "（内置配置）" : "（自定义配置）");
-    $("#status-text").style.color = "#15803d";
+    el.innerHTML = '<span class="dot"></span>已连接：' + cfg.url.replace("https://", "").replace(".supabase.co", "") + (isBuiltin ? "（内置）" : "（自定义）");
+    el.classList.add("on");
   } else {
-    $("#status-text").textContent = "未连接云服务（点击右侧配置）";
-    $("#status-text").style.color = "#a8a29e";
+    el.innerHTML = '<span class="dot"></span>未连接云服务';
+    el.classList.remove("on");
   }
 }
-function showMsg(el, text, ok) {
-  el.textContent = text;
-  el.className = "msg " + (ok ? "ok" : "err");
+function showMsg(el, text, ok) { el.textContent = text; el.className = "msg " + (ok ? "ok" : "err"); }
+function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+
+/* ============ 登录 ============ */
+async function sha256(str) {
+  try {
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
+  } catch {
+    let h = 0x811c9dc5;
+    for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 0x01000193); }
+    return "h" + (h >>> 0).toString(16);
+  }
 }
-function esc(s) {
-  return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+const DEFAULT_USER = "admin";
+const DEFAULT_PASS = "123456";
+function loadPass() { try { return localStorage.getItem("knit-admin-pass") || ""; } catch { return ""; } }
+function loadUser() { try { return localStorage.getItem("knit-admin-user") || DEFAULT_USER; } catch { return DEFAULT_USER; } }
+
+async function doLogin() {
+  const u = $("#lg-user").value.trim();
+  const p = $("#lg-pass").value;
+  const err = $("#lg-err");
+  if (!u || !p) { err.textContent = "请输入账号和密码"; return; }
+  const stored = loadPass();
+  const hash = await sha256(p);
+  const ok = stored
+    ? (u === loadUser() && hash === stored)
+    : (u === DEFAULT_USER && p === DEFAULT_PASS); // 首次：默认账号密码
+  if (ok) {
+    if (!stored) {
+      try {
+        localStorage.setItem("knit-admin-pass", hash);
+        localStorage.setItem("knit-admin-user", u);
+      } catch {}
+    }
+    sessionStorage.setItem("knit-admin-login", "1");
+    err.textContent = "";
+    enterAdmin();
+  } else {
+    err.textContent = "账号或密码错误";
+  }
 }
 
+function enterAdmin() {
+  $("#login-mask").classList.add("hidden");
+  $("#main").classList.remove("hidden");
+  loadCfg();
+  loadLicenses();
+  loadVersions();
+  renderOverview();
+}
+function doLogout() {
+  sessionStorage.removeItem("knit-admin-login");
+  $("#main").classList.add("hidden");
+  $("#login-mask").classList.remove("hidden");
+  $("#lg-user").value = "";
+  $("#lg-pass").value = "";
+}
+
+/* ============ API ============ */
 async function api(path, opts = {}) {
-  if (!cfg.url || !cfg.key) throw new Error("未配置云服务，请点右上角\"配置云服务\"");
-  const headers = {
-    "Content-Type": "application/json",
-    "apikey": cfg.key,
-    ...(opts.headers || {})
-  };
-  // 新版 key（sb_ 开头）不是 JWT，不能放 Bearer；旧版 JWT 需要放
-  if (!String(cfg.key).startsWith("sb_")) {
-    headers["Authorization"] = "Bearer " + cfg.key;
-  }
+  if (!cfg.url || !cfg.key) throw new Error("未配置云服务");
+  const headers = { "Content-Type": "application/json", "apikey": cfg.key, ...(opts.headers || {}) };
+  if (!String(cfg.key).startsWith("sb_")) headers["Authorization"] = "Bearer " + cfg.key;
   const res = await fetch(cfg.url + path, { ...opts, headers });
   if (!res.ok) {
     const t = await res.text();
-    // 404 常见原因：表未建 / URL 配置错误，给清晰提示
-    if (res.status === 404) {
-      throw new Error("HTTP 404: 云端表不存在或URL配置错误。请确认已执行 supabase-setup.sql 建表脚本，且 URL 正确（" + cfg.url + "）");
-    }
+    if (res.status === 404) throw new Error("HTTP 404：表不存在或URL错误，请确认已执行建表脚本");
     throw new Error("HTTP " + res.status + ": " + t.slice(0, 200));
   }
   const ct = res.headers.get("content-type") || "";
@@ -242,49 +403,45 @@ async function api(path, opts = {}) {
 }
 
 function genCode() {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // 去掉易混的 I/O/0/1
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   const seg = () => Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
   return seg() + "-" + seg() + "-" + seg();
 }
 
+/* ============ 授权码 ============ */
 async function loadLicenses() {
   if (!cfg.url || !cfg.key) return;
+  const tb = $("#lic-table");
   try {
     const rows = await api("/rest/v1/licenses?select=*&order=created_at.desc");
     const activations = await api("/rest/v1/license_activations?select=license_code");
     const countMap = {};
     (activations || []).forEach((a) => { countMap[a.license_code] = (countMap[a.license_code] || 0) + 1; });
-    const tb = $("#lic-table");
     if (!rows || !rows.length) {
-      tb.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#a8a29e">暂无授权码，点上方生成</td></tr>';
-      return;
+      tb.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#a89f95">暂无授权码，去「授权码」页生成</td></tr>';
+    } else {
+      tb.innerHTML = rows.map((r) => `
+        <tr>
+          <td class="code-cell">${esc(r.code)}</td>
+          <td>${esc(r.name)}</td>
+          <td>${esc(r.note || "—")}</td>
+          <td>${countMap[r.code] || 0}</td>
+          <td>${new Date(r.created_at).toLocaleDateString("zh-CN")}</td>
+          <td>${r.revoked_at ? '<span class="badge revoked">已吊销</span>' : '<span class="badge active">有效</span>'}</td>
+          <td>
+            ${r.revoked_at
+              ? `<button class="btn-ghost tbl-btn" data-restore="${esc(r.code)}">恢复</button>`
+              : `<button class="btn-danger tbl-btn" data-revoke="${esc(r.code)}">吊销</button>`}
+            <button class="btn-danger tbl-btn" data-del="${esc(r.code)}">删除</button>
+          </td>
+        </tr>`).join("");
     }
-    tb.innerHTML = rows.map((r) => `
-      <tr>
-        <td class="code-cell">${esc(r.code)}</td>
-        <td>${esc(r.name)}</td>
-        <td>${esc(r.note || "—")}</td>
-        <td>${countMap[r.code] || 0}</td>
-        <td>${new Date(r.created_at).toLocaleDateString("zh-CN")}</td>
-        <td>${r.revoked_at ? '<span class="badge revoked">已吊销</span>' : '<span class="badge active">有效</span>'}</td>
-        <td>
-          ${r.revoked_at
-            ? `<button class="btn-ghost" data-restore="${esc(r.code)}">恢复</button>`
-            : `<button class="btn-danger" data-revoke="${esc(r.code)}">吊销</button>`}
-          <button class="btn-danger" data-del="${esc(r.code)}" style="margin-left:6px">删除</button>
-        </td>
-      </tr>`).join("");
-    $$("[data-revoke]").forEach((b) => {
-      b.onclick = () => revokeLicense(b.dataset.revoke);
-    });
-    $$("[data-restore]").forEach((b) => {
-      b.onclick = () => restoreLicense(b.dataset.restore);
-    });
-    $$("[data-del]").forEach((b) => {
-      b.onclick = () => deleteLicense(b.dataset.del);
-    });
+    $$("[data-revoke]").forEach((b) => { b.onclick = () => revokeLicense(b.dataset.revoke); });
+    $$("[data-restore]").forEach((b) => { b.onclick = () => restoreLicense(b.dataset.restore); });
+    $$("[data-del]").forEach((b) => { b.onclick = () => deleteLicense(b.dataset.del); });
+    renderOverview();
   } catch (e) {
-    $("#lic-table").innerHTML = `<tr><td colspan="7" style="text-align:center;color:#b91c2e">加载失败：${esc(e.message)}</td></tr>`;
+    tb.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#b41845">加载失败：${esc(e.message)}</td></tr>`;
   }
 }
 
@@ -292,74 +449,128 @@ async function revokeLicense(code) {
   if (!confirm("确定吊销授权码 " + code + " 吗？该商家的手机将立即失效。")) return;
   try {
     await api("/rest/v1/licenses?code=eq." + encodeURIComponent(code), {
-      method: "PATCH",
-      body: JSON.stringify({ revoked_at: new Date().toISOString() })
+      method: "PATCH", body: JSON.stringify({ revoked_at: new Date().toISOString() })
     });
     showMsg($("#lic-msg"), "已吊销 " + code, true);
     loadLicenses();
-  } catch (e) {
-    showMsg($("#lic-msg"), "操作失败：" + e.message, false);
-  }
+  } catch (e) { showMsg($("#lic-msg"), "操作失败：" + e.message, false); }
 }
 
+async function restoreLicense(code) {
+  if (!confirm("恢复授权码 " + code + " 吗？恢复后商家手机可重新使用。")) return;
+  try {
+    await api("/rest/v1/licenses?code=eq." + encodeURIComponent(code), {
+      method: "PATCH", body: JSON.stringify({ revoked_at: null })
+    });
+    showMsg($("#lic-msg"), "已恢复 " + code, true);
+    loadLicenses();
+  } catch (e) { showMsg($("#lic-msg"), "操作失败：" + e.message, false); }
+}
+
+async function deleteLicense(code) {
+  if (!confirm("永久删除授权码 " + code + " 吗？删除后不可恢复（激活记录也会清除）。")) return;
+  try {
+    await api("/rest/v1/licenses?code=eq." + encodeURIComponent(code), { method: "DELETE" });
+    try { await api("/rest/v1/license_activations?license_code=eq." + encodeURIComponent(code), { method: "DELETE" }); } catch {}
+    showMsg($("#lic-msg"), "已删除 " + code, true);
+    loadLicenses();
+  } catch (e) { showMsg($("#lic-msg"), "操作失败：" + e.message, false); }
+}
+
+/* ============ 版本 ============ */
 async function loadVersions() {
   if (!cfg.url || !cfg.key) return;
+  const tb = $("#ver-table");
   try {
     const rows = await api("/rest/v1/app_versions?select=*&order=created_at.desc");
-    const tb = $("#ver-table");
-    if (!rows || !rows.length) {
-      tb.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#a8a29e">暂无版本</td></tr>';
-      return;
-    }
-    tb.innerHTML = rows.map((r) => `
-      <tr>
-        <td class="vers">v${esc(r.version)}</td>
+    tb.innerHTML = (!rows || !rows.length)
+      ? '<tr><td colspan="3" style="text-align:center;color:#a89f95">暂无版本</td></tr>'
+      : rows.map((r) => `<tr>
+        <td class="code-cell">v${esc(r.version)}</td>
         <td>${esc(r.notes || "—")}</td>
         <td>${new Date(r.created_at).toLocaleString("zh-CN")}</td>
       </tr>`).join("");
   } catch (e) {
-    $("#ver-table").innerHTML = `<tr><td colspan="3" style="text-align:center;color:#b91c2e">加载失败：${esc(e.message)}</td></tr>`;
+    tb.innerHTML = `<tr><td colspan="3" style="text-align:center;color:#b41845">加载失败：${esc(e.message)}</td></tr>`;
+  }
+}
+
+/* ============ 概览 ============ */
+async function renderOverview() {
+  const box = $("#overview-stats");
+  if (!cfg.url || !cfg.key) { box.innerHTML = '<div class="card hint">请先连接云服务</div>'; return; }
+  try {
+    const lic = await api("/rest/v1/licenses?select=code,revoked_at,created_at");
+    const act = await api("/rest/v1/license_activations?select=license_code");
+    const sync = await api("/rest/v1/knit_sync?select=username");
+    const total = (lic || []).length;
+    const active = (lic || []).filter((r) => !r.revoked_at).length;
+    const revoked = total - active;
+    const users = (sync || []).length;
+    box.innerHTML = `
+      <div class="stat-box"><div class="num">${total}</div><div class="lbl">授权码总数</div></div>
+      <div class="stat-box"><div class="num">${active}</div><div class="lbl">有效授权</div></div>
+      <div class="stat-box"><div class="num">${revoked}</div><div class="lbl">已吊销</div></div>
+      <div class="stat-box"><div class="num">${(act || []).length}</div><div class="lbl">激活记录</div></div>
+      <div class="stat-box"><div class="num">${users}</div><div class="lbl">使用商家数</div></div>`;
+    const recent = $("#overview-recent");
+    if (!lic.length) { recent.innerHTML = '<div class="hint">还没有授权码，去「授权码」页生成</div>'; return; }
+    const sorted = lic.slice().sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 5);
+    recent.innerHTML = sorted.map((r) => `<div style="padding:8px 0;border-bottom:1px solid #f1ece5;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+      <span class="code-cell">${esc(r.code)}</span>
+      <span>${esc(r.name)} · ${r.revoked_at ? '<span class="badge revoked">已吊销</span>' : '<span class="badge active">有效</span>'}</span>
+    </div>`).join("");
+  } catch (e) {
+    box.innerHTML = '<div class="card"><div class="hint">概览加载失败：' + esc(e.message) + "</div></div>";
   }
 }
 
 /* ============ 事件 ============ */
-const $$ = (s) => Array.from(document.querySelectorAll(s));
+$("#lg-btn").onclick = doLogin;
+$("#lg-pass").addEventListener("keydown", (e) => { if (e.key === "Enter") doLogin(); });
+$("#lg-user").addEventListener("keydown", (e) => { if (e.key === "Enter") doLogin(); });
+$("#btn-logout").onclick = doLogout;
 
-$("#btn-config").onclick = () => {
-  const f = $("#config-form");
-  f.classList.toggle("show");
-  if (f.classList.contains("show")) {
-    $("#cfg-url").value = cfg.url || BUILTIN.url;
-    $("#cfg-key").value = cfg.key || BUILTIN.key;
-  }
-};
-// 恢复内置配置：清除浏览器里保存的旧连接（旧配置会导致授权码显示为空）
-$("#btn-reset").onclick = () => {
-  if (!confirm("恢复为内置默认连接？（会清除本机保存的旧配置）")) return;
-  localStorage.removeItem(SKEY);
-  cfg = { ...BUILTIN };
-  saveCfg();
-  loadLicenses();
-  loadVersions();
-  showMsg($("#cfg-msg"), "已恢复内置配置并重新连接 ✅", true);
-};
+$$(".tab-btn").forEach((b) => {
+  b.onclick = () => {
+    $$(".tab-btn").forEach((x) => x.classList.remove("active"));
+    b.classList.add("active");
+    $$(".tab-page").forEach((p) => p.classList.add("hidden"));
+    $("#page-" + b.dataset.tab).classList.remove("hidden");
+    if (b.dataset.tab === "overview") renderOverview();
+    if (b.dataset.tab === "licenses") loadLicenses();
+    if (b.dataset.tab === "versions") loadVersions();
+  };
+});
+
 $("#cfg-save").onclick = () => {
   const url = $("#cfg-url").value.trim().replace(/\/+$/, "");
   const key = $("#cfg-key").value.trim();
   if (!url || !key) return showMsg($("#cfg-msg"), "请填写 URL 和 key", false);
   cfg = { url, key };
   saveCfg();
-  $("#config-form").classList.remove("show");
   showMsg($("#cfg-msg"), "已保存并连接 ✅", true);
-  loadLicenses();
-  loadVersions();
+  loadLicenses(); loadVersions(); renderOverview();
 };
-$("#cfg-cancel").onclick = () => $("#config-form").classList.remove("show");
+$("#cfg-cancel").onclick = () => {
+  $("#cfg-url").value = cfg.url || BUILTIN.url;
+  $("#cfg-key").value = cfg.key || BUILTIN.key;
+};
+$("#btn-reset").onclick = () => {
+  if (!confirm("恢复为内置默认连接？（清除本机保存的旧配置）")) return;
+  localStorage.removeItem(SKEY);
+  cfg = { ...BUILTIN };
+  saveCfg();
+  $("#cfg-url").value = BUILTIN.url;
+  $("#cfg-key").value = BUILTIN.key;
+  loadLicenses(); loadVersions(); renderOverview();
+  showMsg($("#cfg-msg"), "已恢复内置配置并重新连接 ✅", true);
+};
 
 $("#lic-generate").onclick = async () => {
   const name = $("#lic-name").value.trim();
   if (!name) return showMsg($("#lic-msg"), "请填写授权对象", false);
-  if (!cfg.url || !cfg.key) return showMsg($("#lic-msg"), "请先配置云服务", false);
+  if (!cfg.url || !cfg.key) return showMsg($("#lic-msg"), "请先连接云服务", false);
   const code = genCode();
   try {
     await api("/rest/v1/licenses", {
@@ -367,20 +578,18 @@ $("#lic-generate").onclick = async () => {
       headers: { "Prefer": "return=minimal" },
       body: JSON.stringify({ code, name, note: $("#lic-note").value.trim() })
     });
-    $("#lic-result").textContent = code;
-    $("#lic-result").style.display = "block";
-    $("#lic-copy").style.display = "block";
+    const r = $("#lic-result");
+    r.textContent = code;
+    r.classList.remove("hidden");
+    $("#lic-copy").style.display = "inline-block";
     showMsg($("#lic-msg"), "授权码已生成 ✅", true);
     $("#lic-name").value = "";
     $("#lic-note").value = "";
     loadLicenses();
-  } catch (e) {
-    showMsg($("#lic-msg"), "生成失败：" + e.message, false);
-  }
+  } catch (e) { showMsg($("#lic-msg"), "生成失败：" + e.message, false); }
 };
 $("#lic-copy").onclick = () => {
-  const code = $("#lic-result").textContent;
-  navigator.clipboard.writeText(code).then(() => {
+  navigator.clipboard.writeText($("#lic-result").textContent).then(() => {
     $("#lic-copy").textContent = "已复制 ✅";
     setTimeout(() => { $("#lic-copy").textContent = "复制授权码"; }, 1500);
   });
@@ -390,24 +599,40 @@ $("#ver-publish").onclick = async () => {
   const version = $("#ver-num").value.trim();
   const url = $("#ver-url").value.trim();
   if (!version || !url) return showMsg($("#ver-msg"), "请填写版本号和文件地址", false);
-  if (!cfg.url || !cfg.key) return showMsg($("#ver-msg"), "请先配置云服务", false);
+  if (!cfg.url || !cfg.key) return showMsg($("#ver-msg"), "请先连接云服务", false);
   try {
     await api("/rest/v1/app_versions", {
       method: "POST",
       headers: { "Prefer": "resolution=merge-duplicates,return=minimal" },
       body: JSON.stringify({ version, url, notes: $("#ver-notes").value.trim() })
     });
-    showMsg($("#ver-msg"), "版本 v" + version + " 已发布 ✅ 手机端将检测到更新", true);
-    $("#ver-num").value = "";
-    $("#ver-url").value = "";
-    $("#ver-notes").value = "";
+    showMsg($("#ver-msg"), "版本 v" + version + " 已记录 ✅", true);
+    $("#ver-num").value = ""; $("#ver-url").value = ""; $("#ver-notes").value = "";
     loadVersions();
-  } catch (e) {
-    showMsg($("#ver-msg"), "发布失败：" + e.message, false);
-  }
+  } catch (e) { showMsg($("#ver-msg"), "发布失败：" + e.message, false); }
 };
 
+$("#pw-save").onclick = async () => {
+  const oldP = $("#pw-old").value;
+  const newP = $("#pw-new").value;
+  const err = $("#pw-msg");
+  if (newP.length < 6) return showMsg(err, "新密码至少 6 位", false);
+  const stored = loadPass();
+  if (stored && (await sha256(oldP)) !== stored) return showMsg(err, "当前密码错误", false);
+  if (!stored && oldP !== DEFAULT_PASS) return showMsg(err, "当前密码错误", false);
+  localStorage.setItem("knit-admin-pass", await sha256(newP));
+  localStorage.setItem("knit-admin-user", $("#lg-user").value.trim() || loadUser());
+  $("#pw-old").value = ""; $("#pw-new").value = "";
+  showMsg(err, "密码已修改 ✅", true);
+};
+
+/* ============ 启动 ============ */
 loadCfg();
+if (sessionStorage.getItem("knit-admin-login") === "1") {
+  enterAdmin();
+} else {
+  $("#login-mask").classList.remove("hidden");
+}
 </script>
 </body>
 </html>

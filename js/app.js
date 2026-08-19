@@ -125,6 +125,10 @@ function announceModal(versions) {
 
 /** 各版本更新公告（每次发布新版本时在此追加一条） */
 const CHANGELOG = {
+  "3.31": [
+    "订单自动编号：每天从 #20260818-001 开始排，卡片和详情都能看到",
+    "后台大升级：新增管理员登录（默认 admin/123456，可改密码）、网页式界面（概览/授权码/版本/设置）、刷新不丢数据、吊销恢复删除都能用了"
+  ],
   "3.30": [
     "高级配色升级：亮红改为酒红+香槟金+暖象牙白，头部金线、统计数字金红渐变，整体更有质感"
   ],
@@ -560,6 +564,13 @@ async function reloadAll() {
 }
 
 /* ================= 今日概览 ================= */
+
+/** 订单编号：当天序号，如 20260818-001 */
+function nextOrderNo() {
+  const key = todayStr().replace(/-/g, "");
+  const count = ordersCache.filter((o) => isToday(o.createdAt)).length + 1;
+  return `${key}-${String(count).padStart(3, "0")}`;
+}
 
 function orderTotal(o) {
   return (o.lines || []).reduce((s, l) => s + (l.qty * l.price), 0);
@@ -2412,6 +2423,7 @@ async function saveQuickOrder(continueNext) {
   }
   const total = validLines.reduce((s, l) => s + l.qty * l.price, 0);
   await Store.saveOrder({
+    orderNo: nextOrderNo(),
     customer: customerName,
     phone,
     address,
@@ -2507,6 +2519,7 @@ async function doImport() {
       }
     }
     await Store.saveOrder({
+      orderNo: nextOrderNo(),
       customer: r.customer,
       phone: r.phone,
       address: r.address,
@@ -2615,6 +2628,7 @@ function renderOrders() {
         <div style="flex:1;min-width:0">
           <div class="order-head">
             <span class="order-customer">${escapeHtml(o.customer)}</span>
+            <span class="order-no">#${escapeHtml(o.orderNo || "")}</span>
             <span class="order-status ${o.status}">${o.status === "done" ? "已完成" : o.status === "cancelled" ? "已取消" : "未完成"}</span>
           </div>
           <div class="list-tags" style="margin-bottom:4px">${typeBadge}${shipBadge}</div>
@@ -2840,6 +2854,7 @@ async function openOrderDetail(id) {
         <span class="order-status ${o.status}">${o.status === "done" ? "已完成" : o.status === "cancelled" ? "已取消" : "未完成"}</span>
       </div>
       ${typeRow}
+      <div class="detail-color-row"><span>订单编号</span><span class="v">#${escapeHtml(o.orderNo || "—")}</span></div>
       <div class="detail-color-row"><span>电话</span><span class="v">${escapeHtml(o.phone || "—")}</span></div>
       <div class="detail-color-row"><span>创建时间</span><span class="v">${timeStr(o.createdAt)}</span></div>
       ${o.doneAt ? `<div class="detail-color-row"><span>完成时间</span><span class="v">${timeStr(o.doneAt)}</span></div>` : ""}
@@ -3274,6 +3289,7 @@ async function saveOrder() {
     }
   }
   const order = {
+    orderNo: nextOrderNo(),
     customer,
     phone,
     address,
