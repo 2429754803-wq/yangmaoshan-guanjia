@@ -125,6 +125,10 @@ function announceModal(versions) {
 
 /** 各版本更新公告（每次发布新版本时在此追加一条） */
 const CHANGELOG = {
+  "3.16": [
+    "去掉「线上爆款速查」入口（保留我的畅销款和行业风向）",
+    "开单修复：颜色改为下拉选择现有颜色（显示库存），没选颜色或库存不足会拦截不能保存"
+  ],
   "3.15": [
     "爆款速查升级：优先直接打开本机已安装的淘宝/小红书 App，没装则自动回退网页版"
   ],
@@ -1959,6 +1963,14 @@ function updateQuickCustomerInfo() {
   }
 }
 
+/** 款式的颜色下拉选项（带库存显示） */
+function colorOptionsHtml(itemId, selected) {
+  const it = itemsCache.find((x) => x.id === itemId);
+  const cs = (it && it.colors) ? it.colors : [];
+  return `<option value="">— 选择颜色 —</option>` + cs.map((c) =>
+    `<option value="${escapeHtml(c.name)}" ${c.name === selected ? "selected" : ""}>${escapeHtml(c.name)}（${c.stock} 件）</option>`).join("");
+}
+
 function renderQuickLines() {
   const el = $("#qo-lines");
   if (!quickLines.length) {
@@ -1971,7 +1983,7 @@ function renderQuickLines() {
         <select class="input ol-item" data-i="${i}">
           ${itemsCache.map((it) => `<option value="${it.id}" ${it.id === l.itemId ? "selected" : ""}>${escapeHtml(it.name)}</option>`).join("")}
         </select>
-        <input class="input ol-color" data-i="${i}" placeholder="颜色" value="${escapeHtml(l.color)}">
+        <select class="input ol-color" data-i="${i}">${colorOptionsHtml(l.itemId, l.color)}</select>
       </div>
       <div class="ol-row">
         <div class="unit-wrap"><input class="input ol-qty" data-i="${i}" type="number" inputmode="numeric" min="1" value="${l.qty}"><span class="unit">件</span></div>
@@ -1986,19 +1998,13 @@ function renderQuickLines() {
       if (it) {
         quickLines[Number(sel.dataset.i)].itemName = it.name;
         quickLines[Number(sel.dataset.i)].price = it.price;
+        quickLines[Number(sel.dataset.i)].color = "";
         renderQuickLines();
       }
     };
   });
-  $$("#qo-lines .ol-color").forEach((inp) => {
-    inp.oninput = () => { quickLines[Number(inp.dataset.i)].color = inp.value; };
-    inp.onblur = () => {
-      // 红 -> 红色 自动补全为标准颜色名
-      const l = quickLines[Number(inp.dataset.i)];
-      const it = itemsCache.find((x) => x.id === l.itemId);
-      const c = findColor(it, l.color);
-      if (c && c.name !== l.color) { l.color = c.name; inp.value = c.name; }
-    };
+  $$("#qo-lines .ol-color").forEach((sel) => {
+    sel.onchange = () => { quickLines[Number(sel.dataset.i)].color = sel.value; };
   });
   $$("#qo-lines .ol-qty").forEach((inp) => {
     inp.oninput = () => { quickLines[Number(inp.dataset.i)].qty = Number(inp.value) || 1; };
@@ -2159,13 +2165,15 @@ async function saveQuickOrder(continueNext) {
   }
   const validLines = quickLines.filter((l) => l.itemId && l.qty >= 1);
   if (!validLines.length) return toast("请至少添加一件商品");
-  // 扣库存
+  // 开单前严格校验：必须选颜色 + 库存足够
   for (const l of validLines) {
     const it = itemsCache.find((x) => x.id === l.itemId);
     if (!it) continue;
+    if (!l.color) return toast(`「${it.name}」请选择颜色`);
     const color = findColor(it, l.color);
-    if (color && color.stock < l.qty) {
-      return toast(`「${it.name}」${l.color ? "(" + l.color + ")" : ""} 库存不足（当前 ${color.stock} 件）`);
+    if (!color) return toast(`「${it.name}」颜色「${l.color}」不存在`);
+    if (color.stock < l.qty) {
+      return toast(`「${it.name}」${l.color} 库存不足（当前 ${color.stock} 件，需要 ${l.qty} 件）`);
     }
   }
   for (const l of validLines) {
@@ -2928,7 +2936,7 @@ function renderOrderLines() {
         <select class="input ol-item" data-i="${i}">
           ${itemsCache.map((it) => `<option value="${it.id}" ${it.id === l.itemId ? "selected" : ""}>${escapeHtml(it.name)}</option>`).join("")}
         </select>
-        <input class="input ol-color" data-i="${i}" placeholder="颜色" value="${escapeHtml(l.color)}">
+        <select class="input ol-color" data-i="${i}">${colorOptionsHtml(l.itemId, l.color)}</select>
       </div>
       <div class="ol-row">
         <div class="unit-wrap"><input class="input ol-qty" data-i="${i}" type="number" inputmode="numeric" min="1" value="${l.qty}" placeholder="数量"><span class="unit">件</span></div>
@@ -2943,12 +2951,13 @@ function renderOrderLines() {
       if (it) {
         editingLines[Number(sel.dataset.i)].itemName = it.name;
         editingLines[Number(sel.dataset.i)].price = it.price;
+        editingLines[Number(sel.dataset.i)].color = "";
         renderOrderLines();
       }
     };
   });
-  $$("#oe-lines .ol-color").forEach((inp) => {
-    inp.oninput = () => { editingLines[Number(inp.dataset.i)].color = inp.value; };
+  $$("#oe-lines .ol-color").forEach((sel) => {
+    sel.onchange = () => { editingLines[Number(sel.dataset.i)].color = sel.value; };
   });
   $$("#oe-lines .ol-qty").forEach((inp) => {
     inp.oninput = () => { editingLines[Number(inp.dataset.i)].qty = Number(inp.value) || 1; };
@@ -2987,12 +2996,15 @@ async function saveOrder() {
   if (!customer) return toast("请填写客户姓名");
   const validLines = editingLines.filter((l) => l.itemId && l.qty >= 1);
   if (!validLines.length) return toast("请至少添加一件商品");
+  // 开单前严格校验：必须选颜色 + 库存足够
   for (const l of validLines) {
     const it = itemsCache.find((x) => x.id === l.itemId);
     if (!it) continue;
+    if (!l.color) return toast(`「${it.name}」请选择颜色`);
     const color = findColor(it, l.color);
-    if (color && color.stock < l.qty) {
-      return toast(`「${it.name}」${l.color ? "(" + l.color + ")" : ""} 库存不足（当前 ${color.stock} 件）`);
+    if (!color) return toast(`「${it.name}」颜色「${l.color}」不存在`);
+    if (color.stock < l.qty) {
+      return toast(`「${it.name}」${l.color} 库存不足（当前 ${color.stock} 件，需要 ${l.qty} 件）`);
     }
   }
   for (const l of validLines) {
@@ -3327,38 +3339,6 @@ function renderStats() {
 }
 
 /* ================= 爆款推荐 ================= */
-
-/** 跳转到电商/社区搜索看爆款：优先拉起本机已安装的 App，失败自动回退网页版 */
-function jumpToSearch(platform) {
-  const kw = encodeURIComponent(($("#trend-keyword").value.trim() || "羊毛衫"));
-  const web = platform === "tb"
-    ? "https://s.taobao.com/search?q=" + kw
-    : "https://www.xiaohongshu.com/search_result?keyword=" + kw;
-  // 淘宝 / 小红书的 App URL Scheme（拉起本机 App）
-  const scheme = platform === "tb"
-    ? "taobao://s.taobao.com/search?q=" + kw
-    : "xhsdiscover://search_result?keyword=" + kw;
-  let opened = false;
-  const mark = () => { opened = true; };
-  window.addEventListener("blur", mark, { once: true });
-  document.addEventListener("visibilitychange", () => { if (document.hidden) mark(); }, { once: true });
-  try {
-    // 用隐藏 iframe 触发 Scheme；若页面没有失焦（App 没打开），1.2 秒后网页兜底
-    const iframe = document.createElement("iframe");
-    iframe.style.cssText = "display:none;width:0;height:0;border:0";
-    iframe.src = scheme;
-    document.body.appendChild(iframe);
-    setTimeout(() => {
-      try { iframe.remove(); } catch {}
-      if (!opened) {
-        toast("本机没装对应 App，已打开网页版");
-        window.open(web, "_blank");
-      }
-    }, 1200);
-  } catch (e) {
-    window.open(web, "_blank");
-  }
-}
 
 /** 行业风向参考（羊毛衫市场常见热门，可后续联网更新） */
 const INDUSTRY_TRENDS = [
@@ -3997,9 +3977,7 @@ function bindEvents() {
   $("#rp-week").onclick = () => openReport("week");
   $("#rp-month").onclick = () => openReport("month");
 
-  // 线上爆款速查（跳转淘宝/小红书）
-  $("#trend-tb").onclick = () => jumpToSearch("tb");
-  $("#trend-xhs").onclick = () => jumpToSearch("xhs");
+  // 线上爆款速查已移除
 
   // 订单编辑
   $("#oe-save").onclick = saveOrder;
